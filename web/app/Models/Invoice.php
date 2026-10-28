@@ -15,7 +15,7 @@ class Invoice extends Model
 
     protected function casts(): array
     {
-        return ['total_minor' => 'integer', 'paid_minor' => 'integer', 'version' => 'integer', 'issued_at' => 'immutable_datetime', 'cancelled_at' => 'immutable_datetime'];
+        return ['issuer_details' => 'array', 'total_minor' => 'integer', 'paid_minor' => 'integer', 'version' => 'integer', 'issued_at' => 'immutable_datetime', 'cancelled_at' => 'immutable_datetime'];
     }
 
     public function lines(): HasMany

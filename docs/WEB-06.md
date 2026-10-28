@@ -29,7 +29,7 @@ Les droits sont vérifiés sur chaque route et revérifiés dans la transaction 
 
 ## Devise et montants
 
-`CLINIC_CURRENCY=XOF` définit la devise des nouveaux actes et nouvelles factures. Les devises prises en charge sont XOF avec zéro décimale, EUR et USD avec deux décimales. Il n’existe aucune conversion entre devises.
+`CLINIC_CURRENCY=XOF` définit la devise initiale des nouveaux actes et nouvelles factures. Les paramètres enregistrés dans [WEB-08](WEB-08.md) prennent ensuite priorité. Les devises prises en charge sont XOF avec zéro décimale, EUR et USD avec deux décimales. Il n’existe aucune conversion entre devises.
 
 Les entrées monétaires sont des chaînes en unités principales, sans séparateur de milliers : `5000` pour XOF, `12.50` ou `12,50` pour EUR/USD. Les nombres négatifs, zéro, la notation exponentielle et les décimales excédentaires sont refusés.
 

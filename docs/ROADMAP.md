@@ -15,12 +15,13 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 - Dossier médical par médecin auteur, informations versionnées, documents privés chiffrés et journal des accès (voir [WEB-05](WEB-05.md)).
 - Catalogue, factures versionnées, encaissements partiels, reçus imprimables et annulations tracées (voir [WEB-06](WEB-06.md)).
 - Fiches professionnelles liées aux comptes, fonctions et spécialités, absences intégrées au planning et historique administratif (voir [WEB-07](WEB-07.md)).
+- Tableau de bord selon les rôles, périodes, paramètres d’établissement et exports statistiques agrégés journalisés (voir [WEB-08](WEB-08.md)).
 - Socle Flutter Android/iOS avec écran de présentation, sans connexion serveur.
 - Tests d’authentification, de validation et de refus d’accès ; vérifications automatiques.
 
 ## Prochain incrément
 
-Développer les indicateurs administratifs et les paramètres de l’établissement (WEB-08). Les comptes, fiches professionnelles et absences sont disponibles dans WEB-01 et WEB-07.
+Préparer l’API mobile et les parcours Flutter, en parallèle des exigences d’exploitation restantes : livraison SMTP réelle, sauvegardes et restauration, protections des données existantes, traitement des fichiers et politique de conservation. Les huit incréments web de base sont implémentés ; la préparation à la production reste distincte.
 
 ## Incréments suivants
 

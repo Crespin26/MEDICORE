@@ -7,6 +7,7 @@ use App\Models\DoctorAvailability;
 use App\Models\StaffAbsence;
 use App\Models\User;
 use App\Services\AppointmentScheduler;
+use App\Support\ClinicHours;
 use App\Support\ClinicTime;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
@@ -49,6 +50,7 @@ class DoctorAvailabilityController extends Controller
             if (StaffAbsence::where('user_id', $doctor->id)->where('status', 'active')->where('starts_at', '<', $end)->where('ends_at', '>', $start)->exists()) {
                 throw ValidationException::withMessages(['starts_at' => 'Cette plage chevauche une absence active du médecin.']);
             }
+            ClinicHours::assertOpen($start, $end);
             if (DoctorAvailability::where('doctor_id', $doctor->id)->where('starts_at', '<', $end)->where('ends_at', '>', $start)->exists()) {
                 throw ValidationException::withMessages(['starts_at' => 'Une disponibilité couvre déjà tout ou partie de ce créneau.']);
             }

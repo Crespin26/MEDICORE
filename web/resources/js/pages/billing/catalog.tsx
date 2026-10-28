@@ -8,6 +8,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 function CatalogForm({ currency, service, onDone }: { currency: string; service?: Service; onDone: () => void }) {
     const form = useForm({
+        currency: service?.currency ?? currency,
         code: service?.code ?? '',
         name: service?.name ?? '',
         price: service ? major(service.price_minor, service.currency) : '',

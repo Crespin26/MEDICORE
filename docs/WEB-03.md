@@ -30,7 +30,7 @@ Les filtres envoyés par le navigateur ne peuvent pas élargir l’agenda d’un
 - Les plages doivent commencer dans le futur ; la fin doit suivre le début le même jour local. Pour une plage passant minuit, déclarer les journées séparément ; les rendez-vous passant minuit ne sont pas pris en charge dans cette version.
 - Les horaires inexistants ou ambigus lors d’un changement d’heure sont refusés explicitement.
 - Les disponibilités sont datées. Il n’y a pas de récurrence hebdomadaire. Les absences datées sont gérées dans [WEB-07](WEB-07.md) et bloquent les réservations.
-- Une réservation doit être entièrement comprise dans une seule disponibilité. Deux disponibilités contiguës ne sont pas fusionnées automatiquement.
+- Les horaires d’établissement peuvent aussi limiter les nouveaux créneaux (voir [WEB-08](WEB-08.md)). Une réservation doit être entièrement comprise dans une seule disponibilité. Deux disponibilités contiguës ne sont pas fusionnées automatiquement.
 - Deux disponibilités d’un même médecin ne peuvent pas se chevaucher. Pour corriger une plage non utilisée, la retirer puis la recréer.
 - Une disponibilité avec rendez-vous prévu, confirmé ou arrivé ne peut pas être retirée : déplacer ou annuler ces rendez-vous d’abord.
 

@@ -12,6 +12,7 @@ const mainNavItems: NavItem[] = [
         url: '/dashboard',
         icon: LayoutGrid,
     },
+    { title: 'Établissement', url: '/administration/settings', icon: Users },
     { title: 'Personnel', url: '/personnel', icon: Users },
     { title: 'Mon profil professionnel', url: '/personnel/me', icon: Users },
     { title: 'Facturation', url: '/billing', icon: Users },
@@ -31,6 +32,7 @@ export function AppSidebar() {
         '/consultations': 'consultations.view',
         '/billing': 'billing.view',
         '/personnel': 'personnel.manage',
+        '/administration/settings': 'administration.manage',
         '/personnel/me': 'personnel.self',
     };
     const items = mainNavItems.filter((item) => auth.permissions.includes(permissions[item.url]));

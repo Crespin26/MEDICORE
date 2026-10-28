@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Models\AdministrationExport;
 use App\Models\Appointment;
 use App\Models\BillingEvent;
+use App\Models\ClinicSettingEvent;
 use App\Models\Consultation;
 use App\Models\DoctorAvailability;
 use App\Models\Invoice;
@@ -67,6 +69,9 @@ class ProfileController extends Controller
             throw ValidationException::withMessages(['password' => 'Un compte administrateur ne peut pas être supprimé depuis cet écran.']);
         }
 
+        if (AdministrationExport::where('actor_id', $user->id)->exists() || ClinicSettingEvent::where('actor_id', $user->id)->exists()) {
+            throw ValidationException::withMessages(['password' => 'Ce compte est référencé dans l’historique administratif. Contactez un administrateur pour le suspendre.']);
+        }
         if (ProfessionalProfile::where('user_id', $user->id)->exists() || StaffAbsence::where('user_id', $user->id)->exists() || PersonnelEvent::where(fn ($query) => $query->where('user_id', $user->id)->orWhere('actor_id', $user->id))->exists()) {
             throw ValidationException::withMessages(['password' => 'Ce compte possède un dossier professionnel. Contactez un administrateur pour le suspendre.']);
         }

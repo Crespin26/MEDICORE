@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BillableService;
 use App\Models\BillingEvent;
+use App\Models\ClinicSetting;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\Patient;
@@ -50,7 +51,7 @@ class BillingController extends Controller
 
     public function store(Request $request, BillingService $service)
     {
-        $data = $request->validate(['patient_id' => ['required', 'integer', 'exists:patients,id'], 'token' => ['required', 'uuid']]);
+        $data = $request->validate(['patient_id' => ['required', 'integer', 'exists:patients,id'], 'token' => ['required', 'uuid'], 'currency' => ['nullable', Rule::in(array_keys(Money::SCALES))]]);
         $invoice = $service->create($request->user(), [...$data, ...$this->lines($request)]);
 
         return to_route('billing.show', $invoice)->with('status', 'Brouillon enregistré.');
@@ -89,7 +90,7 @@ class BillingController extends Controller
 
     public function pay(Request $request, Invoice $invoice, BillingService $service)
     {
-        $data = $request->validate(['amount' => ['required', 'string', 'max:32'], 'token' => ['required', 'uuid'], 'method' => ['required', 'in:cash,transfer,card'], 'reference' => ['nullable', 'string', 'max:100']]);
+        $data = $request->validate(['amount' => ['required', 'string', 'max:32'], 'token' => ['required', 'uuid'], 'currency' => ['nullable', Rule::in(array_keys(Money::SCALES))], 'method' => ['required', 'in:cash,transfer,card'], 'reference' => ['nullable', 'string', 'max:100']]);
         $payment = $service->pay($request->user(), $invoice->id, $data);
 
         return to_route('billing.show', $invoice)->with('status', $payment->voided_at ? 'Cette demande correspond à un paiement déjà annulé. Aucune nouvelle écriture créée.' : 'Paiement enregistré — reçu '.$payment->receipt_number.'.');
@@ -124,7 +125,7 @@ class BillingController extends Controller
 
     public function saveService(Request $request, BillingService $billing, ?BillableService $service = null)
     {
-        $data = $request->validate(['code' => ['required', 'string', 'max:40', 'regex:/^[A-Z0-9_-]+$/', Rule::unique('billable_services', 'code')->ignore($service?->id)], 'name' => ['required', 'string', 'max:255'], 'price' => ['required', 'string', 'max:32'], 'active' => ['required', 'boolean'], 'version' => [$service ? 'required' : 'nullable', 'integer', 'min:1'], 'reason' => [$service ? 'required' : 'nullable', 'string', 'max:1000']]);
+        $data = $request->validate(['code' => ['required', 'string', 'max:40', 'regex:/^[A-Z0-9_-]+$/', Rule::unique('billable_services', 'code')->ignore($service?->id)], 'name' => ['required', 'string', 'max:255'], 'price' => ['required', 'string', 'max:32'], 'currency' => ['nullable', Rule::in(array_keys(Money::SCALES))], 'active' => ['required', 'boolean'], 'version' => [$service ? 'required' : 'nullable', 'integer', 'min:1'], 'reason' => [$service ? 'required' : 'nullable', 'string', 'max:1000']]);
         $billing->transaction($request->user(), 'catalog.manage', function ($actor) use ($billing, $data, $service) {
             $item = $service ? BillableService::whereKey($service->id)->lockForUpdate()->firstOrFail() : new BillableService;
             if ($service && $item->version !== (int) $data['version']) {
@@ -133,7 +134,12 @@ class BillingController extends Controller
             if (BillableService::where('code', $data['code'])->when($service, fn ($query) => $query->whereKeyNot($service->id))->exists()) {
                 throw ValidationException::withMessages(['code' => 'Ce code existe déjà.']);
             }
-            $item->currency ??= config('clinic.currency');
+            $setting = ClinicSetting::whereKey(1)->lockForUpdate()->firstOrFail();
+            $currency = $setting->currency ?? config('clinic.currency');
+            if (! $service && isset($data['currency']) && $data['currency'] !== $currency) {
+                throw ValidationException::withMessages(['price' => 'La devise de l’établissement a changé. Rechargez le formulaire.']);
+            }
+            $item->currency ??= $currency;
             $item->code = $data['code'];
             $item->name = $data['name'];
             $item->price_minor = Money::minor($data['price'], $item->currency, 'price');

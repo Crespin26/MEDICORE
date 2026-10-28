@@ -1,24 +1,21 @@
 <?php
 
+use App\Http\Controllers\AdministrationController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoctorAvailabilityController;
 use App\Http\Controllers\MedicalDocumentController;
 use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\StaffController;
-use App\Models\Patient;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::redirect('/', '/login')->name('home');
 Route::middleware('auth')->group(function () {
-    Route::get('dashboard', fn (Request $request) => Inertia::render('dashboard', [
-        'patientCount' => $request->user()->can('patients.view') ? Patient::count() : null,
-    ]))->middleware('can:dashboard.view')->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->middleware('can:dashboard.view')->name('dashboard');
     Route::get('patients', [PatientController::class, 'index'])->middleware('can:patients.view')->name('patients.index');
     Route::get('patients/{patient}', [PatientController::class, 'show'])->middleware('can:patients.view')->name('patients.show');
     Route::post('patients', [PatientController::class, 'store'])->middleware('can:patients.write')->name('patients.store');
@@ -81,6 +78,14 @@ Route::middleware('auth')->group(function () {
         Route::patch('personnel/{user}', [PersonnelController::class, 'update'])->name('personnel.update');
         Route::post('personnel/{user}/absences', [PersonnelController::class, 'absence'])->name('personnel.absences.store');
         Route::post('personnel/{user}/absences/{absence}/cancel', [PersonnelController::class, 'cancel'])->name('personnel.absences.cancel');
+    });
+    Route::middleware('can:administration.manage')->group(function () {
+        Route::get('administration/settings', [AdministrationController::class, 'settings'])->name('administration.settings');
+        Route::patch('administration/settings', [AdministrationController::class, 'update'])->name('administration.settings.update');
+    });
+    Route::middleware('can:administration.export')->group(function () {
+        Route::post('administration/exports', [AdministrationController::class, 'export'])->middleware('throttle:5,1')->name('administration.export');
+        Route::get('administration/exports', [AdministrationController::class, 'exports'])->name('administration.exports');
     });
     Route::middleware('can:users.manage')->group(function () {
         Route::get('staff', [StaffController::class, 'index'])->name('staff.index');

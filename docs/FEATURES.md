@@ -91,10 +91,12 @@ Voir le [guide WEB-07](WEB-07.md) pour les profils, les absences et leur interac
 ### WEB-08 — Tableau de bord et administration
 
 - [x] Afficher le nombre réel de patients enregistrés.
-- [ ] Afficher les rendez-vous du jour, consultations et paiements selon le rôle.
-- [ ] Ajouter les filtres de période et les états vides.
-- [ ] Configurer les coordonnées, horaires et devise de l’établissement.
-- [ ] Autoriser les exports uniquement selon une politique définie et les tracer.
+- [x] Afficher les rendez-vous du jour, consultations et paiements selon le rôle.
+- [x] Ajouter les filtres de période et les états vides.
+- [x] Configurer les coordonnées, horaires et devise de l’établissement.
+- [x] Autoriser les exports uniquement selon une politique définie et les tracer.
+
+Voir le [guide WEB-08](WEB-08.md) pour les définitions des indicateurs, les paramètres et la politique d’export agrégé.
 
 ## 2. Version mobile — Flutter Android/iOS
 

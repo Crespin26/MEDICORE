@@ -114,6 +114,7 @@ export function InvoiceForm({
 }) {
     const [patientLabel, setPatientLabel] = useState('');
     const form = useForm({
+        currency,
         patient_id: invoice ? String(invoice.patient_id) : '',
         token: crypto.randomUUID(),
         version: invoice?.version ?? 1,
@@ -145,6 +146,7 @@ export function InvoiceForm({
             )}
             <InputError message={form.errors.patient_id} />
             <InputError message={form.errors.token} />
+            <InputError message={form.errors.currency} />
             <InputError message={form.errors.version} />
             <InputError message={form.errors.lines} />
             {form.data.lines.map((line, index) => (

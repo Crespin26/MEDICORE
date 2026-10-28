@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BillableService;
 use App\Models\BillingEvent;
+use App\Models\ClinicSetting;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\Patient;
@@ -68,9 +69,10 @@ class BillingService
     public function create(User $actor, array $data): Invoice
     {
         return $this->transaction($actor, 'billing.manage', function ($actor) use ($data) {
-            $currency = config('clinic.currency');
+            $setting = ClinicSetting::whereKey(1)->lockForUpdate()->firstOrFail();
+            $currency = $setting->currency ?? config('clinic.currency');
             abort_unless(isset(Money::SCALES[$currency]), 422, 'Devise non prise en charge.');
-            $fingerprint = hash('sha256', json_encode(['patient_id' => (int) $data['patient_id'], 'lines' => array_map(fn ($line) => [(int) $line['service_id'], (int) $line['quantity']], $data['lines'])]));
+            $fingerprint = hash('sha256', json_encode(['patient_id' => (int) $data['patient_id'], 'currency' => $data['currency'] ?? null, 'lines' => array_map(fn ($line) => [(int) $line['service_id'], (int) $line['quantity']], $data['lines'])]));
             $existing = Invoice::where('create_token', $data['token'])->first();
             if ($existing) {
                 if ($existing->created_by !== $actor->id || $existing->request_fingerprint !== $fingerprint) {
@@ -78,6 +80,9 @@ class BillingService
                 }
 
                 return $existing;
+            }
+            if (isset($data['currency']) && $data['currency'] !== $currency) {
+                throw ValidationException::withMessages(['currency' => 'La devise de l’établissement a changé. Rechargez le formulaire.']);
             }
             [$lines, $total] = $this->lines($data['lines'], $currency);
             $patient = Patient::findOrFail($data['patient_id']);
@@ -127,6 +132,8 @@ class BillingService
                 return $invoice;
             }
             $this->version($invoice, $version);
+            $issuer = ClinicSetting::whereKey(1)->lockForUpdate()->firstOrFail();
+            $invoice->issuer_details = $issuer->only('name', 'phone', 'email', 'address');
             $invoice->number = $this->number('invoice');
             $invoice->status = 'issued';
             $invoice->issued_at = now();

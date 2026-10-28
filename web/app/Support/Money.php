@@ -29,7 +29,9 @@ class Money
     public static function format(int $minor, string $currency): string
     {
         $scale = self::SCALES[$currency];
+        $sign = $minor < 0 ? '-' : '';
+        $minor = abs($minor);
 
-        return $scale === 0 ? $minor.' '.$currency : intdiv($minor, 100).','.str_pad((string) ($minor % 100), 2, '0', STR_PAD_LEFT).' '.$currency;
+        return $scale === 0 ? $sign.$minor.' '.$currency : $sign.intdiv($minor, 100).','.str_pad((string) ($minor % 100), 2, '0', STR_PAD_LEFT).' '.$currency;
     }
 }
