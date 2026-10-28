@@ -26,11 +26,13 @@ Voir le [guide WEB-01 et la matrice des accès](WEB-01.md).
 - [x] Créer une fiche avec prénom, nom, naissance et téléphone facultatif.
 - [x] Afficher une liste paginée et modifier une fiche.
 - [x] Valider les champs côté serveur.
-- [ ] Ajouter la recherche et les filtres.
-- [ ] Ajouter une page de détail avec les informations accessibles selon le rôle.
-- [ ] Définir les champs complémentaires nécessaires et la détection des doublons.
+- [x] Ajouter la recherche et les filtres.
+- [x] Ajouter une page de détail avec les informations accessibles selon le rôle.
+- [x] Ajouter les coordonnées facultatives (e-mail, adresse) et la détection des doublons d’identité.
 - [ ] Relier les rendez-vous, consultations et factures au patient.
-- [ ] Définir l’archivage et la conservation avant toute suppression.
+- [ ] Finaliser la politique de conservation et implémenter l’archivage réversible ; aucune suppression physique n’est exposée.
+
+Voir le [guide WEB-02](WEB-02.md), notamment les limites du contrôle des homonymes.
 
 ### WEB-03 — Rendez-vous
 

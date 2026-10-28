@@ -13,6 +13,7 @@ Route::middleware('auth')->group(function () {
         'patientCount' => $request->user()->can('patients.view') ? Patient::count() : null,
     ]))->middleware('can:dashboard.view')->name('dashboard');
     Route::get('patients', [PatientController::class, 'index'])->middleware('can:patients.view')->name('patients.index');
+    Route::get('patients/{patient}', [PatientController::class, 'show'])->middleware('can:patients.view')->name('patients.show');
     Route::post('patients', [PatientController::class, 'store'])->middleware('can:patients.write')->name('patients.store');
     Route::patch('patients/{patient}', [PatientController::class, 'update'])->middleware('can:patients.write')->name('patients.update');
     Route::middleware('can:users.manage')->group(function () {

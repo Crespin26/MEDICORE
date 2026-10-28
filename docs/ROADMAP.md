@@ -9,7 +9,7 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 - Inscription publique désactivée et création d’administrateurs en ligne de commande.
 - Permissions par rôle contrôlées côté serveur, invitations et gestion des accès du personnel (voir [WEB-01](WEB-01.md)).
 - Tableau de bord avec le nombre réel de patients.
-- Création, liste paginée et modification des fiches patients, validation serveur.
+- Création, recherche, filtres, liste paginée, détail et modification des fiches patients, coordonnées facultatives et prévention des doublons (voir [WEB-02](WEB-02.md)).
 - Socle Flutter Android/iOS avec écran de présentation, sans connexion serveur.
 - Tests d’authentification, de validation et de refus d’accès ; vérifications automatiques.
 
