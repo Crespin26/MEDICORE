@@ -18,7 +18,7 @@ export default function Dashboard({ patientCount }: { patientCount: number | nul
                 )}
                 <section className="rounded-xl border p-6">
                     <h2 className="font-semibold">En développement</h2>
-                    <p className="text-muted-foreground mt-2">Dossiers médicaux, facturation et profils professionnels du personnel.</p>
+                    <p className="text-muted-foreground mt-2">Facturation et profils professionnels du personnel.</p>
                 </section>
             </main>
         </AppLayout>

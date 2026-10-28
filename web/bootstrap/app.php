@@ -23,6 +23,6 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->dontFlash(['reason', 'observations', 'report', 'vitals', 'correction_reason']);
+        $exceptions->dontFlash(['reason', 'observations', 'report', 'vitals', 'correction_reason', 'label', 'details', 'title', 'file']);
         //
     })->create();

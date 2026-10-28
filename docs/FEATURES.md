@@ -59,11 +59,13 @@ Voir le [guide WEB-04](WEB-04.md) pour les permissions cliniques, la validation 
 
 ### WEB-05 — Dossier médical électronique
 
-- [ ] Définir la structure des antécédents, allergies et traitements.
-- [ ] Regrouper les informations cliniques dans une chronologie patient.
-- [ ] Ajouter les pièces jointes avec validation du format et de la taille.
-- [ ] Stocker les documents dans un espace privé et contrôler chaque téléchargement.
-- [ ] Journaliser la consultation et la modification du dossier.
+- [x] Définir la structure des antécédents, allergies et traitements.
+- [x] Regrouper les informations cliniques dans une chronologie patient.
+- [x] Ajouter les pièces jointes avec validation du format et de la taille.
+- [x] Stocker les documents dans un espace privé et contrôler chaque téléchargement.
+- [x] Journaliser la consultation et la modification du dossier.
+
+Voir le [guide WEB-05](WEB-05.md) pour le périmètre par auteur, le chiffrement, les accès et les limites du traitement des documents.
 
 ### WEB-06 — Facturation et paiements
 

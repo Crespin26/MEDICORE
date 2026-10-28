@@ -115,6 +115,17 @@ export default function PatientDetails({
                         </Link>
                     </section>
                 )}
+                {auth.permissions.includes('medical-record.view') && (
+                    <section className="rounded-xl border p-6">
+                        <h2 className="font-semibold">Dossier médical</h2>
+                        <p className="text-muted-foreground my-3">
+                            Vos antécédents renseignés, allergies, traitements déclarés et documents privés pour ce patient.
+                        </p>
+                        <Link className="underline" href={`/patients/${patient.id}/medical-record`}>
+                            Ouvrir le dossier médical
+                        </Link>
+                    </section>
+                )}
             </main>
         </AppLayout>
     );

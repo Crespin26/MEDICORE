@@ -77,6 +77,8 @@ class ConsultationRecorder
                 'created_at' => CarbonImmutable::now('UTC'),
             ]);
 
+            MedicalAudit::record($actor, $patient->id, $id ? 'consultation.updated' : 'consultation.created', 'consultation', $consultation->id, $consultation->version);
+
             return $consultation;
         });
     }

@@ -12,16 +12,17 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 - Création, recherche, filtres, liste paginée, détail et modification des fiches patients, coordonnées facultatives et prévention des doublons (voir [WEB-02](WEB-02.md)).
 - Calendrier hebdomadaire, agenda du jour, disponibilités datées, statuts et prévention des chevauchements (voir [WEB-03](WEB-03.md)).
 - Consultations du médecin auteur, brouillons, validation et historique des corrections (voir [WEB-04](WEB-04.md)).
+- Dossier médical par médecin auteur, informations versionnées, documents privés chiffrés et journal des accès (voir [WEB-05](WEB-05.md)).
 - Socle Flutter Android/iOS avec écran de présentation, sans connexion serveur.
 - Tests d’authentification, de validation et de refus d’accès ; vérifications automatiques.
 
 ## Prochain incrément
 
-Structurer le dossier médical électronique (antécédents, allergies, traitements, documents privés) à partir des consultations existantes. La gestion des profils professionnels et spécialités reste à compléter dans WEB-07 ; les comptes et rôles sont disponibles dans WEB-01.
+Développer la facturation et le suivi des paiements (WEB-06) à partir des patients et opérations existants. La gestion des profils professionnels et spécialités reste à compléter dans WEB-07 ; les comptes et rôles sont disponibles dans WEB-01.
 
 ## Incréments suivants
 
-1. Dossiers médicaux avec documents privés, antécédents et traçabilité des accès.
+1. Compléter la préparation du dossier médical à la production : protections des données existantes, analyse des fichiers et politique de conservation.
 2. Factures et paiements avec devise explicite, montants en unités mineures et traçabilité.
 3. API mobile authentifiée, stockage sécurisé des sessions et connexion Flutter.
 4. Indicateurs administratifs fondés sur les données réelles.

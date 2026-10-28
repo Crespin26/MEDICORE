@@ -21,7 +21,7 @@ enum Role: string
     {
         return match ($this) {
             self::Admin => ['dashboard.view', 'patients.view', 'patients.write', 'users.manage', 'appointments.view', 'appointments.write', 'appointments.status', 'availabilities.manage'],
-            self::Doctor => ['dashboard.view', 'patients.view', 'appointments.view', 'appointments.status', 'availabilities.manage', 'consultations.view', 'consultations.write'],
+            self::Doctor => ['dashboard.view', 'patients.view', 'appointments.view', 'appointments.status', 'availabilities.manage', 'consultations.view', 'consultations.write', 'medical-record.view', 'medical-record.write'],
             self::Secretary => ['dashboard.view', 'patients.view', 'patients.write', 'appointments.view', 'appointments.write', 'appointments.status'],
             self::Cashier => ['dashboard.view'],
         };

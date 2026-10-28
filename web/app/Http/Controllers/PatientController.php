@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Consultation;
 use App\Models\Patient;
+use App\Services\MedicalAudit;
 use App\Support\ClinicTime;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
@@ -64,6 +65,7 @@ class PatientController extends Controller
 
         $props = ['patient' => $patient, 'appointments' => $appointments];
         if ($request->user()->can('consultations.view')) {
+            MedicalAudit::record($request->user(), $patient->id, 'consultations.summary', 'patient', $patient->id);
             $props['consultations'] = Consultation::where('patient_id', $patient->id)->where('doctor_id', $request->user()->id)
                 ->orderByDesc('consulted_at')->orderByDesc('id')->limit(10)->get()->map(fn ($consultation) => [
                     'id' => $consultation->id, 'consulted_at' => ClinicTime::local($consultation->consulted_at), 'status' => $consultation->status,

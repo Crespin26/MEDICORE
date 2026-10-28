@@ -29,6 +29,10 @@ return [
     */
 
     'disks' => [
+        'medical' => [
+            'driver' => 'local', 'root' => storage_path('app/medical'),
+            'visibility' => 'private', 'serve' => false, 'throw' => true,
+        ],
 
         'local' => [
             'driver' => 'local',

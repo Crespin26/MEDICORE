@@ -55,7 +55,7 @@ La correction conserve la date de validation initiale et les anciennes versions.
 
 L’enregistrement du contenu et de sa version historique se fait dans la même transaction. Une version attendue est transmise par le formulaire et vérifiée sous verrou : si un autre onglet a déjà enregistré, la modification est refusée. Le formulaire ouvert conserve alors les saisies locales ; copier les éléments à conserver avant de recharger ou d’annuler les modifications pour consulter la version récente.
 
-Cette traçabilité est assurée par l’application ; elle ne constitue pas une signature électronique ni une protection contre les modifications directes par un opérateur de base de données. Le journal des lectures et les protections du dossier médical complet relèvent des travaux de sécurité et de WEB-05.
+Cette traçabilité est assurée par l’application ; elle ne constitue pas une signature électronique ni une protection contre les modifications directes par un opérateur de base de données. Les lectures et modifications sont désormais journalisées dans WEB-05 ; consulter [son guide](WEB-05.md) pour le périmètre et les protections du dossier médical.
 
 ## Confidentialité et comptes
 

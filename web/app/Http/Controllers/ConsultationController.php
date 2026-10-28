@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\Consultation;
 use App\Models\Patient;
 use App\Services\ConsultationRecorder;
+use App\Services\MedicalAudit;
 use App\Support\ClinicTime;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
@@ -19,14 +20,23 @@ class ConsultationController extends Controller
     {
         $filters = $request->validate(['patient_id' => ['nullable', 'integer', 'exists:patients,id'], 'status' => ['nullable', 'in:draft,validated']]);
 
-        return Inertia::render('consultations/index', [
-            'consultations' => Consultation::with('patient:id,first_name,last_name')->where('doctor_id', $request->user()->id)
-                ->when($filters['patient_id'] ?? null, fn ($query, $patient) => $query->where('patient_id', $patient))
-                ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
-                ->orderByDesc('consulted_at')->orderByDesc('id')->paginate(20)->withQueryString()->through(fn ($consultation) => [
+        $consultations = Consultation::with('patient:id,first_name,last_name')->where('doctor_id', $request->user()->id)
+            ->when($filters['patient_id'] ?? null, fn ($query, $patient) => $query->where('patient_id', $patient))
+            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->orderByDesc('consulted_at')->orderByDesc('id')->paginate(20)->withQueryString()->through(fn ($consultation) => [
                     'id' => $consultation->id, 'patient_id' => $consultation->patient_id, 'patient' => $consultation->patient->last_name.' '.$consultation->patient->first_name,
                     'consulted_at' => ClinicTime::local($consultation->consulted_at), 'status' => $consultation->status, 'reason' => $consultation->reason,
-                ]),
+                ]);
+        $patientIds = $consultations->getCollection()->pluck('patient_id');
+        if (! empty($filters['patient_id'])) {
+            $patientIds->push((int) $filters['patient_id']);
+        }
+        foreach ($patientIds->unique() as $patientId) {
+            MedicalAudit::record($request->user(), $patientId, 'consultations.list', 'patient', $patientId);
+        }
+
+        return Inertia::render('consultations/index', [
+            'consultations' => $consultations,
             'filters' => ['patient_id' => (string) ($filters['patient_id'] ?? ''), 'status' => $filters['status'] ?? ''], 'timezone' => config('clinic.timezone'),
         ]);
     }
@@ -62,6 +72,7 @@ class ConsultationController extends Controller
     public function show(Request $request, Consultation $consultation)
     {
         Gate::authorize('view', $consultation);
+        MedicalAudit::record($request->user(), $consultation->patient_id, 'consultation.view', 'consultation', $consultation->id, $consultation->version);
         $consultation->load(['patient:id,first_name,last_name,birth_date', 'doctor:id,name']);
 
         return Inertia::render('consultations/show', [
