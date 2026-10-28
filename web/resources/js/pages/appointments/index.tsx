@@ -252,6 +252,14 @@ export default function Appointments({
                                                 Déplacer / modifier
                                             </Button>
                                         )}
+                                        {physician && ['arrived', 'completed'].includes(booking.status) && (
+                                            <Link
+                                                className="underline"
+                                                href={`/patients/${booking.patient_id}/consultations/create?appointment_id=${booking.id}`}
+                                            >
+                                                Ouvrir la consultation
+                                            </Link>
+                                        )}
                                         <StatusAction
                                             key={`${booking.id}-${booking.status}`}
                                             booking={booking}

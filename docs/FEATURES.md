@@ -30,7 +30,8 @@ Voir le [guide WEB-01 et la matrice des accès](WEB-01.md).
 - [x] Ajouter une page de détail avec les informations accessibles selon le rôle.
 - [x] Ajouter les coordonnées facultatives (e-mail, adresse) et la détection des doublons d’identité.
 - [x] Relier les rendez-vous au patient et afficher les rendez-vous accessibles sur sa fiche.
-- [ ] Relier les consultations et factures au patient lors de leur implémentation.
+- [x] Relier les consultations au patient, avec historique limité au médecin auteur.
+- [ ] Relier les factures au patient lors de leur implémentation.
 - [ ] Finaliser la politique de conservation et implémenter l’archivage réversible ; aucune suppression physique n’est exposée.
 
 Voir le [guide WEB-02](WEB-02.md), notamment les limites du contrôle des homonymes.
@@ -48,11 +49,13 @@ Voir le [guide WEB-03](WEB-03.md) pour les règles de disponibilité, les transi
 
 ### WEB-04 — Consultations
 
-- [ ] Associer une consultation à un patient et à un médecin.
-- [ ] Saisir motif, observations, constantes et compte rendu.
-- [ ] Gérer les états brouillon et validé.
-- [ ] Tracer les corrections après validation et l’identité de leur auteur.
-- [ ] Afficher l’historique des consultations selon les permissions.
+- [x] Associer une consultation à un patient et à un médecin.
+- [x] Saisir motif, observations, constantes et compte rendu.
+- [x] Gérer les états brouillon et validé.
+- [x] Tracer les corrections après validation et l’identité de leur auteur.
+- [x] Afficher l’historique des consultations selon les permissions.
+
+Voir le [guide WEB-04](WEB-04.md) pour les permissions cliniques, la validation et les corrections.
 
 ### WEB-05 — Dossier médical électronique
 

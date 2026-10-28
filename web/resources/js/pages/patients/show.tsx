@@ -7,7 +7,16 @@ import { useState } from 'react';
 
 type PatientAppointment = { id: number; doctor: string; starts_at: string; status: string };
 
-export default function PatientDetails({ patient, appointments }: { patient: Patient; appointments: PatientAppointment[] }) {
+type PatientConsultation = { id: number; consulted_at: string; status: string };
+export default function PatientDetails({
+    patient,
+    appointments,
+    consultations,
+}: {
+    patient: Patient;
+    appointments: PatientAppointment[];
+    consultations?: PatientConsultation[];
+}) {
     const { auth, status } = usePage<SharedData>().props;
     const [editing, setEditing] = useState(false);
     const canWrite = auth.permissions.includes('patients.write');
@@ -78,10 +87,34 @@ export default function PatientDetails({ patient, appointments }: { patient: Pat
                         ))}
                     </ul>
                     {appointments.length === 0 && <p className="text-muted-foreground mt-3">Aucun rendez-vous accessible pour ce patient.</p>}
-                    <p className="text-muted-foreground mt-4 text-sm">
-                        Les consultations et factures seront rattachées lorsque ces modules seront disponibles.
-                    </p>
+                    <p className="text-muted-foreground mt-4 text-sm">Les factures seront rattachées lorsque ce module sera disponible.</p>
                 </section>
+                {auth.permissions.includes('consultations.view') && (
+                    <section className="rounded-xl border p-6">
+                        <div className="flex flex-wrap justify-between gap-4">
+                            <h2 className="font-semibold">Mes consultations de ce patient</h2>
+                            <Link className="underline" href={`/patients/${patient.id}/consultations/create`}>
+                                Nouvelle consultation
+                            </Link>
+                        </div>
+                        <ul className="mt-4 space-y-3">
+                            {consultations?.map((item) => (
+                                <li key={item.id}>
+                                    <Link className="underline" href={`/consultations/${item.id}`}>
+                                        {item.consulted_at.slice(0, 10).split('-').reverse().join('/')} à {item.consulted_at.slice(11)}
+                                    </Link>{' '}
+                                    · {item.status === 'validated' ? 'Validé' : 'Brouillon'}
+                                </li>
+                            ))}
+                        </ul>
+                        {!consultations?.length && (
+                            <p className="text-muted-foreground mt-3">Vous n’avez pas encore de consultation pour ce patient.</p>
+                        )}
+                        <Link className="mt-4 inline-block underline" href={`/consultations?patient_id=${patient.id}`}>
+                            Voir tout mon historique pour ce patient
+                        </Link>
+                    </section>
+                )}
             </main>
         </AppLayout>
     );

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\DoctorAvailabilityController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\StaffController;
@@ -27,6 +28,15 @@ Route::middleware('auth')->group(function () {
         Route::get('availabilities', [DoctorAvailabilityController::class, 'index'])->name('availabilities.index');
         Route::post('availabilities', [DoctorAvailabilityController::class, 'store'])->name('availabilities.store');
         Route::delete('availabilities/{availability}', [DoctorAvailabilityController::class, 'destroy'])->name('availabilities.destroy');
+    });
+    Route::middleware('can:consultations.view')->group(function () {
+        Route::get('consultations', [ConsultationController::class, 'index'])->name('consultations.index');
+        Route::get('consultations/{consultation}', [ConsultationController::class, 'show'])->name('consultations.show');
+    });
+    Route::middleware('can:consultations.write')->group(function () {
+        Route::get('patients/{patient}/consultations/create', [ConsultationController::class, 'create'])->name('consultations.create');
+        Route::post('patients/{patient}/consultations', [ConsultationController::class, 'store'])->name('consultations.store');
+        Route::patch('consultations/{consultation}', [ConsultationController::class, 'update'])->name('consultations.update');
     });
     Route::middleware('can:users.manage')->group(function () {
         Route::get('staff', [StaffController::class, 'index'])->name('staff.index');

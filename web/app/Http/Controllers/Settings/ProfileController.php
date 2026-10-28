@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
 use App\Models\Appointment;
+use App\Models\Consultation;
 use App\Models\DoctorAvailability;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -57,8 +58,8 @@ class ProfileController extends Controller
             throw ValidationException::withMessages(['password' => 'Un compte administrateur ne peut pas être supprimé depuis cet écran.']);
         }
 
-        if (Appointment::where('doctor_id', $user->id)->exists() || DoctorAvailability::where('doctor_id', $user->id)->exists()) {
-            throw ValidationException::withMessages(['password' => 'Ce compte possède un agenda. Contactez un administrateur pour le suspendre.']);
+        if (Consultation::where('doctor_id', $user->id)->exists() || Appointment::where('doctor_id', $user->id)->exists() || DoctorAvailability::where('doctor_id', $user->id)->exists()) {
+            throw ValidationException::withMessages(['password' => 'Ce compte possède un agenda ou des consultations. Contactez un administrateur pour le suspendre.']);
         }
 
         Auth::logout();

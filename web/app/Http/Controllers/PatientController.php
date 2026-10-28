@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\Consultation;
 use App\Models\Patient;
 use App\Support\ClinicTime;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -61,7 +62,15 @@ class PatientController extends Controller
                 'status' => Appointment::STATUSES[$appointment->status],
             ]);
 
-        return Inertia::render('patients/show', ['patient' => $patient, 'appointments' => $appointments]);
+        $props = ['patient' => $patient, 'appointments' => $appointments];
+        if ($request->user()->can('consultations.view')) {
+            $props['consultations'] = Consultation::where('patient_id', $patient->id)->where('doctor_id', $request->user()->id)
+                ->orderByDesc('consulted_at')->orderByDesc('id')->limit(10)->get()->map(fn ($consultation) => [
+                    'id' => $consultation->id, 'consulted_at' => ClinicTime::local($consultation->consulted_at), 'status' => $consultation->status,
+                ]);
+        }
+
+        return Inertia::render('patients/show', $props);
     }
 
     private function validated(Request $request, ?Patient $patient = null): array
