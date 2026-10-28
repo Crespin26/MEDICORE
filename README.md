@@ -1,0 +1,61 @@
+# MediCore — Plateforme de gestion clinique
+
+MediCore est un projet de plateforme SaaS HealthTech destiné à faciliter l’administration des établissements de santé. Il vise à centraliser les opérations médicales, administratives et financières dans un environnement sécurisé, accessible sur le web et sur mobile.
+
+> **Statut :** socle de développement initialisé. Le web propose une authentification réservée au personnel, un tableau de bord et la création, la liste paginée et la modification des patients. Le mobile dispose d’un écran d’accueil Flutter ; les autres modules restent à développer.
+
+## Fonctionnalités prévues
+
+| Module | Périmètre envisagé |
+| --- | --- |
+| Patients | Création et mise à jour des fiches patients, recherche et historique. |
+| Rendez-vous | Planification, modification, annulation et suivi des rendez-vous. |
+| Dossiers médicaux électroniques | Centralisation des antécédents, observations et documents médicaux. |
+| Consultations | Saisie des comptes rendus et suivi des consultations. |
+| Facturation et paiements | Émission des factures, enregistrement des paiements et suivi des soldes. |
+| Médecins et personnel | Gestion des profils, des fonctions et des disponibilités. |
+| Tableau de bord administratif | Vue d’ensemble de l’activité clinique et financière. |
+| Authentification et accès | Connexion des utilisateurs et autorisations selon leurs responsabilités. |
+
+## Technologies envisagées
+
+- **Laravel** : API et logique métier côté serveur.
+- **React.js** : interface web de gestion clinique.
+- **Flutter** : application mobile.
+
+Le serveur et le web React/TypeScript avec Inertia sont dans `web/` (Laravel 12, React 19). Le projet Flutter Android/iOS est dans `mobile/`. Les versions résolues sont enregistrées dans les fichiers de verrouillage.
+
+Consulter le [guide de démarrage](docs/DEVELOPMENT.md) et la [feuille de route](docs/ROADMAP.md).
+
+## Confidentialité et sécurité
+
+Le dépôt de développement est destiné à rester **privé**. Ce choix ne remplace pas les protections nécessaires à une application manipulant des informations médicales.
+
+Les exigences à définir et à vérifier avant toute utilisation avec des données réelles comprennent :
+
+- Des permissions par rôle, limitées aux besoins de chaque utilisateur et contrôlées côté serveur.
+- L’isolation des données entre établissements si plusieurs structures utilisent le service.
+- Le chiffrement des communications, la protection des données stockées et la gestion des secrets.
+- La traçabilité des accès et des modifications, sans exposer de données médicales dans les journaux techniques.
+- Les sauvegardes, les tests de restauration et les règles de conservation des données.
+- L’identification des obligations applicables selon les pays de déploiement et les usages retenus.
+
+Aucune garantie de sécurité ou de conformité n’est revendiquée à ce stade. Ne pas ajouter au dépôt de dossiers patients réels, de pièces médicales, d’identifiants ou de secrets.
+
+## Version de démonstration
+
+Une démonstration pourra être créée séparément avec des données entièrement fictives, sans reprendre de code confidentiel. Sa publication devra être précédée d’une vérification de son contenu et de son historique.
+
+## Présentation du projet
+
+**Nom de dépôt envisagé :** `medicore-health-platform`
+
+**Description courte pour GitHub :**
+
+> Full-stack healthcare management platform for patient records, appointments, medical consultations, billing, and administrative operations.
+
+**Description pour un portfolio :**
+
+> Écosystème web et mobile de gestion clinique permettant de centraliser les dossiers patients, les consultations, les rendez-vous et la facturation.
+
+Ces formulations décrivent la cible du projet. Tant que les applications ne sont pas implémentées, accompagner leur utilisation publique de la mention « projet en développement ».
