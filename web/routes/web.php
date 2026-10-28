@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\DoctorAvailabilityController;
 use App\Http\Controllers\MedicalDocumentController;
@@ -50,6 +51,27 @@ Route::middleware('auth')->group(function () {
         Route::post('patients/{patient}/medical-entries', [MedicalRecordController::class, 'store'])->name('medical-entries.store');
         Route::patch('patients/{patient}/medical-entries/{entry}', [MedicalRecordController::class, 'update'])->name('medical-entries.update');
         Route::post('patients/{patient}/medical-documents', [MedicalDocumentController::class, 'store'])->name('medical-documents.store');
+    });
+    Route::middleware('can:billing.view')->group(function () {
+        Route::get('billing', [BillingController::class, 'index'])->name('billing.index');
+        Route::get('billing/create', [BillingController::class, 'create'])->name('billing.create');
+        Route::get('billing/patients', [BillingController::class, 'patients'])->name('billing.patients');
+        Route::get('billing/invoices/{invoice}', [BillingController::class, 'show'])->name('billing.show');
+        Route::get('billing/invoices/{invoice}/print', [BillingController::class, 'print'])->name('billing.print');
+        Route::get('billing/receipts/{payment}', [BillingController::class, 'receipt'])->name('billing.receipt');
+    });
+    Route::middleware('can:billing.manage')->group(function () {
+        Route::post('billing/invoices', [BillingController::class, 'store'])->name('billing.store');
+        Route::patch('billing/invoices/{invoice}', [BillingController::class, 'update'])->name('billing.update');
+        Route::post('billing/invoices/{invoice}/issue', [BillingController::class, 'issue'])->name('billing.issue');
+    });
+    Route::post('billing/invoices/{invoice}/payments', [BillingController::class, 'pay'])->middleware('can:billing.pay')->name('billing.pay');
+    Route::post('billing/invoices/{invoice}/cancel', [BillingController::class, 'cancel'])->middleware('can:billing.reverse')->name('billing.cancel');
+    Route::post('billing/payments/{payment}/void', [BillingController::class, 'void'])->middleware('can:billing.reverse')->name('billing.void');
+    Route::middleware('can:catalog.manage')->group(function () {
+        Route::get('billing/catalog', [BillingController::class, 'catalog'])->name('billing.catalog');
+        Route::post('billing/catalog', [BillingController::class, 'saveService'])->name('billing.catalog.store');
+        Route::patch('billing/catalog/{service}', [BillingController::class, 'saveService'])->name('billing.catalog.update');
     });
     Route::middleware('can:users.manage')->group(function () {
         Route::get('staff', [StaffController::class, 'index'])->name('staff.index');

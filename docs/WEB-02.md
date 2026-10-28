@@ -28,7 +28,7 @@ Le prochain travail d’archivage devra être réversible, réservé à l’admi
 
 ## Dépendances restantes
 
-Les rendez-vous sont désormais reliés au patient (voir [WEB-03](WEB-03.md)) et visibles sur la fiche selon les permissions. Les consultations du médecin auteur sont également rattachées (voir [WEB-04](WEB-04.md)). La facturation reste à développer.
+Les rendez-vous sont désormais reliés au patient (voir [WEB-03](WEB-03.md)) et visibles sur la fiche selon les permissions. Les consultations du médecin auteur sont également rattachées (voir [WEB-04](WEB-04.md)). Les factures sont également rattachées au patient et réservées aux rôles de facturation (voir [WEB-06](WEB-06.md)).
 
 ## Mise à jour et vérifications
 

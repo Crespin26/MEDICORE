@@ -31,7 +31,7 @@ Voir le [guide WEB-01 et la matrice des accès](WEB-01.md).
 - [x] Ajouter les coordonnées facultatives (e-mail, adresse) et la détection des doublons d’identité.
 - [x] Relier les rendez-vous au patient et afficher les rendez-vous accessibles sur sa fiche.
 - [x] Relier les consultations au patient, avec historique limité au médecin auteur.
-- [ ] Relier les factures au patient lors de leur implémentation.
+- [x] Relier les factures au patient avec accès réservé aux rôles de facturation.
 - [ ] Finaliser la politique de conservation et implémenter l’archivage réversible ; aucune suppression physique n’est exposée.
 
 Voir le [guide WEB-02](WEB-02.md), notamment les limites du contrôle des homonymes.
@@ -69,13 +69,15 @@ Voir le [guide WEB-05](WEB-05.md) pour le périmètre par auteur, le chiffrement
 
 ### WEB-06 — Facturation et paiements
 
-- [ ] Définir le catalogue des actes, les tarifs et la devise.
-- [ ] Créer les factures avec lignes, numérotation et totaux calculés côté serveur.
-- [ ] Enregistrer les paiements, y compris partiels, et calculer le solde.
-- [ ] Gérer les statuts : brouillon, émise, partiellement payée, payée, annulée.
-- [ ] Produire une facture et un reçu imprimables.
-- [ ] Prévoir les corrections et annulations traçables.
-- [ ] Tester les montants en unités mineures et les doubles soumissions.
+- [x] Définir le catalogue des actes, les tarifs et la devise.
+- [x] Créer les factures avec lignes, numérotation et totaux calculés côté serveur.
+- [x] Enregistrer les paiements, y compris partiels, et calculer le solde.
+- [x] Gérer les statuts : brouillon, émise, partiellement payée, payée, annulée.
+- [x] Produire une facture et un reçu imprimables.
+- [x] Prévoir les corrections et annulations traçables.
+- [x] Tester les montants en unités mineures et les doubles soumissions.
+
+Voir le [guide WEB-06](WEB-06.md) pour les devises, états, encaissements manuels et limites des documents imprimables.
 
 ### WEB-07 — Médecins et personnel
 

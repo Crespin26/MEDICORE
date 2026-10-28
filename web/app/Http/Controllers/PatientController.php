@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Consultation;
+use App\Models\Invoice;
 use App\Models\Patient;
 use App\Services\MedicalAudit;
 use App\Support\ClinicTime;
@@ -70,6 +71,10 @@ class PatientController extends Controller
                 ->orderByDesc('consulted_at')->orderByDesc('id')->limit(10)->get()->map(fn ($consultation) => [
                     'id' => $consultation->id, 'consulted_at' => ClinicTime::local($consultation->consulted_at), 'status' => $consultation->status,
                 ]);
+        }
+
+        if ($request->user()->can('billing.view')) {
+            $props['invoices'] = Invoice::where('patient_id', $patient->id)->orderByDesc('id')->limit(10)->get(['id', 'number', 'currency', 'status', 'total_minor', 'paid_minor']);
         }
 
         return Inertia::render('patients/show', $props);

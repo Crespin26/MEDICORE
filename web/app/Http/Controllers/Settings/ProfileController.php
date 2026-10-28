@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
 use App\Models\Appointment;
+use App\Models\BillingEvent;
 use App\Models\Consultation;
 use App\Models\DoctorAvailability;
+use App\Models\Invoice;
+use App\Models\InvoicePayment;
 use App\Models\MedicalAccessEvent;
 use App\Models\MedicalDocument;
 use App\Models\MedicalRecordEntry;
@@ -61,6 +64,9 @@ class ProfileController extends Controller
             throw ValidationException::withMessages(['password' => 'Un compte administrateur ne peut pas être supprimé depuis cet écran.']);
         }
 
+        if (BillingEvent::where('actor_id', $user->id)->exists() || Invoice::where('created_by', $user->id)->exists() || InvoicePayment::where('recorded_by', $user->id)->exists()) {
+            throw ValidationException::withMessages(['password' => 'Ce compte possède des opérations financières. Contactez un administrateur pour le suspendre.']);
+        }
         if (MedicalAccessEvent::where('actor_id', $user->id)->exists() || MedicalRecordEntry::where('doctor_id', $user->id)->exists() || MedicalDocument::where('doctor_id', $user->id)->exists() || Consultation::where('doctor_id', $user->id)->exists() || Appointment::where('doctor_id', $user->id)->exists() || DoctorAvailability::where('doctor_id', $user->id)->exists()) {
             throw ValidationException::withMessages(['password' => 'Ce compte possède un agenda ou des consultations. Contactez un administrateur pour le suspendre.']);
         }

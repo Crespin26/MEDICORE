@@ -13,17 +13,18 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 - Calendrier hebdomadaire, agenda du jour, disponibilités datées, statuts et prévention des chevauchements (voir [WEB-03](WEB-03.md)).
 - Consultations du médecin auteur, brouillons, validation et historique des corrections (voir [WEB-04](WEB-04.md)).
 - Dossier médical par médecin auteur, informations versionnées, documents privés chiffrés et journal des accès (voir [WEB-05](WEB-05.md)).
+- Catalogue, factures versionnées, encaissements partiels, reçus imprimables et annulations tracées (voir [WEB-06](WEB-06.md)).
 - Socle Flutter Android/iOS avec écran de présentation, sans connexion serveur.
 - Tests d’authentification, de validation et de refus d’accès ; vérifications automatiques.
 
 ## Prochain incrément
 
-Développer la facturation et le suivi des paiements (WEB-06) à partir des patients et opérations existants. La gestion des profils professionnels et spécialités reste à compléter dans WEB-07 ; les comptes et rôles sont disponibles dans WEB-01.
+Compléter les profils professionnels, fonctions et spécialités du personnel (WEB-07), puis les indicateurs administratifs (WEB-08). La gestion des profils professionnels et spécialités reste à compléter dans WEB-07 ; les comptes et rôles sont disponibles dans WEB-01.
 
 ## Incréments suivants
 
 1. Compléter la préparation du dossier médical à la production : protections des données existantes, analyse des fichiers et politique de conservation.
-2. Factures et paiements avec devise explicite, montants en unités mineures et traçabilité.
+2. Compléter la facturation selon les besoins du déploiement : mentions de l’établissement, règles tarifaires et opérations comptables supplémentaires.
 3. API mobile authentifiée, stockage sécurisé des sessions et connexion Flutter.
 4. Indicateurs administratifs fondés sur les données réelles.
 5. Préparation à la production : isolation si plusieurs établissements, audit des accès, sauvegardes testées et vérification des exigences applicables.

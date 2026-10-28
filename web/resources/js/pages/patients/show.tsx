@@ -1,3 +1,4 @@
+import { money } from '@/components/billing/invoice-form';
 import { PatientForm, type Patient } from '@/components/patients/patient-form';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
@@ -12,10 +13,12 @@ export default function PatientDetails({
     patient,
     appointments,
     consultations,
+    invoices,
 }: {
     patient: Patient;
     appointments: PatientAppointment[];
     consultations?: PatientConsultation[];
+    invoices?: { id: number; number: string | null; currency: string; status: string; total_minor: number; paid_minor: number }[];
 }) {
     const { auth, status } = usePage<SharedData>().props;
     const [editing, setEditing] = useState(false);
@@ -87,7 +90,7 @@ export default function PatientDetails({
                         ))}
                     </ul>
                     {appointments.length === 0 && <p className="text-muted-foreground mt-3">Aucun rendez-vous accessible pour ce patient.</p>}
-                    <p className="text-muted-foreground mt-4 text-sm">Les factures seront rattachées lorsque ce module sera disponible.</p>
+                    <p className="text-muted-foreground mt-4 text-sm">Les opérations financières sont accessibles aux rôles de facturation.</p>
                 </section>
                 {auth.permissions.includes('consultations.view') && (
                     <section className="rounded-xl border p-6">
@@ -123,6 +126,27 @@ export default function PatientDetails({
                         </p>
                         <Link className="underline" href={`/patients/${patient.id}/medical-record`}>
                             Ouvrir le dossier médical
+                        </Link>
+                    </section>
+                )}
+                {auth.permissions.includes('billing.view') && (
+                    <section className="rounded-xl border p-6">
+                        <h2 className="font-semibold">Factures du patient</h2>
+                        <ul className="mt-4 space-y-3">
+                            {invoices?.map((invoice) => (
+                                <li key={invoice.id}>
+                                    <Link className="underline" href={`/billing/invoices/${invoice.id}`}>
+                                        {invoice.number ?? `Brouillon #${invoice.id}`}
+                                    </Link>{' '}
+                                    · {money(invoice.total_minor, invoice.currency)}
+                                    {invoice.status === 'cancelled'
+                                        ? ' · Annulée'
+                                        : ` · Solde ${money(invoice.total_minor - invoice.paid_minor, invoice.currency)}`}
+                                </li>
+                            ))}
+                        </ul>
+                        <Link className="mt-4 inline-block underline" href={`/billing?patient_id=${patient.id}`}>
+                            Toutes les factures de ce patient
                         </Link>
                     </section>
                 )}
