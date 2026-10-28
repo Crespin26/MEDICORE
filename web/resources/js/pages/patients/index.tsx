@@ -2,11 +2,13 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { type SharedData } from '@/types';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, type FormEvent } from 'react';
 type Patient = { id: number; first_name: string; last_name: string; birth_date: string; phone: string | null };
 type Page = { data: Patient[]; prev_page_url: string | null; next_page_url: string | null; current_page: number };
 export default function Patients({ patients }: { patients: Page }) {
+    const canWrite = usePage<SharedData>().props.auth.permissions.includes('patients.write');
     const [editing, setEditing] = useState<number | null>(null);
     const form = useForm({ first_name: '', last_name: '', birth_date: '', phone: '' });
     const clear = () => {
@@ -37,35 +39,37 @@ export default function Patients({ patients }: { patients: Page }) {
             <Head title="Patients" />
             <main className="flex flex-col gap-6 p-6">
                 <h1 className="text-3xl font-semibold">Patients</h1>
-                <form onSubmit={submit} className="rounded-xl border p-6">
-                    <h2 className="mb-4 text-lg font-semibold">{editing ? 'Modifier la fiche patient' : 'Nouveau patient'}</h2>
-                    <div className="grid gap-4 md:grid-cols-2">
-                        {fields.map(({ key, label, type }) => (
-                            <div key={key}>
-                                <label htmlFor={key} className="mb-2 block text-sm">
-                                    {label}
-                                </label>
-                                <Input
-                                    id={key}
-                                    type={type}
-                                    value={form.data[key]}
-                                    required={key !== 'phone'}
-                                    maxLength={key === 'phone' ? 30 : key === 'birth_date' ? undefined : 100}
-                                    onChange={(e) => form.setData(key, e.target.value)}
-                                />
-                                <InputError message={form.errors[key]} />
-                            </div>
-                        ))}
-                    </div>
-                    <div className="mt-4 flex gap-3">
-                        <Button disabled={form.processing}>{editing ? 'Enregistrer les modifications' : 'Créer le patient'}</Button>
-                        {editing && (
-                            <Button variant="outline" type="button" onClick={clear}>
-                                Annuler
-                            </Button>
-                        )}
-                    </div>
-                </form>
+                {canWrite && (
+                    <form onSubmit={submit} className="rounded-xl border p-6">
+                        <h2 className="mb-4 text-lg font-semibold">{editing ? 'Modifier la fiche patient' : 'Nouveau patient'}</h2>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            {fields.map(({ key, label, type }) => (
+                                <div key={key}>
+                                    <label htmlFor={key} className="mb-2 block text-sm">
+                                        {label}
+                                    </label>
+                                    <Input
+                                        id={key}
+                                        type={type}
+                                        value={form.data[key]}
+                                        required={key !== 'phone'}
+                                        maxLength={key === 'phone' ? 30 : key === 'birth_date' ? undefined : 100}
+                                        onChange={(e) => form.setData(key, e.target.value)}
+                                    />
+                                    <InputError message={form.errors[key]} />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-4 flex gap-3">
+                            <Button disabled={form.processing}>{editing ? 'Enregistrer les modifications' : 'Créer le patient'}</Button>
+                            {editing && (
+                                <Button variant="outline" type="button" onClick={clear}>
+                                    Annuler
+                                </Button>
+                            )}
+                        </div>
+                    </form>
+                )}
                 <div className="overflow-x-auto rounded-xl border">
                     <table className="w-full text-left text-sm">
                         <caption className="p-4 text-left font-semibold">Patients enregistrés</caption>
@@ -88,9 +92,11 @@ export default function Patients({ patients }: { patients: Page }) {
                                     <td className="p-4">{patient.birth_date.split('-').reverse().join('/')}</td>
                                     <td className="p-4">{patient.phone ?? '—'}</td>
                                     <td className="p-4">
-                                        <Button variant="outline" onClick={() => edit(patient)}>
-                                            Modifier
-                                        </Button>
+                                        {canWrite && (
+                                            <Button variant="outline" onClick={() => edit(patient)}>
+                                                Modifier
+                                            </Button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

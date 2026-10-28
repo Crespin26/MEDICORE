@@ -21,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::define('manage-clinic', fn (User $user) => $user->role === 'admin');
+        foreach (['dashboard.view', 'patients.view', 'patients.write', 'users.manage'] as $permission) {
+            Gate::define($permission, fn (User $user) => $user->hasPermission($permission));
+        }
         //
     }
 }

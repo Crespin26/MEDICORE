@@ -1,11 +1,13 @@
 # Feuille de route MediCore
 
+Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâches et leur état.
+
 ## Réalisé
 
 - Serveur Laravel et interface React/TypeScript avec Inertia.
 - Connexion, déconnexion, réinitialisation du mot de passe et paramètres du compte issus du starter officiel.
 - Inscription publique désactivée et création d’administrateurs en ligne de commande.
-- Accès clinique limité aux administrateurs côté serveur.
+- Permissions par rôle contrôlées côté serveur, invitations et gestion des accès du personnel (voir [WEB-01](WEB-01.md)).
 - Tableau de bord avec le nombre réel de patients.
 - Création, liste paginée et modification des fiches patients, validation serveur.
 - Socle Flutter Android/iOS avec écran de présentation, sans connexion serveur.

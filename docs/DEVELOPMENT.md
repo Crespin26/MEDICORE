@@ -20,7 +20,7 @@ composer run dev
 
 Ouvrir http://localhost:8000. La commande de création demande le nom, l’adresse e-mail et un mot de passe masqué d’au moins 12 caractères. Aucun compte ni mot de passe par défaut n’est fourni. Ne pas écraser un `.env` existant ni régénérer une clé sur une installation contenant des données.
 
-Le profil `admin` peut consulter le tableau de bord et gérer les patients. Le profil `staff`, attribué par défaut, n’a pas accès aux modules cliniques. Aucun écran de gestion des rôles n’est encore fourni. L’inscription publique est désactivée. L’authentification web utilise les sessions Laravel et la protection CSRF ; les tentatives de connexion sont limitées par le starter.
+Les permissions des administrateurs, médecins, secrétaires et caissiers sont décrites dans le [guide WEB-01](WEB-01.md). Les administrateurs peuvent inviter le personnel, attribuer un rôle, suspendre et réactiver les comptes depuis `/staff`. Le rôle historique `staff` reste sans permission clinique jusqu’à attribution d’un rôle. L’inscription publique est désactivée. L’authentification web utilise les sessions Laravel et la protection CSRF ; les tentatives de connexion sont limitées.
 
 SQLite sert au développement d’un seul établissement. Aucune isolation entre établissements n’est implémentée. Les données patients de cette première version se limitent à l’identité, la naissance et le téléphone ; les dossiers médicaux ne sont pas encore gérés. Utiliser des données fictives.
 

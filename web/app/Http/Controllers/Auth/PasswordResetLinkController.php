@@ -34,7 +34,7 @@ class PasswordResetLinkController extends Controller
         ]);
 
         Password::sendResetLink(
-            $request->only('email')
+            [...$request->only('email'), 'status' => 'active']
         );
 
         return back()->with('status', __('A reset link will be sent if the account exists.'));

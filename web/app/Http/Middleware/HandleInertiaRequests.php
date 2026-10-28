@@ -41,9 +41,11 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             ...parent::share($request),
             'name' => config('app.name'),
+            'status' => fn () => $request->session()->get('status'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'permissions' => collect(['dashboard.view', 'patients.view', 'patients.write', 'users.manage'])->filter(fn ($permission) => $request->user()?->can($permission))->values()->all(),
             ],
         ]);
     }

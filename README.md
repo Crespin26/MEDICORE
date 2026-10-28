@@ -2,7 +2,7 @@
 
 MediCore est un projet de plateforme SaaS HealthTech destiné à faciliter l’administration des établissements de santé. Il vise à centraliser les opérations médicales, administratives et financières dans un environnement sécurisé, accessible sur le web et sur mobile.
 
-> **Statut :** socle de développement initialisé. Le web propose une authentification réservée au personnel, un tableau de bord et la création, la liste paginée et la modification des patients. Le mobile dispose d’un écran d’accueil Flutter ; les autres modules restent à développer.
+> **Statut :** socle de développement initialisé. Le web propose une authentification réservée au personnel, les rôles et invitations, un tableau de bord et la création, la liste paginée et la modification des patients. Le mobile dispose d’un écran d’accueil Flutter ; les autres modules restent à développer.
 
 ## Fonctionnalités prévues
 
@@ -25,7 +25,7 @@ MediCore est un projet de plateforme SaaS HealthTech destiné à faciliter l’a
 
 Le serveur et le web React/TypeScript avec Inertia sont dans `web/` (Laravel 12, React 19). Le projet Flutter Android/iOS est dans `mobile/`. Les versions résolues sont enregistrées dans les fichiers de verrouillage.
 
-Consulter le [guide de démarrage](docs/DEVELOPMENT.md) et la [feuille de route](docs/ROADMAP.md).
+Consulter le [guide de démarrage](docs/DEVELOPMENT.md), la [feuille de route](docs/ROADMAP.md) et la [liste des fonctionnalités et tâches web/mobile](docs/FEATURES.md).
 
 ## Confidentialité et sécurité
 
