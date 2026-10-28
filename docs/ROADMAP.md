@@ -14,12 +14,13 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 - Consultations du médecin auteur, brouillons, validation et historique des corrections (voir [WEB-04](WEB-04.md)).
 - Dossier médical par médecin auteur, informations versionnées, documents privés chiffrés et journal des accès (voir [WEB-05](WEB-05.md)).
 - Catalogue, factures versionnées, encaissements partiels, reçus imprimables et annulations tracées (voir [WEB-06](WEB-06.md)).
+- Fiches professionnelles liées aux comptes, fonctions et spécialités, absences intégrées au planning et historique administratif (voir [WEB-07](WEB-07.md)).
 - Socle Flutter Android/iOS avec écran de présentation, sans connexion serveur.
 - Tests d’authentification, de validation et de refus d’accès ; vérifications automatiques.
 
 ## Prochain incrément
 
-Compléter les profils professionnels, fonctions et spécialités du personnel (WEB-07), puis les indicateurs administratifs (WEB-08). La gestion des profils professionnels et spécialités reste à compléter dans WEB-07 ; les comptes et rôles sont disponibles dans WEB-01.
+Développer les indicateurs administratifs et les paramètres de l’établissement (WEB-08). Les comptes, fiches professionnelles et absences sont disponibles dans WEB-01 et WEB-07.
 
 ## Incréments suivants
 

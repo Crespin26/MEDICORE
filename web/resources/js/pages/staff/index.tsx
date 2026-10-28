@@ -91,6 +91,9 @@ export default function Staff({ staff, roles }: { staff: Page; roles: Role[] }) 
             <main className="flex flex-col gap-6 p-6">
                 <div>
                     <h1 className="text-3xl font-semibold">Comptes du personnel</h1>
+                    <Link className="mt-3 inline-block underline" href="/personnel">
+                        Profils professionnels et absences
+                    </Link>
                     <p className="text-muted-foreground mt-2">Invitez le personnel et gérez ses accès à la clinique.</p>
                 </div>
                 {status && (

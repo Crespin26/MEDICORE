@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Appointment;
 use App\Models\DoctorAvailability;
+use App\Models\StaffAbsence;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +59,9 @@ class AppointmentScheduler
             }
             if ($start < CarbonImmutable::now('UTC')) {
                 throw ValidationException::withMessages(['starts_at' => 'Le rendez-vous doit commencer dans le futur.']);
+            }
+            if (StaffAbsence::where('user_id', $doctor->id)->where('status', 'active')->where('starts_at', '<', $end)->where('ends_at', '>', $start)->exists()) {
+                throw ValidationException::withMessages(['starts_at' => 'Le médecin est absent sur ce créneau.']);
             }
             if (! DoctorAvailability::where('doctor_id', $doctor->id)->where('starts_at', '<=', $start)->where('ends_at', '>=', $end)->exists()) {
                 throw ValidationException::withMessages(['starts_at' => 'Le créneau doit être entièrement compris dans une disponibilité du médecin.']);

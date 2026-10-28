@@ -81,10 +81,12 @@ Voir le [guide WEB-06](WEB-06.md) pour les devises, états, encaissements manuel
 
 ### WEB-07 — Médecins et personnel
 
-- [ ] Créer les profils professionnels, fonctions et spécialités.
-- [ ] Associer chaque profil à un compte utilisateur.
-- [ ] Gérer les disponibilités et absences.
-- [ ] Réserver la gestion des comptes et rôles aux personnes autorisées.
+- [x] Créer les profils professionnels, fonctions et spécialités.
+- [x] Associer chaque profil à un compte utilisateur.
+- [x] Gérer les disponibilités et absences.
+- [x] Réserver la gestion des comptes et rôles aux personnes autorisées.
+
+Voir le [guide WEB-07](WEB-07.md) pour les profils, les absences et leur interaction avec le planning médical.
 
 ### WEB-08 — Tableau de bord et administration
 

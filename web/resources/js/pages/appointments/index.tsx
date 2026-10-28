@@ -49,6 +49,7 @@ export default function Appointments({
     calendar,
     doctors,
     availability,
+    absences,
     filters,
     timezone,
     statuses,
@@ -57,6 +58,7 @@ export default function Appointments({
     calendar: Day[];
     doctors: Doctor[];
     availability: Slot[];
+    absences: { id: number; doctor: string; starts_at: string; ends_at: string }[];
     filters: Filters;
     timezone: string;
     statuses: Record<string, string>;
@@ -212,6 +214,22 @@ export default function Appointments({
                         <p className="text-muted-foreground mt-3 text-sm">Aucune disponibilité déclarée pour cette sélection.</p>
                     )}
                 </section>
+                {absences.length > 0 && (
+                    <section className="rounded-xl border p-4">
+                        <h2 className="font-semibold">Absences actives sur cette journée</h2>
+                        <ul className="mt-3 space-y-2 text-sm">
+                            {absences.map((absence) => (
+                                <li key={absence.id}>
+                                    {absence.doctor} · {absence.starts_at.slice(0, 10).split('-').reverse().join('/')} à {absence.starts_at.slice(11)}{' '}
+                                    → {absence.ends_at.slice(0, 10).split('-').reverse().join('/')} à {absence.ends_at.slice(11)}
+                                </li>
+                            ))}
+                        </ul>
+                        <p className="text-muted-foreground mt-3 text-sm">
+                            Ces périodes ne sont pas réservables, même si une plage de disponibilité avait été déclarée.
+                        </p>
+                    </section>
+                )}
                 <div className="overflow-x-auto rounded-xl border">
                     <table className="w-full text-left text-sm">
                         <caption className="p-4 text-left font-semibold">

@@ -18,7 +18,7 @@ export default function Dashboard({ patientCount }: { patientCount: number | nul
                 )}
                 <section className="rounded-xl border p-6">
                     <h2 className="font-semibold">En développement</h2>
-                    <p className="text-muted-foreground mt-2">Profils professionnels du personnel et indicateurs administratifs complémentaires.</p>
+                    <p className="text-muted-foreground mt-2">Indicateurs administratifs complémentaires et paramètres de l’établissement.</p>
                 </section>
             </main>
         </AppLayout>

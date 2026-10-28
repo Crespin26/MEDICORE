@@ -173,7 +173,7 @@ class StaffAccessTest extends TestCase
     public function test_cashier_dashboard_never_contains_patient_count_or_permissions(): void
     {
         $this->actingAs($this->account('cashier'))->get('/dashboard')->assertInertia(fn (Assert $page) => $page
-            ->component('dashboard', false)->where('patientCount', null)->where('auth.permissions', ['dashboard.view', 'billing.view', 'billing.manage', 'billing.pay']));
+            ->component('dashboard', false)->where('patientCount', null)->where('auth.permissions', ['dashboard.view', 'billing.view', 'billing.manage', 'billing.pay', 'personnel.self']));
     }
 
     public function test_invitation_is_rendered_and_sent_through_actual_local_mail_transport(): void

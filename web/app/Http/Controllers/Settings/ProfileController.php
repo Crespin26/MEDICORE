@@ -13,6 +13,9 @@ use App\Models\InvoicePayment;
 use App\Models\MedicalAccessEvent;
 use App\Models\MedicalDocument;
 use App\Models\MedicalRecordEntry;
+use App\Models\PersonnelEvent;
+use App\Models\ProfessionalProfile;
+use App\Models\StaffAbsence;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -64,6 +67,9 @@ class ProfileController extends Controller
             throw ValidationException::withMessages(['password' => 'Un compte administrateur ne peut pas être supprimé depuis cet écran.']);
         }
 
+        if (ProfessionalProfile::where('user_id', $user->id)->exists() || StaffAbsence::where('user_id', $user->id)->exists() || PersonnelEvent::where(fn ($query) => $query->where('user_id', $user->id)->orWhere('actor_id', $user->id))->exists()) {
+            throw ValidationException::withMessages(['password' => 'Ce compte possède un dossier professionnel. Contactez un administrateur pour le suspendre.']);
+        }
         if (BillingEvent::where('actor_id', $user->id)->exists() || Invoice::where('created_by', $user->id)->exists() || InvoicePayment::where('recorded_by', $user->id)->exists()) {
             throw ValidationException::withMessages(['password' => 'Ce compte possède des opérations financières. Contactez un administrateur pour le suspendre.']);
         }

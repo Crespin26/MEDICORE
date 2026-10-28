@@ -7,6 +7,7 @@ use App\Http\Controllers\DoctorAvailabilityController;
 use App\Http\Controllers\MedicalDocumentController;
 use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\StaffController;
 use App\Models\Patient;
 use Illuminate\Http\Request;
@@ -72,6 +73,14 @@ Route::middleware('auth')->group(function () {
         Route::get('billing/catalog', [BillingController::class, 'catalog'])->name('billing.catalog');
         Route::post('billing/catalog', [BillingController::class, 'saveService'])->name('billing.catalog.store');
         Route::patch('billing/catalog/{service}', [BillingController::class, 'saveService'])->name('billing.catalog.update');
+    });
+    Route::get('personnel/me', [PersonnelController::class, 'own'])->middleware('can:personnel.self')->name('personnel.own');
+    Route::middleware('can:personnel.manage')->group(function () {
+        Route::get('personnel', [PersonnelController::class, 'index'])->name('personnel.index');
+        Route::get('personnel/{user}', [PersonnelController::class, 'show'])->name('personnel.show');
+        Route::patch('personnel/{user}', [PersonnelController::class, 'update'])->name('personnel.update');
+        Route::post('personnel/{user}/absences', [PersonnelController::class, 'absence'])->name('personnel.absences.store');
+        Route::post('personnel/{user}/absences/{absence}/cancel', [PersonnelController::class, 'cancel'])->name('personnel.absences.cancel');
     });
     Route::middleware('can:users.manage')->group(function () {
         Route::get('staff', [StaffController::class, 'index'])->name('staff.index');

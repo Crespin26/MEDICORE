@@ -12,6 +12,8 @@ const mainNavItems: NavItem[] = [
         url: '/dashboard',
         icon: LayoutGrid,
     },
+    { title: 'Personnel', url: '/personnel', icon: Users },
+    { title: 'Mon profil professionnel', url: '/personnel/me', icon: Users },
     { title: 'Facturation', url: '/billing', icon: Users },
     { title: 'Mes consultations', url: '/consultations', icon: Users },
     { title: 'Rendez-vous', url: '/appointments', icon: CalendarDays },
@@ -28,6 +30,8 @@ export function AppSidebar() {
         '/appointments': 'appointments.view',
         '/consultations': 'consultations.view',
         '/billing': 'billing.view',
+        '/personnel': 'personnel.manage',
+        '/personnel/me': 'personnel.self',
     };
     const items = mainNavItems.filter((item) => auth.permissions.includes(permissions[item.url]));
     return (

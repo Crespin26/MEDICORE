@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\DoctorAvailability;
 use App\Models\Patient;
+use App\Models\StaffAbsence;
 use App\Models\User;
 use App\Services\AppointmentScheduler;
 use App\Support\ClinicTime;
@@ -46,8 +47,14 @@ class AppointmentController extends Controller
             ->when($request->user()->role !== 'doctor' && ! empty($filters['doctor_id']), fn ($query) => $query->where('doctor_id', $filters['doctor_id']))
             ->orderBy('starts_at')->get()->map(fn ($slot) => ['id' => $slot->id, 'doctor' => $slot->doctor->name, 'starts_at' => ClinicTime::local($slot->starts_at), 'ends_at' => ClinicTime::local($slot->ends_at)]);
 
+        $absences = StaffAbsence::with('user:id,name')->where('status', 'active')->where('starts_at', '<', $day->addDay()->utc())->where('ends_at', '>', $day->utc())
+            ->whereHas('user', fn ($query) => $query->where('role', 'doctor'))
+            ->when($request->user()->role === 'doctor', fn ($query) => $query->where('user_id', $request->user()->id))
+            ->when($request->user()->role !== 'doctor' && ! empty($filters['doctor_id']), fn ($query) => $query->where('user_id', $filters['doctor_id']))
+            ->orderBy('starts_at')->get()->map(fn ($absence) => ['id' => $absence->id, 'doctor' => $absence->user->name, 'starts_at' => ClinicTime::local($absence->starts_at), 'ends_at' => ClinicTime::local($absence->ends_at)]);
+
         return Inertia::render('appointments/index', [
-            'appointments' => $daily, 'calendar' => $calendar, 'doctors' => $doctors, 'availability' => $availability,
+            'absences' => $absences, 'appointments' => $daily, 'calendar' => $calendar, 'doctors' => $doctors, 'availability' => $availability,
             'filters' => ['date' => $day->toDateString(), 'doctor_id' => $request->user()->role === 'doctor' ? (string) $request->user()->id : (string) ($filters['doctor_id'] ?? ''), 'status' => $filters['status'] ?? ''],
             'timezone' => config('clinic.timezone'), 'statuses' => Appointment::STATUSES,
         ]);
