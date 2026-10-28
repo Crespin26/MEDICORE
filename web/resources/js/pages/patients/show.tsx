@@ -5,7 +5,9 @@ import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function PatientDetails({ patient }: { patient: Patient }) {
+type PatientAppointment = { id: number; doctor: string; starts_at: string; status: string };
+
+export default function PatientDetails({ patient, appointments }: { patient: Patient; appointments: PatientAppointment[] }) {
     const { auth, status } = usePage<SharedData>().props;
     const [editing, setEditing] = useState(false);
     const canWrite = auth.permissions.includes('patients.write');
@@ -61,9 +63,23 @@ export default function PatientDetails({ patient }: { patient: Patient }) {
                     </section>
                 )}
                 <section className="rounded-xl border p-6">
-                    <h2 className="font-semibold">Suivi du patient</h2>
-                    <p className="text-muted-foreground mt-2">
-                        Les rendez-vous, consultations et factures seront rattachés ici lorsque ces modules seront disponibles.
+                    <h2 className="font-semibold">Rendez-vous liés au patient</h2>
+                    <p className="text-muted-foreground mt-2 text-sm">
+                        Dix rendez-vous les plus récents dans l’ordre des dates, parmi ceux que vous pouvez consulter. Horaires de la clinique.
+                    </p>
+                    <ul className="mt-4 space-y-3">
+                        {appointments.map((appointment) => (
+                            <li key={appointment.id}>
+                                <Link className="underline" href={`/appointments?date=${appointment.starts_at.slice(0, 10)}`}>
+                                    {appointment.starts_at.slice(0, 10).split('-').reverse().join('/')} à {appointment.starts_at.slice(11)}
+                                </Link>{' '}
+                                · {appointment.doctor} · {appointment.status}
+                            </li>
+                        ))}
+                    </ul>
+                    {appointments.length === 0 && <p className="text-muted-foreground mt-3">Aucun rendez-vous accessible pour ce patient.</p>}
+                    <p className="text-muted-foreground mt-4 text-sm">
+                        Les consultations et factures seront rattachées lorsque ces modules seront disponibles.
                     </p>
                 </section>
             </main>

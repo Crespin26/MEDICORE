@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
-                'permissions' => collect(['dashboard.view', 'patients.view', 'patients.write', 'users.manage'])->filter(fn ($permission) => $request->user()?->can($permission))->values()->all(),
+                'permissions' => collect(['dashboard.view', 'patients.view', 'patients.write', 'users.manage', 'appointments.view', 'appointments.write', 'appointments.status', 'availabilities.manage'])->filter(fn ($permission) => $request->user()?->can($permission))->values()->all(),
             ],
         ]);
     }

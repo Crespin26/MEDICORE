@@ -10,12 +10,13 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 - Permissions par rôle contrôlées côté serveur, invitations et gestion des accès du personnel (voir [WEB-01](WEB-01.md)).
 - Tableau de bord avec le nombre réel de patients.
 - Création, recherche, filtres, liste paginée, détail et modification des fiches patients, coordonnées facultatives et prévention des doublons (voir [WEB-02](WEB-02.md)).
+- Calendrier hebdomadaire, agenda du jour, disponibilités datées, statuts et prévention des chevauchements (voir [WEB-03](WEB-03.md)).
 - Socle Flutter Android/iOS avec écran de présentation, sans connexion serveur.
 - Tests d’authentification, de validation et de refus d’accès ; vérifications automatiques.
 
 ## Prochain incrément
 
-Définir le fonctionnement d’un établissement et les responsabilités des administrateurs, médecins, secrétaires et caissiers. Implémenter la gestion du personnel et les permissions, puis les rendez-vous avec disponibilités, statuts et prévention des conflits.
+Développer les consultations et leur historique à partir des patients et rendez-vous existants. La gestion des profils professionnels et spécialités reste à compléter dans WEB-07 ; les comptes et rôles sont disponibles dans WEB-01.
 
 ## Incréments suivants
 

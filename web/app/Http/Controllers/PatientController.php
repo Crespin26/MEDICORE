@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointment;
 use App\Models\Patient;
+use App\Support\ClinicTime;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -49,9 +51,17 @@ class PatientController extends Controller
         ]);
     }
 
-    public function show(Patient $patient)
+    public function show(Request $request, Patient $patient)
     {
-        return Inertia::render('patients/show', ['patient' => $patient]);
+        $appointments = Appointment::with('doctor:id,name')->where('patient_id', $patient->id)
+            ->when($request->user()->role === 'doctor', fn ($query) => $query->where('doctor_id', $request->user()->id))
+            ->orderByDesc('starts_at')->limit(10)->get()->map(fn ($appointment) => [
+                'id' => $appointment->id, 'doctor' => $appointment->doctor->name,
+                'starts_at' => ClinicTime::local($appointment->starts_at),
+                'status' => Appointment::STATUSES[$appointment->status],
+            ]);
+
+        return Inertia::render('patients/show', ['patient' => $patient, 'appointments' => $appointments]);
     }
 
     private function validated(Request $request, ?Patient $patient = null): array

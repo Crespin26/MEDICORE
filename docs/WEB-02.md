@@ -28,7 +28,7 @@ Le prochain travail d’archivage devra être réversible, réservé à l’admi
 
 ## Dépendances restantes
 
-Les rendez-vous, consultations et factures n’existent pas encore. La fiche indique leur statut à venir, sans données fictives ni liens vers des écrans absents. Leur rattachement utilisera la référence interne du patient lors de la réalisation de ces modules.
+Les rendez-vous sont désormais reliés au patient (voir [WEB-03](WEB-03.md)) et visibles sur la fiche selon les permissions. Les consultations et factures seront rattachées lors de la réalisation de ces modules.
 
 ## Mise à jour et vérifications
 

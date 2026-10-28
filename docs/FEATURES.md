@@ -29,19 +29,22 @@ Voir le [guide WEB-01 et la matrice des accès](WEB-01.md).
 - [x] Ajouter la recherche et les filtres.
 - [x] Ajouter une page de détail avec les informations accessibles selon le rôle.
 - [x] Ajouter les coordonnées facultatives (e-mail, adresse) et la détection des doublons d’identité.
-- [ ] Relier les rendez-vous, consultations et factures au patient.
+- [x] Relier les rendez-vous au patient et afficher les rendez-vous accessibles sur sa fiche.
+- [ ] Relier les consultations et factures au patient lors de leur implémentation.
 - [ ] Finaliser la politique de conservation et implémenter l’archivage réversible ; aucune suppression physique n’est exposée.
 
 Voir le [guide WEB-02](WEB-02.md), notamment les limites du contrôle des homonymes.
 
 ### WEB-03 — Rendez-vous
 
-- [ ] Créer les modèles et migrations des rendez-vous et disponibilités.
-- [ ] Afficher un calendrier et une liste par date, médecin et statut.
-- [ ] Planifier, déplacer et annuler un rendez-vous.
-- [ ] Gérer les statuts : prévu, confirmé, arrivé, terminé, annulé, absent.
-- [ ] Empêcher les chevauchements, y compris lors de demandes simultanées.
-- [ ] Définir le fuseau horaire de l’établissement et tester les horaires.
+- [x] Créer les modèles et migrations des rendez-vous et disponibilités.
+- [x] Afficher un calendrier et une liste par date, médecin et statut.
+- [x] Planifier, déplacer et annuler un rendez-vous.
+- [x] Gérer les statuts : prévu, confirmé, arrivé, terminé, annulé, absent.
+- [x] Empêcher les chevauchements, y compris lors de demandes simultanées.
+- [x] Définir le fuseau horaire de l’établissement et tester les horaires.
+
+Voir le [guide WEB-03](WEB-03.md) pour les règles de disponibilité, les transitions et les limites.
 
 ### WEB-04 — Consultations
 

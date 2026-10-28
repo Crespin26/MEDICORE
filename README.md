@@ -2,7 +2,7 @@
 
 MediCore est un projet de plateforme SaaS HealthTech destiné à faciliter l’administration des établissements de santé. Il vise à centraliser les opérations médicales, administratives et financières dans un environnement sécurisé, accessible sur le web et sur mobile.
 
-> **Statut :** socle de développement initialisé. Le web propose une authentification réservée au personnel, les rôles et invitations, un tableau de bord et la création, la recherche, les filtres, les fiches détaillées et la modification des patients. Le mobile dispose d’un écran d’accueil Flutter ; les autres modules restent à développer.
+> **Statut :** socle de développement initialisé. Le web propose une authentification réservée au personnel, les rôles et invitations, un tableau de bord et la création, la recherche, les filtres, les fiches détaillées et la modification des patients. La gestion des rendez-vous inclut un agenda, les disponibilités et le suivi des statuts. Le mobile dispose d’un écran d’accueil Flutter ; les autres modules restent à développer.
 
 ## Fonctionnalités prévues
 

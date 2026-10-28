@@ -20,9 +20,9 @@ enum Role: string
     public function permissions(): array
     {
         return match ($this) {
-            self::Admin => ['dashboard.view', 'patients.view', 'patients.write', 'users.manage'],
-            self::Doctor => ['dashboard.view', 'patients.view'],
-            self::Secretary => ['dashboard.view', 'patients.view', 'patients.write'],
+            self::Admin => ['dashboard.view', 'patients.view', 'patients.write', 'users.manage', 'appointments.view', 'appointments.write', 'appointments.status', 'availabilities.manage'],
+            self::Doctor => ['dashboard.view', 'patients.view', 'appointments.view', 'appointments.status', 'availabilities.manage'],
+            self::Secretary => ['dashboard.view', 'patients.view', 'patients.write', 'appointments.view', 'appointments.write', 'appointments.status'],
             self::Cashier => ['dashboard.view'],
         };
     }
