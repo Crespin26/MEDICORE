@@ -11,7 +11,7 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 - Tableau de bord avec le nombre réel de patients.
 - Création, recherche, filtres, liste paginée, détail et modification des fiches patients, coordonnées facultatives et prévention des doublons (voir [WEB-02](WEB-02.md)).
 - Calendrier hebdomadaire, agenda du jour, disponibilités datées, statuts et prévention des chevauchements (voir [WEB-03](WEB-03.md)).
-- Consultations du médecin auteur, brouillons, validation et historique des corrections (voir [WEB-04](WEB-04.md)).
+- Consultations du médecin auteur, brouillons, validation, contenu chiffré et historique des corrections (voir [WEB-04](WEB-04.md)).
 - Dossier médical par médecin auteur, informations versionnées, documents privés chiffrés et journal des accès (voir [WEB-05](WEB-05.md)).
 - Catalogue, factures versionnées, encaissements partiels, reçus imprimables et annulations tracées (voir [WEB-06](WEB-06.md)).
 - Fiches professionnelles liées aux comptes, fonctions et spécialités, absences intégrées au planning et historique administratif (voir [WEB-07](WEB-07.md)).
@@ -19,6 +19,8 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 - Socle Flutter Android/iOS avec écran de présentation, sans connexion serveur.
 - Tests d’authentification, de validation et de refus d’accès ; vérifications automatiques.
 - Correctifs de dépendances web du 29 octobre 2026 : audits npm et Composer sans avis signalé après mise à jour ; 167 tests et compilation validés (voir [bilan web](BILAN-WEB.md)).
+
+- Sauvegarde SQLite chiffrée avec clé indépendante, restauration isolée contrôlant base et documents, et procédure de gestion des clés (voir [reprise](RECOVERY.md)). L’exploitation réelle reste à provisionner.
 
 ## Prochain incrément
 

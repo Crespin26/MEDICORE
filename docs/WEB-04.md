@@ -75,3 +75,9 @@ npm run lint:check
 ```
 
 La migration ajoute les consultations et leurs versions, sans modifier les dossiers patients existants. Les pièces jointes, antécédents, prescriptions et exports ne sont pas ajoutés dans cet incrément.
+
+## Chiffrement et reprise — 29 octobre 2026
+
+Les motifs, observations, comptes rendus, constantes, instantanés de révision et motifs de correction sont chiffrés au repos par les modèles. La migration du 29 octobre transforme également les anciennes valeurs, sans retour automatique en clair. Sur une base contenant des consultations, elle exige la maintenance ; arrêter aussi tous les processus écrivains. Les métadonnées (identifiants, dates, statut et auteur) ne sont pas toutes chiffrées.
+
+Le [guide de reprise et de gestion des clés](RECOVERY.md) décrit la sauvegarde préalable, la rotation, la restauration et les limites d’exploitation. Ne pas appliquer le nouveau code sur les anciennes valeurs sans sa migration, ni supprimer les clés historiques nécessaires.

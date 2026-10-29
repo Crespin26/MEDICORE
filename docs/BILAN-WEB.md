@@ -2,6 +2,12 @@
 
 Bilan du 28 octobre 2026, établi sur le code local au commit `79213ea`, les guides WEB-01 à WEB-08, les contrôles locaux et les audits de dépendances. Le bilan initial était documentaire. La mise à jour du 29 octobre ci-dessous décrit les correctifs de dépendances appliqués ensuite.
 
+## Mise à jour du 29 octobre 2026 — protection et reprise
+
+Le point 2 dispose désormais d'une implémentation : chiffrement des consultations et de leurs révisions, migration des valeurs existantes, commandes de sauvegarde SQLite chiffrée et de restauration isolée, vérification des clés et des documents. Voir le [guide de reprise](RECOVERY.md).
+
+Validation locale après ces changements : **177 tests et 1 888 assertions réussis**, dont migration des anciennes valeurs, annulation transactionnelle en cas d’échec, rotation avec ancienne clé, sauvegarde/restauration de la base et des documents, refus des archives altérées et des clés manquantes. Les exercices automatisés utilisent des données fictives. La migration n'a pas été exécutée sur la base active du développeur. Le coffre, le stockage distant, la fréquence, la rétention et la validation sur l'hébergement cible restent à provisionner. Le point 2 n'est donc pas déclaré terminé pour une exploitation réelle.
+
 ## Mise à jour du 29 octobre 2026 — dépendances
 
 Le point 1 du plan de suite est réalisé pour les avis connus lors de la vérification : les fichiers `web/package-lock.json` et `web/composer.lock` ont été mis à jour sans changement de version majeure ni de code métier.
@@ -118,7 +124,7 @@ Les invitations et réinitialisations doivent être testées avec de vrais courr
 | Priorité | Travail | Critère de validation |
 | --- | --- | --- |
 | P0 — réalisé le 29 octobre | Mettre à jour et analyser les dépendances signalées. | Aucun avis npm/Composer après correction ; tests et compilation réussis. Surveillance régulière à maintenir. |
-| P0 | Protéger les consultations stockées et organiser les clés, sauvegardes et restauration. | Migration testée, accès contrôlés et restauration complète démontrée. |
+| P0 — outils et tests locaux livrés le 29 octobre | Protéger les consultations stockées et organiser les clés, sauvegardes et restauration. | Migration et reprise testées sur données fictives ; coffre, copies distantes et exercice sur hébergement cible encore requis. |
 | P0 | Préparer la configuration d'exploitation, le SMTP et la surveillance. | Parcours d'invitation/réinitialisation reçus, configuration revue, alertes vérifiées. |
 | P1 | Valider les besoins métier : homonymes, archivage, relais entre médecins, règles et documents de facturation. | Décisions documentées puis scénarios de recette acceptés. |
 | P1 | Réaliser une recette navigateur par rôle, dont accès interdits et parcours complets ; automatiser les parcours critiques. | Patients → rendez-vous → consultation → dossier et facture → paiements → reçu vérifiés selon les droits. |

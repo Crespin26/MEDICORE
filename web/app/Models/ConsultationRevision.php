@@ -13,7 +13,7 @@ class ConsultationRevision extends Model
 
     protected function casts(): array
     {
-        return ['snapshot' => 'array', 'created_at' => 'immutable_datetime'];
+        return ['snapshot' => 'encrypted:array', 'correction_reason' => 'encrypted', 'created_at' => 'immutable_datetime'];
     }
 
     public function author(): BelongsTo

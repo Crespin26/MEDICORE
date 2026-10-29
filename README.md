@@ -29,6 +29,8 @@ Consulter le [guide de démarrage](docs/DEVELOPMENT.md), la [feuille de route](d
 
 Le [bilan complet de la partie web](docs/BILAN-WEB.md) récapitule les modules livrés, les tests, les limites et les priorités avant production.
 
+Le [guide de reprise et de gestion des clés](docs/RECOVERY.md) décrit le chiffrement des consultations, les sauvegardes SQLite et les exercices de restauration.
+
 ## Confidentialité et sécurité
 
 Le dépôt de développement est destiné à rester **privé**. Ce choix ne remplace pas les protections nécessaires à une application manipulant des informations médicales.

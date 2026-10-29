@@ -54,6 +54,7 @@ Voir le [guide WEB-03](WEB-03.md) pour les règles de disponibilité, les transi
 - [x] Gérer les états brouillon et validé.
 - [x] Tracer les corrections après validation et l’identité de leur auteur.
 - [x] Afficher l’historique des consultations selon les permissions.
+- [x] Chiffrer le contenu des consultations et révisions, avec migration des valeurs existantes.
 
 Voir le [guide WEB-04](WEB-04.md) pour les permissions cliniques, la validation et les corrections.
 
@@ -175,7 +176,8 @@ Voir le [guide WEB-08](WEB-08.md) pour les définitions des indicateurs, les par
 - [x] Ajouter des en-têtes interdisant la mise en cache des réponses web.
 - [ ] Définir et implémenter le journal d’audit des actions sensibles.
 - [ ] Configurer HTTPS, secrets de production et protection des données stockées.
-- [ ] Mettre en place les sauvegardes et vérifier la restauration.
+- [x] Fournir une sauvegarde SQLite chiffrée et une restauration isolée avec tests sur données fictives (voir [reprise et clés](RECOVERY.md)).
+- [ ] Provisionner le coffre de clés, le stockage distant, la rétention et valider la reprise sur l’hébergement cible.
 - [ ] Définir la conservation des données et les exigences applicables au déploiement.
 - [ ] Si plusieurs établissements sont retenus, implémenter leur isolation avant leur ouverture.
 

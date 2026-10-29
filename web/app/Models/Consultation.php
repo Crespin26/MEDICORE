@@ -12,7 +12,7 @@ class Consultation extends Model
 
     protected function casts(): array
     {
-        return ['vitals' => 'array', 'consulted_at' => 'immutable_datetime', 'validated_at' => 'immutable_datetime', 'version' => 'integer'];
+        return ['reason' => 'encrypted', 'observations' => 'encrypted', 'report' => 'encrypted', 'vitals' => 'encrypted:array', 'consulted_at' => 'immutable_datetime', 'validated_at' => 'immutable_datetime', 'version' => 'integer'];
     }
 
     public function patient(): BelongsTo
