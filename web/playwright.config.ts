@@ -14,6 +14,8 @@ export default defineConfig({
         screenshot: 'only-on-failure',
     },
     projects: [
+        { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+        { name: 'webkit', use: { ...devices['Desktop Safari'] } },
         { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
         { name: 'small-screen', use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } } },
     ],

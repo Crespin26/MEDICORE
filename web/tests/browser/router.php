@@ -12,6 +12,9 @@ $file = realpath($public.parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 if ($file !== false && str_starts_with($file, $public.DIRECTORY_SEPARATOR) && is_file($file)) {
     return false;
 }
+if (getenv('MEDICORE_E2E_PROBE_ID')) {
+    header('X-MediCore-Fixture: '.getenv('MEDICORE_E2E_PROBE_ID'));
+}
 define('LARAVEL_START', microtime(true));
 require __DIR__.'/../../vendor/autoload.php';
 $app = require __DIR__.'/../../bootstrap/app.php';

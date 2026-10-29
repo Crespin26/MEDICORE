@@ -2,6 +2,22 @@
 
 Bilan du 28 octobre 2026, établi sur le code local au commit `79213ea`, les guides WEB-01 à WEB-08, les contrôles locaux et les audits de dépendances. Le bilan initial était documentaire. La mise à jour du 29 octobre ci-dessous décrit les correctifs de dépendances appliqués ensuite.
 
+## Extension demandée : recette, charge et mobile connecté
+
+Les trois volets sont livrés localement : **108 scénarios navigateur réussis** sur Chromium, Firefox, WebKit et petit écran ; banc de charge HTTP sur 1 001 patients/10 004 rendez-vous fictifs ; API v1 Sanctum et première version Flutter connectée pour sessions, patients et agenda.
+
+Validation : **191 tests PHP et 2 107 assertions réussis** ; **11 tests Flutter réussis**, plus un test HTTP réel Flutter/Laravel exécuté séparément avec une fixture temporaire ; Flutter analyze sans anomalie. TypeScript, ESLint, compilation et contrôles de format sont validés. Après ajout de l’API, 20 scénarios navigateur de contrôle des accès ont également été rejoués avec succès sur les quatre configurations. Le test HTTP est ignoré par un `flutter test` sans fixture, puis exécuté explicitement par la commande dédiée.
+
+Deux références locales de 100 requêtes chacune, avec concurrence 5 puis 10, ont obtenu uniquement HTTP 200 et des p95 de 120,36 ms puis 152,94 ms. Ces mesures sur PHP en serveur de développement/SQLite ne qualifient pas une capacité de production. Voir [performance](PERFORMANCE.md) et [API/mobile](API-MOBILE.md).
+
+Le SDK Android est absent : aucun APK n’a été compilé. iOS n’a pas été compilé sous Linux et aucune recette sur appareil réel n’est revendiquée. Le stockage sécurisé matériel, les captures et l’acceptation métier restent à vérifier. Aucune migration n’a été appliquée à la base active et aucune mise en production n’a eu lieu.
+
+## Extension du point 5 — compatibilité et accessibilité
+
+La recette inclut maintenant Firefox et WebKit en plus de Chromium sur bureau et petit écran. Les mêmes parcours métier sont complétés par des contrôles axe sur neuf pages représentatives et sur des états dynamiques : erreurs, thème sombre, menu, focus et chargement. Les correctifs concernent les contrastes, l’annonce des erreurs, le retour du focus et l’indicateur de navigation accessible.
+
+La [grille de recette humaine](RECETTE-MANUELLE.md) précise les vérifications restantes avec lecteur d’écran, zoom, appareils réels et responsables métier. Les tests automatisés ne certifient pas la conformité globale et ne remplacent pas cette acceptation. Les résultats du point 4 ci-dessous sont conservés comme historique.
+
 ## Mise à jour du 29 octobre 2026 — recette et besoins métier
 
 À la demande de traiter les trois volets, le lot ajoute les homonymes confirmés et motivés par un administrateur, l’archivage réversible sans suppression, et le partage explicite/révocable en lecture seule des éléments d’un médecin pour un patient. Les corrections restent réservées à l’auteur ; le partage n’accorde aucun accès clinique aux administrateurs, secrétaires ou caissiers.
@@ -135,9 +151,9 @@ Les invitations et réinitialisations doivent être testées avec de vrais courr
 | P0 — outils et tests locaux livrés le 29 octobre | Protéger les consultations stockées et organiser les clés, sauvegardes et restauration. | Migration et reprise testées sur données fictives ; coffre, copies distantes et exercice sur hébergement cible encore requis. |
 | P0 | Préparer la configuration d'exploitation, le SMTP et la surveillance. | Parcours d'invitation/réinitialisation reçus, configuration revue, alertes vérifiées. |
 | P1 — règles et fonctions livrées localement | Homonymes, archivage et relais entre médecins ; validation des règles et documents de facturation. | Scénarios automatisés et règles documentées ; acceptation par l’établissement et mentions de facturation encore requises. |
-| P1 — automatisation livrée | Recette navigateur par rôle et accès interdits. | 26 scénarios Chromium réussis sur deux tailles de fenêtre ; recette humaine, autres navigateurs et accessibilité complète à terminer. |
-| P1 | Mesurer la charge sur le moteur et l'hébergement cibles. | Objectifs de volume et temps de réponse définis, conflits et restauration vérifiés dans cet environnement. |
-| P2 | Étendre selon les besoins : rappels, récurrence, exports comptables, assurances et API mobile. | Périmètre priorisé après recette du socle web. |
+| P1 — automatisation étendue | Recette navigateur par rôle, accès interdits, clavier et axe. | 108 scénarios réussis sur trois moteurs et petit écran ; recette humaine et accessibilité complète à terminer. |
+| P1 — référence locale livrée | Mesurer la charge sur le moteur et l’hébergement cibles. | Deux mesures locales documentées ; objectifs, endurance et hébergement de production encore à qualifier. |
+| P2 — socle API/mobile livré | Étendre rappels, récurrence, comptabilité et modules mobiles cliniques/financiers. | Première API/mobile session-patients-agenda testée ; appareils et modules suivants à recetter. |
 
 ## Conclusion
 

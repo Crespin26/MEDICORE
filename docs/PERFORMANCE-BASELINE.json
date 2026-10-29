@@ -1,0 +1,41 @@
+{
+  "environment": "Local PHP development server and SQLite only; synthetic data; no production capacity claim",
+  "runs": [
+    {
+      "recordedAt": "2026-10-29T17:06:34.152Z",
+      "scope": "Local synthetic HTTP baseline; PHP development server, SQLite; not production capacity",
+      "patients": 1001,
+      "appointments": 10004,
+      "concurrency": 5,
+      "requests": 100,
+      "statuses": {
+        "200": 100
+      },
+      "durationSeconds": 2.1,
+      "requestsPerSecond": 47.67,
+      "latencyMs": {
+        "p50": 104.2,
+        "p95": 120.36,
+        "max": 123.29
+      }
+    },
+    {
+      "recordedAt": "2026-10-29T17:09:25.256Z",
+      "scope": "Local synthetic HTTP baseline; PHP development server, SQLite; not production capacity",
+      "patients": 1001,
+      "appointments": 10004,
+      "concurrency": 10,
+      "requests": 100,
+      "statuses": {
+        "200": 100
+      },
+      "durationSeconds": 1.4,
+      "requestsPerSecond": 71.34,
+      "latencyMs": {
+        "p50": 136.84,
+        "p95": 152.94,
+        "max": 165.61
+      }
+    }
+  ]
+}

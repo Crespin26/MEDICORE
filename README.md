@@ -2,7 +2,7 @@
 
 MediCore est un projet de plateforme SaaS HealthTech destiné à faciliter l’administration des établissements de santé. Il vise à centraliser les opérations médicales, administratives et financières dans un environnement sécurisé, accessible sur le web et sur mobile.
 
-> **Statut :** socle de développement initialisé. Le web propose une authentification réservée au personnel, les rôles et invitations, un tableau de bord et la création, la recherche, les filtres, les fiches détaillées et la modification des patients, la confirmation administrative des homonymes et l’archivage réversible. La gestion des rendez-vous inclut un agenda, les disponibilités et le suivi des statuts. Les consultations proposent des brouillons, une validation et un historique des corrections réservé en écriture au médecin auteur, avec partage explicite en lecture seule. Le dossier médical ajoute les antécédents, allergies, traitements déclarés, documents privés et journal des accès du médecin auteur. La facturation inclut un catalogue, des factures, des paiements partiels et des reçus imprimables. Le personnel dispose de fiches professionnelles, fonctions, spécialités et absences prises en compte dans le planning. Le tableau de bord adapte les indicateurs aux rôles et propose des paramètres d’établissement ainsi que des exports statistiques contrôlés. Le mobile dispose d’un écran d’accueil Flutter ; les modules mobiles et la préparation à la production restent à réaliser.
+> **Statut :** socle de développement initialisé. Le web propose une authentification réservée au personnel, les rôles et invitations, un tableau de bord et la création, la recherche, les filtres, les fiches détaillées et la modification des patients, la confirmation administrative des homonymes et l’archivage réversible. La gestion des rendez-vous inclut un agenda, les disponibilités et le suivi des statuts. Les consultations proposent des brouillons, une validation et un historique des corrections réservé en écriture au médecin auteur, avec partage explicite en lecture seule. Le dossier médical ajoute les antécédents, allergies, traitements déclarés, documents privés et journal des accès du médecin auteur. La facturation inclut un catalogue, des factures, des paiements partiels et des reçus imprimables. Le personnel dispose de fiches professionnelles, fonctions, spécialités et absences prises en compte dans le planning. Le tableau de bord adapte les indicateurs aux rôles et propose des paramètres d’établissement ainsi que des exports statistiques contrôlés. Le mobile Flutter est connecté à une API v1 pour la session du personnel, les patients et l’agenda. Les modules mobiles cliniques/financiers, la recette sur appareils et la préparation à la production restent à réaliser.
 
 ## Fonctionnalités prévues
 
@@ -32,6 +32,10 @@ Le [bilan complet de la partie web](docs/BILAN-WEB.md) récapitule les modules l
 Le [guide de reprise et de gestion des clés](docs/RECOVERY.md) décrit le chiffrement des consultations, les sauvegardes SQLite et les exercices de restauration.
 
 La [recette web et les règles métier](docs/WEB-RECETTE.md) décrivent les scénarios navigateur, les homonymes, l’archivage et le partage entre médecins.
+
+La [grille de recette humaine](docs/RECETTE-MANUELLE.md) complète les tests multi-navigateurs et les contrôles automatisés d’accessibilité.
+
+Le [guide API/mobile](docs/API-MOBILE.md) et la [référence de charge locale](docs/PERFORMANCE.md) documentent les nouveaux parcours et leurs limites de validation.
 
 ## Confidentialité et sécurité
 

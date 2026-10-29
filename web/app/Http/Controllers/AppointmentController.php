@@ -34,6 +34,11 @@ class AppointmentController extends Controller
         if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
+        if ($request->is('api/*')) {
+            $daily = (clone $query)->where('starts_at', '>=', $day->utc())->where('starts_at', '<', $day->addDay()->utc())->orderBy('starts_at')->orderBy('id')->paginate(20)->withQueryString()->through(fn ($appointment) => $this->record($appointment));
+
+            return response()->json(['appointments' => $daily, 'date' => $day->toDateString(), 'timezone' => config('clinic.timezone'), 'availability' => DoctorAvailability::with('doctor:id,name')->where('starts_at', '>=', $day->utc())->where('starts_at', '<', $day->addDay()->utc())->when($request->user()->role === 'doctor', fn ($q) => $q->where('doctor_id', $request->user()->id))->orderBy('starts_at')->get()->map(fn ($slot) => ['doctor_id' => $slot->doctor_id, 'doctor' => $slot->doctor->name, 'starts_at' => ClinicTime::local($slot->starts_at), 'ends_at' => ClinicTime::local($slot->ends_at)]), 'doctors' => User::where('role', 'doctor')->where('status', 'active')->when($request->user()->role === 'doctor', fn ($q) => $q->whereKey($request->user()->id))->get(['id', 'name']), 'statuses' => Appointment::STATUSES]);
+        }
         $calendar = [];
         for ($i = 0; $i < 7; $i++) {
             $date = $day->startOfWeek()->addDays($i);
@@ -89,7 +94,10 @@ class AppointmentController extends Controller
     {
         $data = $request->validate(['patient_id' => ['required', 'integer', 'exists:patients,id'], 'doctor_id' => ['required', 'integer', 'exists:users,id']]);
         [$start, $end] = ClinicTime::interval($request);
-        $scheduler->book($data, $start, $end);
+        $appointment = $scheduler->book($data, $start, $end);
+        if ($request->is('api/*')) {
+            return response()->json(['data' => $this->record($appointment->load(['patient', 'doctor']))], 201);
+        }
 
         return back(fallback: route('appointments.index'))->with('status', 'Rendez-vous planifié.');
     }
@@ -98,7 +106,10 @@ class AppointmentController extends Controller
     {
         $data = $request->validate(['patient_id' => ['required', 'integer', 'exists:patients,id'], 'doctor_id' => ['required', 'integer', 'exists:users,id']]);
         [$start, $end] = ClinicTime::interval($request);
-        $scheduler->book($data, $start, $end, $appointment->id);
+        $appointment = $scheduler->book($data, $start, $end, $appointment->id);
+        if ($request->is('api/*')) {
+            return response()->json(['data' => $this->record($appointment->load(['patient', 'doctor']))]);
+        }
 
         return back(fallback: route('appointments.index'))->with('status', 'Rendez-vous modifié ; sa confirmation est à renouveler.');
     }
@@ -121,6 +132,10 @@ class AppointmentController extends Controller
             $appointment->status = $data['status'];
             $appointment->save();
         });
+
+        if ($request->is('api/*')) {
+            return response()->json(['data' => $this->record($appointment->fresh()->load(['patient', 'doctor']))]);
+        }
 
         return back(fallback: route('appointments.index'))->with('status', 'Statut du rendez-vous mis à jour.');
     }

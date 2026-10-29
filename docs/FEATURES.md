@@ -109,33 +109,34 @@ Voir le [guide WEB-08](WEB-08.md) pour les définitions des indicateurs, les par
 ### MOB-01 — Socle et navigation
 
 - [x] Initialiser le projet Flutter Android/iOS.
-- [x] Créer un écran de présentation MediCore.
-- [x] Ajouter un test de l’écran d’accueil.
-- [ ] Construire la navigation et les écrans adaptés aux petits écrans.
-- [ ] Gérer chargement, absence de connexion, erreurs et listes vides.
-- [ ] Configurer les environnements de développement et de production.
+- [x] Créer les écrans de connexion et d’accueil connecté MediCore.
+- [x] Tester la connexion, les droits affichés, la révocation et le masquage en arrière-plan.
+- [x] Construire la navigation patients, agenda et compte adaptée aux petits écrans.
+- [x] Gérer chargement, absence de connexion, erreurs et listes vides.
+- [x] Configurer l’URL par build, HTTPS obligatoire et exception HTTP locale en debug.
+- [ ] Valider le déploiement et les périphériques de production.
 
 ### MOB-02 — Connexion du personnel
 
-- [ ] Ajouter le client API et l’écran de connexion.
-- [ ] Stocker les éléments de session dans le stockage sécurisé du système.
-- [ ] Gérer expiration, révocation et déconnexion.
-- [ ] Adapter les actions visibles au rôle, avec contrôle systématique côté serveur.
-- [ ] Prévoir le verrouillage après inactivité et masquer les informations sensibles lors du passage en arrière-plan.
+- [x] Ajouter le client API et l’écran de connexion.
+- [x] Intégrer le stockage sécurisé du jeton (validation Keystore/Keychain sur appareil encore requise).
+- [x] Gérer expiration, révocation et déconnexion.
+- [x] Adapter les actions visibles au rôle, avec contrôle systématique côté serveur.
+- [x] Ajouter la fermeture après inactivité et le masquage en arrière-plan ; recette sur appareils à compléter.
 
 ### MOB-03 — Patients
 
-- [ ] Rechercher un patient et parcourir une liste paginée.
-- [ ] Afficher la fiche patient autorisée.
-- [ ] Créer et modifier une fiche si le rôle le permet.
-- [ ] Afficher les erreurs de validation retournées par l’API.
+- [x] Rechercher un patient et parcourir une liste paginée.
+- [x] Afficher la fiche patient autorisée.
+- [x] Créer et modifier une fiche si le rôle le permet.
+- [x] Afficher les erreurs de validation retournées par l’API.
 
 ### MOB-04 — Agenda et rendez-vous
 
-- [ ] Afficher l’agenda du jour et les rendez-vous à venir.
-- [ ] Filtrer par médecin et consulter le détail d’un rendez-vous.
-- [ ] Planifier, déplacer, annuler et mettre à jour le statut selon les permissions.
-- [ ] Présenter les conflits d’horaire retournés par le serveur.
+- [x] Afficher l’agenda journalier avec choix de la date, passée ou à venir.
+- [x] Filtrer par médecin et présenter les informations du rendez-vous.
+- [x] Planifier, déplacer, annuler et mettre à jour le statut selon les permissions.
+- [x] Présenter les conflits d’horaire retournés par le serveur.
 
 ### MOB-05 — Consultations et dossiers médicaux
 
@@ -169,11 +170,12 @@ Voir le [guide WEB-08](WEB-08.md) pour les définitions des indicateurs, les par
 
 ### API-01 — API partagée
 
-- [ ] Exposer une API versionnée pour les modules destinés au mobile.
-- [ ] Mettre en place l’authentification mobile et la révocation des sessions.
-- [ ] Réutiliser les règles métier et permissions du web.
-- [ ] Standardiser validation, pagination, erreurs, dates et montants.
-- [ ] Documenter les endpoints et tester les accès directs non autorisés.
+- [x] Exposer l’API v1 de session, patients et agenda (voir [API/mobile](API-MOBILE.md)).
+- [x] Mettre en place l’authentification mobile et la révocation des sessions.
+- [x] Réutiliser les règles métier et permissions du web.
+- [x] Standardiser validation, pagination, erreurs et dates du premier périmètre.
+- [ ] Définir les contrats monétaires de la future API financière.
+- [x] Documenter les endpoints et tester les accès directs non autorisés.
 
 ### SEC-01 — Protection et exploitation
 
@@ -193,8 +195,12 @@ Voir le [guide WEB-08](WEB-08.md) pour les définitions des indicateurs, les par
 - [ ] Vérifier les résultats CI après publication du dépôt.
 - [x] Mettre à jour et auditer les dépendances web (aucun avis npm/Composer après correction du 29 octobre).
 - [x] Ajouter une recette navigateur des parcours critiques par rôle sur bureau et petit écran (voir [recette web](WEB-RECETTE.md)).
-- [ ] Compléter la recette avec les responsables métier, les autres navigateurs et l’accessibilité.
+- [x] Étendre la recette automatisée à Firefox et WebKit et ajouter des contrôles axe, de thème sombre et de navigation clavier.
+- [ ] Faire accepter la [recette humaine](RECETTE-MANUELLE.md) avec les responsables métier, les lecteurs d’écran et les appareils/navigateurs réellement installés.
 - [ ] Préparer un environnement de démonstration avec données entièrement fictives.
+
+- [x] Ajouter une référence de charge HTTP locale sur données fictives (voir [mesures](PERFORMANCE.md)).
+- [ ] Qualifier la charge et l’endurance sur le moteur et l’hébergement cibles.
 
 ## 4. Ordre de réalisation proposé
 

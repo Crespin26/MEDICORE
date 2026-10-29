@@ -44,7 +44,7 @@ Ce fonctionnement ne présume pas d'une règle de consentement valable dans tous
 
 ## Automatisation navigateur
 
-Les tests sont dans `web/tests/browser/clinical.spec.ts`, avec configuration `web/playwright.config.ts`. Ils utilisent Chromium sur deux tailles de fenêtre : bureau et 390 × 844. La seconde configuration teste le web sur petit écran ; elle ne simule pas une application Flutter ni un véritable appareil mobile.
+Les tests sont dans `web/tests/browser/clinical.spec.ts`, avec configuration `web/playwright.config.ts`. Les projets exécutent les mêmes parcours avec Firefox, WebKit et Chromium sur bureau, puis Chromium à 390 × 844. Cette dernière configuration teste le web sur petit écran ; elle ne simule pas une application Flutter ni un véritable appareil mobile. WebKit automatisé ne vaut pas une validation de Safari installé sur chaque appareil Apple.
 
 Les parcours couvrent :
 
@@ -70,7 +70,7 @@ Depuis `web/`, avec PHP et les extensions SQLite, sodium et zip requis par l'ens
 ```bash
 composer install
 npm ci
-npx playwright install chromium
+npx playwright install --with-deps chromium firefox webkit
 npm run build
 npm run typecheck
 npm run typecheck:e2e
@@ -83,13 +83,41 @@ php artisan test
 
 Le lanceur crée un dossier temporaire privé `medicore-e2e-*`, une base SQLite neuve, une clé applicative aléatoire et des sessions dans cette base. Il force le cache en mémoire, les courriels dans un transport de test, le stockage médical dans ce dossier et l'absence de fichier Vite `hot`. Il utilise `APP_ENV=e2e` pour conserver le véritable middleware CSRF. Aucun endpoint de contournement de connexion n'est ajouté : les tests passent par le formulaire réel.
 
-La base et la configuration actives du développeur ne sont ni migrées ni remplacées. Le port `127.0.0.1:8123` doit être libre : aucun serveur existant n'est réutilisé. Le serveur est arrêté et le dossier supprimé en fin d'exécution normale ; un arrêt brutal peut nécessiter un nettoyage manuel. Ne pas exécuter plusieurs recettes simultanées sur ce même port. Les tests utilisent un worker et des créneaux distincts pour les deux tailles de fenêtre.
+La base et la configuration actives du développeur ne sont ni migrées ni remplacées. Le port `127.0.0.1:8123` doit être libre : aucun serveur existant n'est réutilisé. Le serveur est arrêté et le dossier supprimé en fin d'exécution normale ; un arrêt brutal peut nécessiter un nettoyage manuel. Ne pas exécuter plusieurs recettes simultanées sur ce même port. Les tests utilisent un worker et des créneaux et rendez-vous distincts pour les quatre projets. La fixture et les scénarios doivent être adaptés ensemble si de nouveaux projets sont ajoutés.
 
 Les identifiants `*@medicore.test` et le mot de passe fixe du fichier de fixture sont exclusivement fictifs et ne sont créés que dans cette base temporaire. La fixture n'est pas un seeder de démonstration à exécuter sur une base réelle. Le routeur de test n'accepte que le serveur PHP CLI dans l'environnement de recette et n'est pas un fichier du répertoire public.
 
-La CI configure les contrôles, l'installation de Chromium et la recette. Les traces et captures sur échec sont ignorées par Git ; la CI les conserve cinq jours. Elles contiennent uniquement les données fictives de cette fixture. Aucun résultat distant GitHub Actions n'a été inspecté ici.
+La CI configure les contrôles, l'installation des trois moteurs et la recette. Les traces et captures sur échec sont ignorées par Git ; la CI les conserve cinq jours. Elles contiennent uniquement les données fictives de cette fixture. Aucun résultat distant GitHub Actions n'a été inspecté ici.
 
-## Résultats locaux
+## Extension du point 5 : compatibilité et accessibilité
+
+Les contrôles d’accessibilité sont dans `web/tests/browser/accessibility.spec.ts` et utilisent `@axe-core/playwright`. Neuf pages représentatives sont scannées : connexion, liste et fiche patient, paramètres d’établissement, planning, dossier médical, création d’une consultation, création de facture et paramètres du profil. Les analyses utilisent les tags axe `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`, sans exclusion d’éléments ni désactivation d’une règle de cette sélection. Les résultats conservent aussi les contrôles incomplets pour leur examen humain.
+
+Des scénarios complémentaires vérifient la connexion au clavier, le focus visible du bouton, l’association de l’erreur de connexion au champ, son annonce `role="alert"`, les contrastes en thème sombre et l’ouverture/fermeture du menu sur petit écran avec restitution du focus, ainsi que l’indicateur de chargement pendant une requête retenue et la préférence de réduction des animations. Le menu sur petit écran se ferme au démarrage d’une navigation pour que cet indicateur reste accessible.
+
+Les défauts détectés et corrigés concernent le contraste des textes secondaires, des libellés de navigation, du panneau d’avertissement et des boutons destructifs, le focus après fermeture du menu et les rôles ARIA invalides de l’indicateur de chargement par défaut d’Inertia 2.0. Celui-ci est remplacé par un indicateur indéterminé accessible, nommé, sans pourcentage inventé, qui disparaît à la fin de la navigation. Les erreurs partagées du composant `InputError` sont maintenant annoncées et les erreurs du formulaire de connexion reliées à leurs champs avec `aria-describedby`/`aria-invalid`.
+
+Ces tests couvrent les problèmes automatisables des états effectivement affichés. Les états non scannés, l’usage réel d’un lecteur d’écran, le zoom et l’acceptation métier restent à examiner avec la [grille de recette humaine](RECETTE-MANUELLE.md). Aucun résultat d’axe ne constitue une certification globale de conformité.
+
+Références d’implémentation : [projets multi-navigateurs Playwright](https://playwright.dev/docs/test-projects) et [tests d’accessibilité avec axe](https://playwright.dev/docs/accessibility-testing).
+
+### Environnement local de vérification
+
+Sur cette machine, les navigateurs et les bibliothèques natives manquantes ont été téléchargés dans `/tmp`, sans installation système. L’extension SQLite PHP a également été chargée depuis `/tmp`. Ces répertoires temporaires ne sont pas des prérequis portables à copier dans le dépôt : une installation normale utilise les extensions PHP requises et `playwright install --with-deps`.
+
+WebKit rencontrait un conflit avec les variables graphiques héritées de VS Code Snap (`GIO_MODULE_DIR`, `GIO_EXTRA_MODULES`, `GTK_PATH`, `SNAP_LIBRARY_PATH`). Elles ont été retirées uniquement de l’environnement du processus de test. Aucun réglage système ni code applicatif n’a été modifié pour contourner ce conflit. Si ce cas se reproduit dans un terminal VS Code Snap, après installation normale des dépendances natives :
+
+```bash
+env -u GIO_MODULE_DIR -u GIO_EXTRA_MODULES -u GTK_PATH -u SNAP_LIBRARY_PATH npm run test:e2e
+```
+
+Toujours terminer `npm run build` **avant** de lancer les tests et ne pas reconstruire les assets pendant l’exécution : une page déjà chargée pourrait référencer des chunks supprimés par Vite. Les tests ne doivent pas réutiliser le serveur ou la base actifs du développeur.
+
+## Résultats étendus
+
+L’extension a réussi **108 scénarios** sur les quatre configurations, comprenant les parcours métier et les contrôles d’accessibilité/clavier. Les références de charge et le client mobile connecté sont décrits dans les guides [performance](PERFORMANCE.md) et [API/mobile](API-MOBILE.md).
+
+## Résultats locaux initiaux
 
 Le 29 octobre 2026 : **26 scénarios navigateur réussis** sur Chromium, répartis entre bureau et petit écran. Les contrôles TypeScript applicatif et navigateur, ESLint et la compilation Vite ont réussi. L’audit npm après ajout des outils de test signale **zéro vulnérabilité**. La suite PHP complète a réussi **184 tests et 2 044 assertions**, incluant la restauration des nouveaux motifs chiffrés. Pint et les vérifications de diff ont également réussi.
 
@@ -97,4 +125,4 @@ Le 29 octobre 2026 : **26 scénarios navigateur réussis** sur Chromium, répart
 
 Appliquer les migrations avec le guide de [reprise](RECOVERY.md), en maintenance et après sauvegarde/restauration vérifiée ; la migration de chiffrement du point 2 doit précéder celle des nouveaux états et partages. La base active locale n'a pas été migrée durant ce lot. Les nouvelles raisons chiffrées sont incluses dans les contrôles de restauration pour les sauvegardes contenant ces tables.
 
-Avant une mise en service, faire accepter par les responsables métier les règles ci-dessus, puis compléter la recette : invitations et réinitialisations réellement reçues, annulations financières, documents imprimés et mentions attendues, continuité lors d'un départ de médecin, audit avec lecteur d'écran, navigation clavier et autres navigateurs. Le fait que les scénarios automatisés passent ne vaut pas acceptation par l'établissement. Les mentions de facturation restent à valider selon le déploiement.
+Avant une mise en service, faire accepter par les responsables métier les règles ci-dessus, puis compléter la [recette humaine](RECETTE-MANUELLE.md) : invitations et réinitialisations réellement reçues, annulations financières, documents imprimés et mentions attendues, continuité lors d'un départ de médecin, audit avec lecteur d'écran, zoom et navigateurs/appareils réellement installés. Les contrôles automatisés clavier et multi-moteurs complètent cette validation sans la remplacer. Le fait que les scénarios automatisés passent ne vaut pas acceptation par l'établissement. Les mentions de facturation restent à valider selon le déploiement.

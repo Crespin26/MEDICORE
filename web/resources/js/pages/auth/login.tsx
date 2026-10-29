@@ -45,6 +45,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <Label htmlFor="email">Adresse e-mail</Label>
                         <Input
                             id="email"
+                            aria-invalid={!!errors.email}
+                            aria-describedby={errors.email ? 'email-error' : undefined}
                             type="email"
                             required
                             autoFocus
@@ -54,7 +56,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             onChange={(e) => setData('email', e.target.value)}
                             placeholder="email@example.com"
                         />
-                        <InputError message={errors.email} />
+                        <InputError id="email-error" message={errors.email} />
                     </div>
 
                     <div className="grid gap-2">
@@ -68,6 +70,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         </div>
                         <Input
                             id="password"
+                            aria-invalid={!!errors.password}
+                            aria-describedby={errors.password ? 'password-error' : undefined}
                             type="password"
                             required
                             tabIndex={2}
@@ -76,7 +80,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             onChange={(e) => setData('password', e.target.value)}
                             placeholder="Mot de passe"
                         />
-                        <InputError message={errors.password} />
+                        <InputError id="password-error" message={errors.password} />
                     </div>
 
                     <div className="flex items-center space-x-3">

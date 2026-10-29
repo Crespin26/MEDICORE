@@ -16,7 +16,7 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 - Catalogue, factures versionnées, encaissements partiels, reçus imprimables et annulations tracées (voir [WEB-06](WEB-06.md)).
 - Fiches professionnelles liées aux comptes, fonctions et spécialités, absences intégrées au planning et historique administratif (voir [WEB-07](WEB-07.md)).
 - Tableau de bord selon les rôles, périodes, paramètres d’établissement et exports statistiques agrégés journalisés (voir [WEB-08](WEB-08.md)).
-- Socle Flutter Android/iOS avec écran de présentation, sans connexion serveur.
+- API v1 Sanctum et première version Flutter connectée : session, patients, agenda et contrôles de rôle (voir [API/mobile](API-MOBILE.md)).
 - Tests d’authentification, de validation et de refus d’accès ; vérifications automatiques.
 - Correctifs de dépendances web du 29 octobre 2026 : audits npm et Composer sans avis signalé après mise à jour ; 167 tests et compilation validés (voir [bilan web](BILAN-WEB.md)).
 
@@ -24,15 +24,19 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 
 - Recette navigateur par rôle sur bureau et petit écran ; confirmation des homonymes, archivage réversible et partage médical explicite en lecture seule (voir [recette web et règles métier](WEB-RECETTE.md)).
 
+- Extension du point 5 : scénarios sur Chromium, Firefox et WebKit, contrôles axe, navigation clavier et grille de [recette humaine](RECETTE-MANUELLE.md).
+
+- Référence de charge locale et test HTTP Flutter/Laravel réel, sur fixtures isolées (voir [performance](PERFORMANCE.md)).
+
 ## Prochain incrément
 
-Préparer l’API mobile et les parcours Flutter, en parallèle des exigences d’exploitation restantes : livraison SMTP réelle, sauvegardes et restauration, protections des données existantes, traitement des fichiers et politique de conservation. Les huit incréments web de base sont implémentés ; la préparation à la production reste distincte.
+Recetter la première version mobile connectée sur appareils Android/iOS et préparer les futurs modules mobiles cliniques/financiers, en parallèle des exigences d’exploitation restantes : livraison SMTP réelle, sauvegardes et restauration sur hébergement cible, traitement des fichiers et politique de conservation. Les huit incréments web de base sont implémentés ; la préparation à la production reste distincte.
 
 ## Incréments suivants
 
 1. Compléter la préparation du dossier médical à la production : protections des données existantes, analyse des fichiers et politique de conservation.
 2. Compléter la facturation selon les besoins du déploiement : mentions de l’établissement, règles tarifaires et opérations comptables supplémentaires.
-3. API mobile authentifiée, stockage sécurisé des sessions et connexion Flutter.
+3. Recette du mobile connecté sur appareils, puis extension de l’API aux modules cliniques et financiers.
 4. Recette des indicateurs administratifs existants et enrichissement selon les besoins validés.
 5. Préparation à la production : isolation si plusieurs établissements, audit des accès, sauvegardes testées et vérification des exigences applicables.
 

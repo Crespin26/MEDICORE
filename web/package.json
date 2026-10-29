@@ -11,9 +11,12 @@
         "typecheck": "tsc --noEmit",
         "lint:check": "eslint .",
         "test:e2e": "playwright test",
-        "typecheck:e2e": "tsc -p tsconfig.e2e.json"
+        "typecheck:e2e": "tsc -p tsconfig.e2e.json",
+        "test:load": "node tests/performance/probe.mjs",
+        "test:mobile-live": "node tests/performance/probe.mjs --mobile"
     },
     "devDependencies": {
+        "@axe-core/playwright": "^4.14.0",
         "@eslint/js": "^9.19.0",
         "@playwright/test": "^1.64.1",
         "@types/node": "^24.19.2",

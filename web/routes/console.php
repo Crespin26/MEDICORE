@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Validator;
 
 Artisan::command('medicore:create-admin', function () {
@@ -27,3 +28,5 @@ Artisan::command('medicore:create-admin', function () {
 
     return 0;
 })->purpose('Créer un administrateur sans inscription publique');
+
+Schedule::command('sanctum:prune-expired --hours=24')->daily();

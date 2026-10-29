@@ -45,7 +45,7 @@ Pour un usage durable, installer les extensions SQLite correspondant à la versi
 
 ## Mobile
 
-Consulter [mobile/README.md](../mobile/README.md). Flutter doit satisfaire la contrainte Dart du `pubspec.yaml`. L’application n’est pas encore reliée au serveur ; aucune API mobile n’est exposée.
+Consulter [mobile/README.md](../mobile/README.md). Flutter doit satisfaire la contrainte Dart du `pubspec.yaml`. L’application utilise l’API v1 de session, patients et agenda ; voir le [guide API/mobile](API-MOBILE.md) et les commandes de test HTTP avec fixture isolée.
 
 Le lanceur Snap échoue dans l’environnement de préparation. Le SDK fonctionne directement via `/home/crespin/snap/flutter/common/flutter/bin/flutter`.
 

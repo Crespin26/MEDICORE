@@ -55,6 +55,10 @@ class PatientController extends Controller
             $query->where(fn ($query) => $query->whereNull('phone')->orWhere('phone', ''));
         }
 
+        if ($request->is('api/*')) {
+            return response()->json($query->orderBy('last_name')->orderBy('first_name')->orderBy('id')->paginate(20)->withQueryString());
+        }
+
         return Inertia::render('patients/index', [
             'patients' => $query->orderBy('last_name')->orderBy('first_name')->orderBy('id')->paginate(20)->withQueryString(),
             'filters' => array_merge(['search' => '', 'birth_from' => '', 'birth_to' => '', 'contact' => '', 'state' => 'active'], $filters),
@@ -63,6 +67,9 @@ class PatientController extends Controller
 
     public function show(Request $request, Patient $patient)
     {
+        if ($request->is('api/*')) {
+            return response()->json(['data' => $patient]);
+        }
         $appointments = Appointment::with('doctor:id,name')->where('patient_id', $patient->id)
             ->when($request->user()->role === 'doctor', fn ($query) => $query->where('doctor_id', $request->user()->id))
             ->orderByDesc('starts_at')->limit(10)->get()->map(fn ($appointment) => [
@@ -148,7 +155,11 @@ class PatientController extends Controller
 
     public function store(Request $request)
     {
-        $this->save(new Patient, $this->validated($request), $request);
+        $patient = new Patient;
+        $this->save($patient, $this->validated($request), $request);
+        if ($request->is('api/*')) {
+            return response()->json(['data' => $patient->fresh()], 201);
+        }
 
         return to_route('patients.index')->with('status', 'Patient créé.');
     }
@@ -160,6 +171,10 @@ class PatientController extends Controller
             $patient->assertActive();
             $this->save($patient, $this->validated($request, $patient), $request);
         });
+
+        if ($request->is('api/*')) {
+            return response()->json(['data' => $patient->fresh()]);
+        }
 
         return back(fallback: route('patients.index'))->with('status', 'Fiche patient mise à jour.');
     }

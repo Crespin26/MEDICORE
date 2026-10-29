@@ -94,7 +94,7 @@ test('secrétariat : création, recherche, doublon et réservation', async ({ pa
         .filter({ has: page.getByRole('heading', { name: 'Planifier un rendez-vous' }) })
         .getByLabel('Médecin', { exact: true })
         .selectOption({ label: 'Recette doctor' });
-    const hour = info.project.name === 'chromium' ? '09' : '10';
+    const hour = String(9 + info.config.projects.findIndex((project) => project.name === info.project.name)).padStart(2, '0');
     await page.getByLabel('Début', { exact: true }).fill(`${date}T${hour}:00`);
     await page.getByLabel('Fin', { exact: true }).fill(`${date}T${hour}:30`);
     await page.getByRole('button', { name: 'Planifier', exact: true }).click();
@@ -103,7 +103,7 @@ test('secrétariat : création, recherche, doublon et réservation', async ({ pa
 
 test('médecin : validation, correction tracée, information et document privé', async ({ page }, info) => {
     await login(page, 'doctor');
-    const appointment = info.project.name === 'chromium' ? 1 : 2;
+    const appointment = 1 + info.config.projects.findIndex((project) => project.name === info.project.name);
     await page.goto(`/patients/1/consultations/create?appointment_id=${appointment}`);
     const report = `Compte rendu fictif ${info.project.name}`;
     await page.getByLabel('Motif', { exact: true }).fill('Contrôle de recette fictif');

@@ -149,6 +149,7 @@ const Sidebar = React.forwardRef<
     }
 >(({ side = 'left', variant = 'sidebar', collapsible = 'offcanvas', className, children, ...props }, ref) => {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+    const returnFocus = React.useRef<HTMLElement | null>(null);
 
     if (collapsible === 'none') {
         return (
@@ -164,6 +165,15 @@ const Sidebar = React.forwardRef<
                 <SheetContent
                     data-sidebar="sidebar"
                     data-mobile="true"
+                    onOpenAutoFocus={() => {
+                        returnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+                    }}
+                    onCloseAutoFocus={(event) => {
+                        if (returnFocus.current?.isConnected) {
+                            event.preventDefault();
+                            returnFocus.current.focus();
+                        }
+                    }}
                     className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
                     style={
                         {
@@ -346,7 +356,7 @@ const SidebarGroupLabel = React.forwardRef<HTMLDivElement, React.ComponentProps<
                 ref={ref}
                 data-sidebar="group-label"
                 className={cn(
-                    'flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-hidden ring-sidebar-ring transition-[margin,opa] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
+                    'flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/80 outline-hidden ring-sidebar-ring transition-[margin,opa] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
                     'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0',
                     className,
                 )}
