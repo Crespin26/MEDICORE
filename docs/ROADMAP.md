@@ -18,6 +18,7 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 - Tableau de bord selon les rôles, périodes, paramètres d’établissement et exports statistiques agrégés journalisés (voir [WEB-08](WEB-08.md)).
 - Socle Flutter Android/iOS avec écran de présentation, sans connexion serveur.
 - Tests d’authentification, de validation et de refus d’accès ; vérifications automatiques.
+- Correctifs de dépendances web du 29 octobre 2026 : audits npm et Composer sans avis signalé après mise à jour ; 167 tests et compilation validés (voir [bilan web](BILAN-WEB.md)).
 
 ## Prochain incrément
 
@@ -28,7 +29,7 @@ Préparer l’API mobile et les parcours Flutter, en parallèle des exigences d�
 1. Compléter la préparation du dossier médical à la production : protections des données existantes, analyse des fichiers et politique de conservation.
 2. Compléter la facturation selon les besoins du déploiement : mentions de l’établissement, règles tarifaires et opérations comptables supplémentaires.
 3. API mobile authentifiée, stockage sécurisé des sessions et connexion Flutter.
-4. Indicateurs administratifs fondés sur les données réelles.
+4. Recette des indicateurs administratifs existants et enrichissement selon les besoins validés.
 5. Préparation à la production : isolation si plusieurs établissements, audit des accès, sauvegardes testées et vérification des exigences applicables.
 
-Chaque module devra inclure ses validations et ses tests d’autorisation. La suppression de patients et l’export de données attendent une politique de conservation et d’accès.
+Chaque module devra inclure ses validations et ses tests d’autorisation. La suppression de patients et les exports nominatifs attendent une politique de conservation et d’accès. Les exports statistiques agrégés sont déjà disponibles dans WEB-08. Consulter le [bilan web](BILAN-WEB.md) pour les priorités de stabilisation.

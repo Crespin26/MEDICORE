@@ -27,6 +27,8 @@ Le serveur et le web React/TypeScript avec Inertia sont dans `web/` (Laravel 12,
 
 Consulter le [guide de démarrage](docs/DEVELOPMENT.md), la [feuille de route](docs/ROADMAP.md) et la [liste des fonctionnalités et tâches web/mobile](docs/FEATURES.md).
 
+Le [bilan complet de la partie web](docs/BILAN-WEB.md) récapitule les modules livrés, les tests, les limites et les priorités avant production.
+
 ## Confidentialité et sécurité
 
 Le dépôt de développement est destiné à rester **privé**. Ce choix ne remplace pas les protections nécessaires à une application manipulant des informations médicales.

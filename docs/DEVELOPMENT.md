@@ -22,7 +22,7 @@ Ouvrir http://localhost:8000. La commande de création demande le nom, l’adres
 
 Les permissions des administrateurs, médecins, secrétaires et caissiers sont décrites dans le [guide WEB-01](WEB-01.md). Les administrateurs peuvent inviter le personnel, attribuer un rôle, suspendre et réactiver les comptes depuis `/staff`. Le rôle historique `staff` reste sans permission clinique jusqu’à attribution d’un rôle. L’inscription publique est désactivée. L’authentification web utilise les sessions Laravel et la protection CSRF ; les tentatives de connexion sont limitées.
 
-SQLite sert au développement d’un seul établissement. Aucune isolation entre établissements n’est implémentée. Les données patients de cette première version se limitent à l’identité, la naissance et le téléphone ; les dossiers médicaux ne sont pas encore gérés. Utiliser des données fictives.
+SQLite sert au développement d’un seul établissement. Aucune isolation entre établissements n’est implémentée. Les huit modules web sont décrits dans les guides WEB-01 à WEB-08, notamment les consultations, dossiers médicaux et documents privés. Consulter le [bilan web](BILAN-WEB.md) pour leurs limites. Utiliser des données fictives.
 
 Le courrier utilise le journal local par défaut : les liens de réinitialisation y apparaissent. Configurer un transport mail avant tout autre usage.
 
@@ -51,4 +51,4 @@ Le lanceur Snap échoue dans l’environnement de préparation. Le SDK fonctionn
 
 ## Avant un déploiement
 
-Cette version est destinée au développement local. Il reste notamment à définir l’organisation des établissements, les permissions métiers, l’audit des accès, le chiffrement au repos, les sauvegardes et leur restauration. Préparer une configuration de production avec HTTPS, `APP_DEBUG=false`, cookies sécurisés, secrets dédiés et transport mail, puis vérifier les obligations du lieu de déploiement.
+Cette version est destinée au développement local. Les permissions métiers, plusieurs historiques et le chiffrement de certaines données existent déjà. Il reste notamment à valider l’organisation des établissements, compléter la protection des consultations et des journaux, et mettre en place les sauvegardes et leur restauration. Préparer une configuration de production avec HTTPS, `APP_DEBUG=false`, cookies sécurisés, secrets dédiés et transport mail, puis vérifier les obligations du lieu de déploiement.
