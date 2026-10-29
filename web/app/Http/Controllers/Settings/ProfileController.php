@@ -7,6 +7,7 @@ use App\Http\Requests\Settings\ProfileUpdateRequest;
 use App\Models\AdministrationExport;
 use App\Models\Appointment;
 use App\Models\BillingEvent;
+use App\Models\ClinicalShare;
 use App\Models\ClinicSettingEvent;
 use App\Models\Consultation;
 use App\Models\DoctorAvailability;
@@ -15,6 +16,7 @@ use App\Models\InvoicePayment;
 use App\Models\MedicalAccessEvent;
 use App\Models\MedicalDocument;
 use App\Models\MedicalRecordEntry;
+use App\Models\PatientEvent;
 use App\Models\PersonnelEvent;
 use App\Models\ProfessionalProfile;
 use App\Models\StaffAbsence;
@@ -67,6 +69,10 @@ class ProfileController extends Controller
         $user = $request->user();
         if ($user->role === 'admin') {
             throw ValidationException::withMessages(['password' => 'Un compte administrateur ne peut pas être supprimé depuis cet écran.']);
+        }
+
+        if (PatientEvent::where('actor_id', $user->id)->exists() || ClinicalShare::where(fn ($query) => $query->where('owner_id', $user->id)->orWhere('viewer_id', $user->id))->exists()) {
+            throw ValidationException::withMessages(['password' => 'Ce compte est référencé dans une décision patient ou un partage. Contactez un administrateur pour le suspendre.']);
         }
 
         if (AdministrationExport::where('actor_id', $user->id)->exists() || ClinicSettingEvent::where('actor_id', $user->id)->exists()) {

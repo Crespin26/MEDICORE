@@ -1,7 +1,8 @@
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useForm } from '@inertiajs/react';
+import { type SharedData } from '@/types';
+import { useForm, usePage } from '@inertiajs/react';
 import { type FormEvent } from 'react';
 
 export type Patient = {
@@ -12,11 +13,14 @@ export type Patient = {
     phone: string | null;
     email: string | null;
     address: string | null;
+    archived_at?: string | null;
+    distinct_identity?: boolean;
     created_at?: string;
     updated_at?: string;
 };
 
 export function PatientForm({ patient, onDone }: { patient?: Patient; onDone?: () => void }) {
+    const { auth } = usePage<SharedData>().props;
     const form = useForm({
         first_name: patient?.first_name ?? '',
         last_name: patient?.last_name ?? '',
@@ -24,6 +28,8 @@ export function PatientForm({ patient, onDone }: { patient?: Patient; onDone?: (
         phone: patient?.phone ?? '',
         email: patient?.email ?? '',
         address: patient?.address ?? '',
+        confirm_distinct: false as boolean,
+        distinct_reason: '',
     });
     const submit = (event: FormEvent) => {
         event.preventDefault();
@@ -66,6 +72,36 @@ export function PatientForm({ patient, onDone }: { patient?: Patient; onDone?: (
                     </div>
                 ))}
             </div>
+            {auth.user.role === 'admin' && (
+                <fieldset className="mt-4 space-y-3 rounded-md border p-3">
+                    <legend>Homonymes — confirmation administrative</legend>
+                    <label className="flex gap-2">
+                        <input
+                            type="checkbox"
+                            checked={form.data.confirm_distinct}
+                            onChange={(event) => form.setData('confirm_distinct', event.target.checked)}
+                        />
+                        Je confirme qu’il s’agit d’une personne distincte malgré une identité identique.
+                    </label>
+                    {form.data.confirm_distinct && (
+                        <>
+                            <label htmlFor="distinct_reason" className="block">
+                                Justification de la distinction
+                            </label>
+                            <textarea
+                                id="distinct_reason"
+                                required
+                                minLength={5}
+                                maxLength={1000}
+                                className="w-full rounded-md border p-2"
+                                value={form.data.distinct_reason}
+                                onChange={(event) => form.setData('distinct_reason', event.target.value)}
+                            />
+                        </>
+                    )}
+                    <InputError message={form.errors.distinct_reason} />
+                </fieldset>
+            )}
             <div className="mt-4 flex gap-3">
                 <Button disabled={form.processing}>{patient ? 'Enregistrer les modifications' : 'Créer le patient'}</Button>
                 {patient && onDone && (

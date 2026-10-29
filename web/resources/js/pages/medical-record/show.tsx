@@ -1,5 +1,6 @@
 import InputError from '@/components/input-error';
 import { EntryForm, displayTime, type Entry, type Page } from '@/components/medical-record/entry-form';
+import { ClinicalSharing, type Share } from '@/components/medical-record/sharing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
@@ -7,7 +8,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useRef, type FormEvent } from 'react';
 type Patient = { id: number; first_name: string; last_name: string };
-type Document = { id: number; title: string; original_name: string; size: number; created_at: string };
+type Document = { doctor_id: number; id: number; title: string; original_name: string; size: number; created_at: string };
 type Timeline = { id: number; type: 'entry' | 'document' | 'consultation'; event_at: string };
 function Pagination({ page, label }: { page: Page<unknown>; label: string }) {
     return (
@@ -26,6 +27,10 @@ export default function MedicalRecord({
     kinds,
     kind,
     timezone,
+    sharingDoctors,
+    outgoingShares,
+    incomingAuthors,
+    archived,
 }: {
     patient: Patient;
     entries: Page<Entry>;
@@ -34,8 +39,13 @@ export default function MedicalRecord({
     kinds: Record<string, string>;
     kind: string;
     timezone: string;
+    sharingDoctors: { id: number; name: string }[];
+    outgoingShares: Share[];
+    incomingAuthors: { id: number; name: string }[];
+    archived: boolean;
 }) {
-    const { status } = usePage<SharedData>().props;
+    const { status, auth } = usePage<SharedData>().props;
+    const author = (id?: number) => (id === auth.user.id ? 'Moi' : (incomingAuthors.find((doctor) => doctor.id === id)?.name ?? `Médecin n° ${id}`));
     const fileInput = useRef<HTMLInputElement>(null);
     const upload = useForm<{ title: string; file: File | null }>({ title: '', file: null });
     const submit = (event: FormEvent) => {
@@ -83,7 +93,12 @@ export default function MedicalRecord({
                         {status}
                     </p>
                 )}
-                <EntryForm patientId={patient.id} kinds={kinds} />
+                <ClinicalSharing patientId={patient.id} doctors={sharingDoctors} shares={outgoingShares} incoming={incomingAuthors} />
+                {archived ? (
+                    <p>Patient archivé : les nouvelles informations et pièces sont bloquées.</p>
+                ) : (
+                    <EntryForm patientId={patient.id} kinds={kinds} />
+                )}
                 <section className="rounded-xl border p-6">
                     <h2 className="text-lg font-semibold">Antécédents, allergies et traitements déclarés</h2>
                     <nav aria-label="Catégories" className="my-4 flex flex-wrap gap-4">
@@ -104,7 +119,7 @@ export default function MedicalRecord({
                         {entries.data.map((entry) => (
                             <li key={entry.id} className="rounded-lg border p-4">
                                 <p className="text-muted-foreground text-sm">
-                                    {kinds[entry.kind]} · {entry.status === 'active' ? 'Actif' : 'Résolu / terminé'}
+                                    {author(entry.doctor_id)} · {kinds[entry.kind]} · {entry.status === 'active' ? 'Actif' : 'Résolu / terminé'}
                                 </p>
                                 <Link
                                     className="mt-2 inline-block font-semibold break-words underline"
@@ -124,37 +139,39 @@ export default function MedicalRecord({
                 </section>
                 <section className="rounded-xl border p-6">
                     <h2 className="text-lg font-semibold">Documents privés</h2>
-                    <form onSubmit={submit} className="my-4 space-y-4">
-                        <div>
-                            <label htmlFor="title" className="mb-2 block text-sm">
-                                Titre du document
-                            </label>
-                            <Input
-                                id="title"
-                                required
-                                maxLength={255}
-                                value={upload.data.title}
-                                onChange={(event) => upload.setData('title', event.target.value)}
-                            />
-                            <InputError message={upload.errors.title} />
-                        </div>
-                        <div>
-                            <label htmlFor="file" className="mb-2 block text-sm">
-                                PDF, JPEG ou PNG · 10 Mo maximum
-                            </label>
-                            <Input
-                                ref={fileInput}
-                                id="file"
-                                type="file"
-                                required
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={(event) => upload.setData('file', event.target.files?.[0] ?? null)}
-                            />
-                            <InputError message={upload.errors.file} />
-                        </div>
-                        {upload.progress && <p role="status">Envoi : {upload.progress.percentage}%</p>}
-                        <Button disabled={upload.processing}>Ajouter le document</Button>
-                    </form>
+                    {!archived && (
+                        <form onSubmit={submit} className="my-4 space-y-4">
+                            <div>
+                                <label htmlFor="title" className="mb-2 block text-sm">
+                                    Titre du document
+                                </label>
+                                <Input
+                                    id="title"
+                                    required
+                                    maxLength={255}
+                                    value={upload.data.title}
+                                    onChange={(event) => upload.setData('title', event.target.value)}
+                                />
+                                <InputError message={upload.errors.title} />
+                            </div>
+                            <div>
+                                <label htmlFor="file" className="mb-2 block text-sm">
+                                    PDF, JPEG ou PNG · 10 Mo maximum
+                                </label>
+                                <Input
+                                    ref={fileInput}
+                                    id="file"
+                                    type="file"
+                                    required
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    onChange={(event) => upload.setData('file', event.target.files?.[0] ?? null)}
+                                />
+                                <InputError message={upload.errors.file} />
+                            </div>
+                            {upload.progress && <p role="status">Envoi : {upload.progress.percentage}%</p>}
+                            <Button disabled={upload.processing}>Ajouter le document</Button>
+                        </form>
+                    )}
                     <ul className="space-y-3">
                         {documents.data.map((document) => (
                             <li key={document.id} className="rounded-lg border p-3">
@@ -162,7 +179,8 @@ export default function MedicalRecord({
                                     {document.title}
                                 </a>
                                 <p className="text-muted-foreground mt-1 text-sm break-words">
-                                    {document.original_name} · {Math.ceil(document.size / 1024)} Ko · {displayTime(document.created_at, timezone)}
+                                    {author(document.doctor_id)} · {document.original_name} · {Math.ceil(document.size / 1024)} Ko ·{' '}
+                                    {displayTime(document.created_at, timezone)}
                                 </p>
                             </li>
                         ))}

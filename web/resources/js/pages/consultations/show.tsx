@@ -46,10 +46,12 @@ export default function ConsultationDetails({
     consultation,
     revisions,
     timezone,
+    canUpdate,
 }: {
     consultation: Consultation;
     revisions: { data: Revision[]; current_page: number; prev_page_url: string | null; next_page_url: string | null };
     timezone: string;
+    canUpdate: boolean;
 }) {
     const [editing, setEditing] = useState(false);
     const { status } = usePage<SharedData>().props;
@@ -88,7 +90,8 @@ export default function ConsultationDetails({
                         {status}
                     </p>
                 )}
-                {editing ? (
+                {!canUpdate && <p className="rounded-md border p-3">Lecture partagée : les corrections restent réservées au médecin auteur.</p>}
+                {editing && canUpdate ? (
                     <ConsultationForm
                         key={consultation.id}
                         consultation={consultation}
@@ -99,9 +102,11 @@ export default function ConsultationDetails({
                 ) : (
                     <section className="rounded-xl border p-6">
                         <ClinicalContent data={consultation} />
-                        <Button className="mt-6" onClick={() => setEditing(true)}>
-                            {consultation.status === 'validated' ? 'Apporter une correction' : 'Modifier ou valider'}
-                        </Button>
+                        {canUpdate && (
+                            <Button className="mt-6" onClick={() => setEditing(true)}>
+                                {consultation.status === 'validated' ? 'Apporter une correction' : 'Modifier ou valider'}
+                            </Button>
+                        )}
                     </section>
                 )}
                 <section className="rounded-xl border p-6">

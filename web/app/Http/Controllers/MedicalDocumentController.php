@@ -37,6 +37,7 @@ class MedicalDocumentController extends Controller
             $scheduler->transaction(function () use ($request, $patient, $scheduler, $data, $file, $mime, $extensions, $content, $path) {
                 $scheduler->lockDoctors([$request->user()->id]);
                 abort_unless(User::findOrFail($request->user()->id)->hasPermission('medical-record.write'), 403);
+                Patient::whereKey($patient->id)->lockForUpdate()->firstOrFail()->assertActive();
                 $document = MedicalDocument::create([
                     'patient_id' => $patient->id, 'doctor_id' => $request->user()->id, 'title' => $data['title'],
                     'original_name' => basename(str_replace('\\', '/', $file->getClientOriginalName())),

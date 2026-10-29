@@ -24,9 +24,9 @@ class ConsultationController extends Controller
             ->when($filters['patient_id'] ?? null, fn ($query, $patient) => $query->where('patient_id', $patient))
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->orderByDesc('consulted_at')->orderByDesc('id')->paginate(20)->withQueryString()->through(fn ($consultation) => [
-                    'id' => $consultation->id, 'patient_id' => $consultation->patient_id, 'patient' => $consultation->patient->last_name.' '.$consultation->patient->first_name,
-                    'consulted_at' => ClinicTime::local($consultation->consulted_at), 'status' => $consultation->status, 'reason' => $consultation->reason,
-                ]);
+                'id' => $consultation->id, 'patient_id' => $consultation->patient_id, 'patient' => $consultation->patient->last_name.' '.$consultation->patient->first_name,
+                'consulted_at' => ClinicTime::local($consultation->consulted_at), 'status' => $consultation->status, 'reason' => $consultation->reason,
+            ]);
         $patientIds = $consultations->getCollection()->pluck('patient_id');
         if (! empty($filters['patient_id'])) {
             $patientIds->push((int) $filters['patient_id']);
@@ -43,6 +43,7 @@ class ConsultationController extends Controller
 
     public function create(Request $request, Patient $patient)
     {
+        $patient->assertActive();
         $data = $request->validate(['appointment_id' => ['nullable', 'integer', 'exists:appointments,id']]);
         $appointment = null;
         if (! empty($data['appointment_id'])) {
@@ -80,7 +81,7 @@ class ConsultationController extends Controller
                 ...$consultation->toArray(), 'consulted_at' => ClinicTime::local($consultation->consulted_at),
             ],
             'revisions' => $consultation->revisions()->with('author:id,name')->orderByDesc('version')->paginate(10)->withQueryString(),
-            'timezone' => config('clinic.timezone'),
+            'timezone' => config('clinic.timezone'), 'canUpdate' => $request->user()->can('update', $consultation),
         ]);
     }
 

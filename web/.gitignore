@@ -26,3 +26,6 @@ yarn-error.log
 
 # Recovery archives must never be committed.
 *.mcb
+
+/playwright-report/
+/test-results/

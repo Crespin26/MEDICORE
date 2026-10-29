@@ -30,11 +30,14 @@ Voir le [guide WEB-01 et la matrice des accès](WEB-01.md).
 - [x] Ajouter une page de détail avec les informations accessibles selon le rôle.
 - [x] Ajouter les coordonnées facultatives (e-mail, adresse) et la détection des doublons d’identité.
 - [x] Relier les rendez-vous au patient et afficher les rendez-vous accessibles sur sa fiche.
-- [x] Relier les consultations au patient, avec historique limité au médecin auteur.
+- [x] Relier les consultations au patient, avec historique de l’auteur et lecture des éléments explicitement partagés.
 - [x] Relier les factures au patient avec accès réservé aux rôles de facturation.
-- [ ] Finaliser la politique de conservation et implémenter l’archivage réversible ; aucune suppression physique n’est exposée.
+- [ ] Finaliser la politique de conservation et de purge ; l’archivage réversible est disponible, sans suppression physique.
 
 Voir le [guide WEB-02](WEB-02.md), notamment les limites du contrôle des homonymes.
+
+- [x] Confirmer les homonymes distincts avec justification administrative et trace chiffrée.
+- [x] Archiver et réactiver les patients sans suppression des historiques.
 
 ### WEB-03 — Rendez-vous
 
@@ -67,6 +70,8 @@ Voir le [guide WEB-04](WEB-04.md) pour les permissions cliniques, la validation 
 - [x] Journaliser la consultation et la modification du dossier.
 
 Voir le [guide WEB-05](WEB-05.md) pour le périmètre par auteur, le chiffrement, les accès et les limites du traitement des documents.
+
+- [x] Accorder et révoquer un partage patient en lecture seule entre médecins, limité aux éléments de l’auteur.
 
 ### WEB-06 — Facturation et paiements
 
@@ -186,8 +191,9 @@ Voir le [guide WEB-08](WEB-08.md) pour les définitions des indicateurs, les par
 - [x] Ajouter des tests serveur d’authentification, de patients et d’autorisation.
 - [x] Définir les contrôles CI web et mobile dans GitHub Actions.
 - [ ] Vérifier les résultats CI après publication du dépôt.
-- [ ] Finaliser la mise à jour et l’audit des dépendances du starter.
-- [ ] Ajouter des tests métier et des parcours de bout en bout pour chaque nouveau module.
+- [x] Mettre à jour et auditer les dépendances web (aucun avis npm/Composer après correction du 29 octobre).
+- [x] Ajouter une recette navigateur des parcours critiques par rôle sur bureau et petit écran (voir [recette web](WEB-RECETTE.md)).
+- [ ] Compléter la recette avec les responsables métier, les autres navigateurs et l’accessibilité.
 - [ ] Préparer un environnement de démonstration avec données entièrement fictives.
 
 ## 4. Ordre de réalisation proposé

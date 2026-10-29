@@ -72,7 +72,7 @@ class AppointmentController extends Controller
     public function patients(Request $request)
     {
         $data = $request->validate(['search' => ['required', 'string', 'min:2', 'max:100']]);
-        $query = Patient::query();
+        $query = Patient::whereNull('archived_at');
         if (preg_match('/^MC-([0-9]+)$/i', $data['search'], $match)) {
             $query->whereKey($match[1]);
         } else {

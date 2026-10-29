@@ -22,6 +22,8 @@ Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâc
 
 - Sauvegarde SQLite chiffrée avec clé indépendante, restauration isolée contrôlant base et documents, et procédure de gestion des clés (voir [reprise](RECOVERY.md)). L’exploitation réelle reste à provisionner.
 
+- Recette navigateur par rôle sur bureau et petit écran ; confirmation des homonymes, archivage réversible et partage médical explicite en lecture seule (voir [recette web et règles métier](WEB-RECETTE.md)).
+
 ## Prochain incrément
 
 Préparer l’API mobile et les parcours Flutter, en parallèle des exigences d’exploitation restantes : livraison SMTP réelle, sauvegardes et restauration, protections des données existantes, traitement des fichiers et politique de conservation. Les huit incréments web de base sont implémentés ; la préparation à la production reste distincte.

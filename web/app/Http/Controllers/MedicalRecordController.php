@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClinicalShare;
 use App\Models\MedicalAccessEvent;
 use App\Models\MedicalDocument;
 use App\Models\MedicalRecordEntry;
 use App\Models\Patient;
 use App\Models\User;
 use App\Services\AppointmentScheduler;
+use App\Services\ClinicalAccess;
 use App\Services\MedicalAudit;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
@@ -22,19 +24,24 @@ class MedicalRecordController extends Controller
     public function show(Request $request, Patient $patient)
     {
         $data = $request->validate(['kind' => ['nullable', Rule::in(array_keys(MedicalRecordEntry::KINDS))]]);
-        $entries = MedicalRecordEntry::where('patient_id', $patient->id)->where('doctor_id', $request->user()->id)
+        $authors = ClinicalAccess::authors($request->user(), $patient->id);
+        $entries = MedicalRecordEntry::where('patient_id', $patient->id)->whereIn('doctor_id', $authors)
             ->when($data['kind'] ?? null, fn ($query, $kind) => $query->where('kind', $kind))->orderByDesc('updated_at')->orderByDesc('id')->paginate(15)->withQueryString();
-        $documents = MedicalDocument::where('patient_id', $patient->id)->where('doctor_id', $request->user()->id)->orderByDesc('id')->paginate(10, ['*'], 'documents_page')->withQueryString();
+        $documents = MedicalDocument::where('patient_id', $patient->id)->whereIn('doctor_id', $authors)->orderByDesc('id')->paginate(10, ['*'], 'documents_page')->withQueryString();
         $timeline = DB::table('consultations')->select('id', DB::raw("'consultation' as type"), 'consulted_at as event_at')
-            ->where('patient_id', $patient->id)->where('doctor_id', $request->user()->id)
-            ->unionAll(DB::table('medical_record_entries')->select('id', DB::raw("'entry' as type"), 'updated_at as event_at')->where('patient_id', $patient->id)->where('doctor_id', $request->user()->id))
-            ->unionAll(DB::table('medical_documents')->select('id', DB::raw("'document' as type"), 'created_at as event_at')->where('patient_id', $patient->id)->where('doctor_id', $request->user()->id))
+            ->where('patient_id', $patient->id)->whereIn('doctor_id', $authors)
+            ->unionAll(DB::table('medical_record_entries')->select('id', DB::raw("'entry' as type"), 'updated_at as event_at')->where('patient_id', $patient->id)->whereIn('doctor_id', $authors))
+            ->unionAll(DB::table('medical_documents')->select('id', DB::raw("'document' as type"), 'created_at as event_at')->where('patient_id', $patient->id)->whereIn('doctor_id', $authors))
             ->orderByDesc('event_at')->orderBy('type')->orderByDesc('id')->paginate(20, ['*'], 'timeline_page')->withQueryString();
         MedicalAudit::record($request->user(), $patient->id, 'record.view', 'patient', $patient->id);
 
         return Inertia::render('medical-record/show', [
             'patient' => $patient->only('id', 'first_name', 'last_name'), 'entries' => $entries, 'documents' => $documents, 'timeline' => $timeline,
             'kinds' => MedicalRecordEntry::KINDS, 'kind' => $data['kind'] ?? '', 'timezone' => config('clinic.timezone'),
+            'sharingDoctors' => User::where('role', 'doctor')->where('status', 'active')->whereKeyNot($request->user()->id)->get(['id', 'name']),
+            'outgoingShares' => ClinicalShare::where('patient_id', $patient->id)->where('owner_id', $request->user()->id)->whereNull('revoked_at')->get(['id', 'viewer_id', 'created_at']),
+            'incomingAuthors' => User::whereIn('id', array_diff($authors, [$request->user()->id]))->get(['id', 'name']),
+            'archived' => $patient->archived_at !== null,
         ]);
     }
 
@@ -56,6 +63,7 @@ class MedicalRecordController extends Controller
         $entry = $scheduler->transaction(function () use ($request, $patient, $scheduler, $data) {
             $scheduler->lockDoctors([$request->user()->id]);
             abort_unless(User::findOrFail($request->user()->id)->hasPermission('medical-record.write'), 403);
+            Patient::whereKey($patient->id)->lockForUpdate()->firstOrFail()->assertActive();
             $entry = new MedicalRecordEntry($data);
             $entry->patient_id = $patient->id;
             $entry->doctor_id = $request->user()->id;
@@ -76,7 +84,7 @@ class MedicalRecordController extends Controller
         $revisions = $entry->revisions()->orderByDesc('version')->paginate(10)->withQueryString();
         MedicalAudit::record($request->user(), $patient->id, 'entry.view', 'entry', $entry->id, $entry->version);
 
-        return Inertia::render('medical-record/entry', ['patient' => $patient->only('id', 'first_name', 'last_name'), 'entry' => $entry, 'revisions' => $revisions, 'kinds' => MedicalRecordEntry::KINDS, 'timezone' => config('clinic.timezone')]);
+        return Inertia::render('medical-record/entry', ['patient' => $patient->only('id', 'first_name', 'last_name'), 'entry' => $entry, 'canUpdate' => $request->user()->can('update', $entry), 'revisions' => $revisions, 'kinds' => MedicalRecordEntry::KINDS, 'timezone' => config('clinic.timezone')]);
     }
 
     public function update(Request $request, Patient $patient, MedicalRecordEntry $entry, AppointmentScheduler $scheduler)

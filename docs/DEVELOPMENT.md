@@ -52,3 +52,7 @@ Le lanceur Snap échoue dans l’environnement de préparation. Le SDK fonctionn
 ## Avant un déploiement
 
 Cette version est destinée au développement local. Les permissions métiers, plusieurs historiques et le chiffrement de certaines données existent déjà. Il reste notamment à valider l’organisation des établissements, renforcer la protection des journaux et provisionner les sauvegardes, les clés et la reprise sur l’hébergement cible. Le contenu des consultations dispose désormais d’une migration de chiffrement ; des commandes SQLite de sauvegarde chiffrée et restauration isolée sont disponibles. Lire le [guide de reprise et de gestion des clés](RECOVERY.md) avant toute migration de données existantes. Préparer une configuration de production avec HTTPS, `APP_DEBUG=false`, cookies sécurisés, secrets dédiés et transport mail, puis vérifier les obligations du lieu de déploiement.
+
+## Recette web et nouvelles règles métier
+
+La [recette web](WEB-RECETTE.md) décrit l’exécution Playwright sur base temporaire, les homonymes confirmés par l’administrateur, l’archivage réversible et les partages en lecture seule entre médecins. Appliquer les migrations après sauvegarde contrôlée avant d’utiliser ces nouveaux écrans sur une base existante. Les comptes fictifs des tests ne sont jamais provisionnés dans la base active.

@@ -21,6 +21,8 @@ export default function Audit({
     timezone: string;
 }) {
     const actions: Record<string, string> = {
+        'sharing.granted': 'Partage en lecture seule accordé',
+        'sharing.revoked': 'Partage révoqué',
         'record.view': 'Lecture du dossier',
         'entry.view': 'Lecture d’une information et de ses versions',
         'entry.created': 'Ajout d’une information',

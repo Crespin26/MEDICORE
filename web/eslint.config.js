@@ -40,5 +40,9 @@ export default [
     {
         ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
     },
+    {
+        files: ['playwright.config.ts', 'tests/browser/**/*.{ts,mjs}'],
+        languageOptions: { globals: globals.node },
+    },
     prettier, // Turn off all rules that might conflict with Prettier
 ];

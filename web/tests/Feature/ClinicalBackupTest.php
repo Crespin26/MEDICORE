@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\ClinicalShare;
 use App\Models\Consultation;
 use App\Models\MedicalDocument;
 use App\Models\Patient;
+use App\Models\PatientEvent;
 use App\Models\User;
 use App\Services\ClinicalBackup;
 use Illuminate\Contracts\Foundation\MaintenanceMode;
@@ -42,6 +44,9 @@ class ClinicalBackupTest extends TestCase
         $consultation->doctor_id = $doctor->id;
         $consultation->patient_id = $patient->id;
         $consultation->save();
+        $viewer = User::factory()->create(['role' => 'doctor']);
+        PatientEvent::create(['patient_id' => $patient->id, 'actor_id' => $doctor->id, 'action' => 'sharing.granted', 'reason' => 'Motif de relais fictif', 'created_at' => now()]);
+        ClinicalShare::create(['patient_id' => $patient->id, 'owner_id' => $doctor->id, 'viewer_id' => $viewer->id, 'reason' => 'Relais clinique fictif']);
         $content = random_bytes(100000);
         file_put_contents($this->root.'/medical/document.bin', Crypt::encryptString($content));
         MedicalDocument::create(['patient_id' => $patient->id, 'doctor_id' => $doctor->id, 'title' => 'Document fictif', 'original_name' => 'demo.pdf', 'path' => 'document.bin', 'mime_type' => 'application/pdf', 'extension' => 'pdf', 'size' => strlen($content), 'sha256' => hash('sha256', $content)]);
@@ -75,6 +80,8 @@ class ClinicalBackupTest extends TestCase
         $pdo = new \PDO('sqlite:'.$this->root.'/recovered/database.sqlite');
         $this->assertSame('ok', $pdo->query('PRAGMA integrity_check')->fetchColumn());
         $this->assertSame('Consultation restaurable', Crypt::decryptString($pdo->query('SELECT report FROM consultations')->fetchColumn()));
+        $this->assertSame('Motif de relais fictif', Crypt::decryptString($pdo->query('SELECT reason FROM patient_events')->fetchColumn()));
+        $this->assertSame('Relais clinique fictif', Crypt::decryptString($pdo->query('SELECT reason FROM clinical_shares')->fetchColumn()));
         $this->assertSame('Rapport fictif à restaurer', Crypt::decryptString($pdo->query('SELECT report FROM recovery_probe')->fetchColumn()));
         $this->assertSame('Version après sauvegarde', Crypt::decryptString(DB::table('recovery_probe')->value('report')));
         $this->assertSame(file_get_contents($this->root.'/medical/document.bin'), file_get_contents($this->root.'/recovered/medical/document.bin'));

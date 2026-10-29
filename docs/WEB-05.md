@@ -1,5 +1,7 @@
 # WEB-05 — Dossier médical électronique
 
+> Mise à jour du 29 octobre : un partage explicite et révocable peut ouvrir la lecture des éléments d’un auteur à un autre médecin pour un patient donné. Les corrections restent réservées à l’auteur. Les mentions d’accès « par auteur » ci-dessous décrivent le périmètre sans partage. Voir les [règles métier et la recette](WEB-RECETTE.md).
+
 ## Accès et parcours
 
 Depuis une fiche patient, le médecin ouvre **Dossier médical** (`/patients/{patient}/medical-record`). Le dossier présente les informations, documents et consultations dont ce médecin est l’auteur. Les autres médecins, administrateurs, secrétaires et caissiers n’obtiennent pas d’accès aux contenus cliniques de cet auteur.

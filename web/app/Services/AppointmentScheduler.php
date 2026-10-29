@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Appointment;
 use App\Models\DoctorAvailability;
+use App\Models\Patient;
 use App\Models\StaffAbsence;
 use App\Models\User;
 use App\Support\ClinicHours;
@@ -50,6 +51,7 @@ class AppointmentScheduler
             }
             $doctorIds[] = (int) $data['doctor_id'];
             $this->lockDoctors($doctorIds);
+            Patient::whereKey($data['patient_id'])->lockForUpdate()->firstOrFail()->assertActive();
             $appointment = $id ? Appointment::whereKey($id)->lockForUpdate()->firstOrFail() : new Appointment;
             if ($id && ! in_array($appointment->status, ['scheduled', 'confirmed'], true)) {
                 throw ValidationException::withMessages(['starts_at' => 'Seuls les rendez-vous prévus ou confirmés peuvent être déplacés.']);

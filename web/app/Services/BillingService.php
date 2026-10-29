@@ -85,7 +85,8 @@ class BillingService
                 throw ValidationException::withMessages(['currency' => 'La devise de l’établissement a changé. Rechargez le formulaire.']);
             }
             [$lines, $total] = $this->lines($data['lines'], $currency);
-            $patient = Patient::findOrFail($data['patient_id']);
+            $patient = Patient::whereKey($data['patient_id'])->lockForUpdate()->firstOrFail();
+            $patient->assertActive();
             $invoice = Invoice::create(['patient_id' => $patient->id, 'patient_name' => $patient->last_name.' '.$patient->first_name, 'created_by' => $actor->id, 'create_token' => $data['token'], 'request_fingerprint' => $fingerprint, 'currency' => $currency, 'status' => 'draft', 'total_minor' => $total, 'paid_minor' => 0, 'version' => 1]);
             $invoice->lines()->createMany($lines);
             $this->event($actor, 'invoice.created', $invoice);

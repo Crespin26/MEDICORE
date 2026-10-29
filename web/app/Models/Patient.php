@@ -4,12 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class Patient extends Model
 {
     protected $fillable = ['first_name', 'last_name', 'birth_date', 'phone', 'email', 'address'];
 
     protected $hidden = ['identity_key', 'search_text'];
+
+    public function assertActive(): void
+    {
+        if ($this->archived_at !== null) {
+            throw ValidationException::withMessages(['patient_id' => 'Ce patient est archivé. Un administrateur doit le réactiver avant une nouvelle opération.']);
+        }
+    }
 
     public static function identityKey(string $firstName, string $lastName, string $birthDate): string
     {
@@ -27,12 +35,12 @@ class Patient extends Model
             $patient->first_name = Str::squish($patient->first_name);
             $patient->last_name = Str::squish($patient->last_name);
             $patient->search_text = self::searchText($patient->first_name, $patient->last_name, $patient->phone ?? '', $patient->email ?? '');
-            $patient->identity_key = self::identityKey($patient->first_name, $patient->last_name, $patient->birth_date->format('Y-m-d'));
+            $patient->identity_key = $patient->distinct_identity ? null : self::identityKey($patient->first_name, $patient->last_name, $patient->birth_date->format('Y-m-d'));
         });
     }
 
     protected function casts(): array
     {
-        return ['birth_date' => 'date:Y-m-d'];
+        return ['birth_date' => 'date:Y-m-d', 'archived_at' => 'immutable_datetime', 'distinct_identity' => 'boolean'];
     }
 }

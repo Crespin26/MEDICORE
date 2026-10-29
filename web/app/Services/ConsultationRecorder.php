@@ -37,6 +37,7 @@ class ConsultationRecorder
                 throw ValidationException::withMessages(['consulted_at' => 'La date doit se situer entre la naissance du patient et l’heure actuelle.']);
             }
             if (! $id) {
+                Patient::whereKey($patient->id)->lockForUpdate()->firstOrFail()->assertActive();
                 $consultation->patient_id = $patient->id;
                 $consultation->doctor_id = $actor->id;
                 $appointmentId = $data['appointment_id'] ?? null;

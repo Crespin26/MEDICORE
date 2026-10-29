@@ -8,7 +8,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, type FormEvent } from 'react';
 
 type Page = { data: Patient[]; prev_page_url: string | null; next_page_url: string | null; current_page: number; total: number };
-type Filters = { search: string; birth_from: string; birth_to: string; contact: string };
+type Filters = { search: string; birth_from: string; birth_to: string; contact: string; state: string };
 export default function Patients({ patients, filters }: { patients: Page; filters: Filters }) {
     const { auth, status } = usePage<SharedData>().props;
     const canWrite = auth.permissions.includes('patients.write');
@@ -18,6 +18,7 @@ export default function Patients({ patients, filters }: { patients: Page; filter
         birth_from: filters.birth_from ?? '',
         birth_to: filters.birth_to ?? '',
         contact: filters.contact ?? '',
+        state: filters.state ?? 'active',
     });
     const submit = (event: FormEvent) => {
         event.preventDefault();
@@ -40,6 +41,17 @@ export default function Patients({ patients, filters }: { patients: Page; filter
                 {canWrite && <PatientForm key={editing?.id ?? 'new'} patient={editing} onDone={() => setEditing(undefined)} />}
                 <form onSubmit={submit} className="rounded-xl border p-6">
                     <h2 className="mb-4 font-semibold">Rechercher un patient</h2>
+                    <label htmlFor="patient_state">État des fiches</label>
+                    <select
+                        id="patient_state"
+                        className="mb-4 rounded-md border p-2"
+                        value={search.data.state}
+                        onChange={(event) => search.setData('state', event.target.value)}
+                    >
+                        <option value="active">Actives</option>
+                        <option value="archived">Archivées</option>
+                        <option value="all">Toutes</option>
+                    </select>
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
                             <label htmlFor="search" className="mb-2 block text-sm">
@@ -127,7 +139,7 @@ export default function Patients({ patients, filters }: { patients: Page; filter
                                                 Voir la fiche
                                             </Link>
                                             {canWrite && (
-                                                <Button variant="outline" onClick={() => edit(patient)}>
+                                                <Button variant="outline" disabled={!!patient.archived_at} onClick={() => edit(patient)}>
                                                     Modifier
                                                 </Button>
                                             )}

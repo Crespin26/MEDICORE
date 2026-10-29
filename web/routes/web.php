@@ -3,12 +3,14 @@
 use App\Http\Controllers\AdministrationController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\ClinicalShareController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoctorAvailabilityController;
 use App\Http\Controllers\MedicalDocumentController;
 use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PatientLifecycleController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +20,9 @@ Route::middleware('auth')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->middleware('can:dashboard.view')->name('dashboard');
     Route::get('patients', [PatientController::class, 'index'])->middleware('can:patients.view')->name('patients.index');
     Route::get('patients/{patient}', [PatientController::class, 'show'])->middleware('can:patients.view')->name('patients.show');
+    Route::patch('patients/{patient}/lifecycle', [PatientLifecycleController::class, 'update'])->middleware('can:users.manage')->name('patients.lifecycle');
+    Route::post('patients/{patient}/clinical-shares', [ClinicalShareController::class, 'store'])->middleware('can:medical-record.write')->name('clinical-shares.store');
+    Route::patch('patients/{patient}/clinical-shares/{share}/revoke', [ClinicalShareController::class, 'revoke'])->middleware('can:medical-record.write')->name('clinical-shares.revoke');
     Route::post('patients', [PatientController::class, 'store'])->middleware('can:patients.write')->name('patients.store');
     Route::patch('patients/{patient}', [PatientController::class, 'update'])->middleware('can:patients.write')->name('patients.update');
     Route::get('appointments', [AppointmentController::class, 'index'])->middleware('can:appointments.view')->name('appointments.index');

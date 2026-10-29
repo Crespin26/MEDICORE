@@ -2,6 +2,14 @@
 
 Bilan du 28 octobre 2026, établi sur le code local au commit `79213ea`, les guides WEB-01 à WEB-08, les contrôles locaux et les audits de dépendances. Le bilan initial était documentaire. La mise à jour du 29 octobre ci-dessous décrit les correctifs de dépendances appliqués ensuite.
 
+## Mise à jour du 29 octobre 2026 — recette et besoins métier
+
+À la demande de traiter les trois volets, le lot ajoute les homonymes confirmés et motivés par un administrateur, l’archivage réversible sans suppression, et le partage explicite/révocable en lecture seule des éléments d’un médecin pour un patient. Les corrections restent réservées à l’auteur ; le partage n’accorde aucun accès clinique aux administrateurs, secrétaires ou caissiers.
+
+La suite PHP complète a réussi **184 tests et 2 044 assertions**, incluant les nouveaux droits, règles patient et la reprise des motifs chiffrés. La recette Playwright a réussi **26 scénarios sur Chromium**, sur bureau et à 390 × 844 : rôles, refus directs, patients/rendez-vous, consultation liée, correction, documents privés, facturation/paiements/reçu, CSRF, déconnexion, homonymes, archivage/réactivation et partage/révocation. TypeScript, contrôle des tests TypeScript, ESLint et compilation passent. L’audit npm après ajout des outils de test ne signale aucun avis.
+
+Voir le [guide de recette et de règles métier](WEB-RECETTE.md) pour le détail, les commandes, l’isolation et les décisions restant à faire accepter par l’établissement. Les autres navigateurs, la recette humaine et l’accessibilité complète restent à vérifier. La CI est configurée ; son résultat distant n’a pas été inspecté. Les migrations n’ont pas été appliquées sur la base active locale.
+
 ## Mise à jour du 29 octobre 2026 — protection et reprise
 
 Le point 2 dispose désormais d'une implémentation : chiffrement des consultations et de leurs révisions, migration des valeurs existantes, commandes de sauvegarde SQLite chiffrée et de restauration isolée, vérification des clés et des documents. Voir le [guide de reprise](RECOVERY.md).
@@ -126,8 +134,8 @@ Les invitations et réinitialisations doivent être testées avec de vrais courr
 | P0 — réalisé le 29 octobre | Mettre à jour et analyser les dépendances signalées. | Aucun avis npm/Composer après correction ; tests et compilation réussis. Surveillance régulière à maintenir. |
 | P0 — outils et tests locaux livrés le 29 octobre | Protéger les consultations stockées et organiser les clés, sauvegardes et restauration. | Migration et reprise testées sur données fictives ; coffre, copies distantes et exercice sur hébergement cible encore requis. |
 | P0 | Préparer la configuration d'exploitation, le SMTP et la surveillance. | Parcours d'invitation/réinitialisation reçus, configuration revue, alertes vérifiées. |
-| P1 | Valider les besoins métier : homonymes, archivage, relais entre médecins, règles et documents de facturation. | Décisions documentées puis scénarios de recette acceptés. |
-| P1 | Réaliser une recette navigateur par rôle, dont accès interdits et parcours complets ; automatiser les parcours critiques. | Patients → rendez-vous → consultation → dossier et facture → paiements → reçu vérifiés selon les droits. |
+| P1 — règles et fonctions livrées localement | Homonymes, archivage et relais entre médecins ; validation des règles et documents de facturation. | Scénarios automatisés et règles documentées ; acceptation par l’établissement et mentions de facturation encore requises. |
+| P1 — automatisation livrée | Recette navigateur par rôle et accès interdits. | 26 scénarios Chromium réussis sur deux tailles de fenêtre ; recette humaine, autres navigateurs et accessibilité complète à terminer. |
 | P1 | Mesurer la charge sur le moteur et l'hébergement cibles. | Objectifs de volume et temps de réponse définis, conflits et restauration vérifiés dans cet environnement. |
 | P2 | Étendre selon les besoins : rappels, récurrence, exports comptables, assurances et API mobile. | Périmètre priorisé après recette du socle web. |
 

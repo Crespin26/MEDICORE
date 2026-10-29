@@ -6,10 +6,13 @@ use App\Models\Appointment;
 use App\Models\Consultation;
 use App\Models\Invoice;
 use App\Models\Patient;
+use App\Models\PatientEvent;
+use App\Services\ClinicalAccess;
 use App\Services\MedicalAudit;
 use App\Support\ClinicTime;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -23,8 +26,12 @@ class PatientController extends Controller
             'birth_from' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:today'],
             'birth_to' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:today', ...($request->filled('birth_from') ? ['after_or_equal:birth_from'] : [])],
             'contact' => ['nullable', 'in:with_phone,without_phone'],
+            'state' => ['nullable', 'in:active,archived,all'],
         ]);
         $query = Patient::query();
+        if (($filters['state'] ?? 'active') !== 'all') {
+            ($filters['state'] ?? 'active') === 'archived' ? $query->whereNotNull('archived_at') : $query->whereNull('archived_at');
+        }
         $search = Str::squish($filters['search'] ?? '');
         if ($search !== '') {
             $query->where(function ($query) use ($search) {
@@ -50,7 +57,7 @@ class PatientController extends Controller
 
         return Inertia::render('patients/index', [
             'patients' => $query->orderBy('last_name')->orderBy('first_name')->orderBy('id')->paginate(20)->withQueryString(),
-            'filters' => array_merge(['search' => '', 'birth_from' => '', 'birth_to' => '', 'contact' => ''], $filters),
+            'filters' => array_merge(['search' => '', 'birth_from' => '', 'birth_to' => '', 'contact' => '', 'state' => 'active'], $filters),
         ]);
     }
 
@@ -67,7 +74,7 @@ class PatientController extends Controller
         $props = ['patient' => $patient, 'appointments' => $appointments];
         if ($request->user()->can('consultations.view')) {
             MedicalAudit::record($request->user(), $patient->id, 'consultations.summary', 'patient', $patient->id);
-            $props['consultations'] = Consultation::where('patient_id', $patient->id)->where('doctor_id', $request->user()->id)
+            $props['consultations'] = Consultation::where('patient_id', $patient->id)->whereIn('doctor_id', ClinicalAccess::authors($request->user(), $patient->id))
                 ->orderByDesc('consulted_at')->orderByDesc('id')->limit(10)->get()->map(fn ($consultation) => [
                     'id' => $consultation->id, 'consulted_at' => ClinicTime::local($consultation->consulted_at), 'status' => $consultation->status,
                 ]);
@@ -75,6 +82,10 @@ class PatientController extends Controller
 
         if ($request->user()->can('billing.view')) {
             $props['invoices'] = Invoice::where('patient_id', $patient->id)->orderByDesc('id')->limit(10)->get(['id', 'number', 'currency', 'status', 'total_minor', 'paid_minor']);
+        }
+
+        if ($request->user()->role === 'admin') {
+            $props['lifecycleEvents'] = PatientEvent::where('patient_id', $patient->id)->whereIn('action', ['identity.distinct-confirmed', 'patient.archived', 'patient.reactivated'])->orderByDesc('id')->limit(30)->get();
         }
 
         return Inertia::render('patients/show', $props);
@@ -89,6 +100,8 @@ class PatientController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string', 'max:500'],
+            'confirm_distinct' => ['sometimes', 'boolean'],
+            'distinct_reason' => ['nullable', 'string', 'min:5', 'max:1000'],
         ]);
         $data['first_name'] = Str::squish($data['first_name']);
         $data['last_name'] = Str::squish($data['last_name']);
@@ -99,17 +112,35 @@ class PatientController extends Controller
             $duplicate = Patient::whereNull('identity_key')->when($patient, fn ($query) => $query->whereKeyNot($patient->id))->get()
                 ->first(fn ($existing) => Patient::identityKey($existing->first_name, $existing->last_name, $existing->birth_date->format('Y-m-d')) === $key);
         }
-        if ($duplicate) {
+        $confirmed = (bool) ($data['confirm_distinct'] ?? false);
+        if ($confirmed) {
+            abort_unless($request->user()->role === 'admin', 403);
+            if (trim($data['distinct_reason'] ?? '') === '') {
+                throw ValidationException::withMessages(['distinct_reason' => 'Justifiez la confirmation de deux personnes distinctes.']);
+            }
+        }
+        $unchanged = $patient && Patient::identityKey($patient->first_name, $patient->last_name, $patient->birth_date->format('Y-m-d')) === $key;
+        $establishedIdentity = $unchanged && ($patient->distinct_identity || $patient->identity_key === $key);
+        $previouslyConfirmed = $unchanged && $patient->distinct_identity;
+        if ($duplicate && ! $confirmed && ! $establishedIdentity) {
             throw ValidationException::withMessages(['first_name' => 'Une fiche porte déjà ces prénom, nom et date de naissance (MC-'.$duplicate->id.'). Vérifiez-la avant de poursuivre.']);
         }
+
+        $data['distinct_identity'] = $duplicate && ($confirmed || $previouslyConfirmed);
 
         return $data;
     }
 
-    private function save(Patient $patient, array $data): void
+    private function save(Patient $patient, array $data, Request $request): void
     {
         try {
-            $patient->fill($data)->save();
+            DB::transaction(function () use ($patient, $data, $request) {
+                $patient->distinct_identity = $data['distinct_identity'];
+                $patient->fill($data)->save();
+                if ($data['distinct_identity'] && ($data['confirm_distinct'] ?? false)) {
+                    PatientEvent::create(['patient_id' => $patient->id, 'actor_id' => $request->user()->id, 'action' => 'identity.distinct-confirmed', 'reason' => trim($data['distinct_reason']), 'created_at' => now()]);
+                }
+            });
         } catch (UniqueConstraintViolationException $error) {
             throw ValidationException::withMessages(['first_name' => 'Une fiche porte déjà ces prénom, nom et date de naissance. Actualisez la liste et vérifiez-la.']);
         }
@@ -117,14 +148,18 @@ class PatientController extends Controller
 
     public function store(Request $request)
     {
-        $this->save(new Patient, $this->validated($request));
+        $this->save(new Patient, $this->validated($request), $request);
 
         return to_route('patients.index')->with('status', 'Patient créé.');
     }
 
     public function update(Request $request, Patient $patient)
     {
-        $this->save($patient, $this->validated($request, $patient));
+        DB::transaction(function () use ($request, $patient) {
+            $patient = Patient::whereKey($patient->id)->lockForUpdate()->firstOrFail();
+            $patient->assertActive();
+            $this->save($patient, $this->validated($request, $patient), $request);
+        });
 
         return back(fallback: route('patients.index'))->with('status', 'Fiche patient mise à jour.');
     }

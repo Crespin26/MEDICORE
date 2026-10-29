@@ -25,9 +25,19 @@ jobs:
       - run: php artisan key:generate
       - run: npm ci
       - run: npm run typecheck
+      - run: npm run typecheck:e2e
       - run: npm run lint:check
       - run: npm run build
       - run: php artisan test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: web-browser-failures
+          path: web/test-results/
+          retention-days: 5
+          if-no-files-found: ignore
   mobile:
     runs-on: ubuntu-latest
     defaults:

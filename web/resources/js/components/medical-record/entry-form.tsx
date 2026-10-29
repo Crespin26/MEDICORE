@@ -3,7 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useForm } from '@inertiajs/react';
 import { type FormEvent } from 'react';
-export type Entry = { id: number; kind: string; label: string; details: string | null; occurred_on: string | null; status: string; version: number };
+export type Entry = {
+    doctor_id?: number;
+    id: number;
+    kind: string;
+    label: string;
+    details: string | null;
+    occurred_on: string | null;
+    status: string;
+    version: number;
+};
 export const inputClass = 'border-input bg-background w-full rounded-md border px-3 py-2 text-sm';
 export function EntryForm({
     patientId,

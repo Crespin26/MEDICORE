@@ -24,6 +24,11 @@ class ClinicalRecoveryCheck
             $columns['consultations'] = ['reason', 'observations', 'report', 'vitals'];
             $columns['consultation_revisions'] = ['snapshot', 'correction_reason'];
         }
+        foreach (['patient_events', 'clinical_shares'] as $table) {
+            if ($pdo->query("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = '".$table."'")->fetchColumn() > 0) {
+                $columns[$table] = ['reason'];
+            }
+        }
         foreach ($columns as $table => $fields) {
             $query = $pdo->query('SELECT '.implode(', ', $fields).' FROM '.$table);
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {

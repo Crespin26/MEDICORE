@@ -1,5 +1,7 @@
 # WEB-04 — Consultations
 
+> Mise à jour du 29 octobre : un partage explicite et révocable peut ouvrir la lecture des éléments d’un auteur à un autre médecin pour un patient donné. Les corrections restent réservées à l’auteur. Les mentions d’accès « par auteur » ci-dessous décrivent le périmètre sans partage. Voir les [règles métier et la recette](WEB-RECETTE.md).
+
 ## Périmètre et accès
 
 Les consultations contiennent un motif, des observations, des constantes facultatives et un compte rendu. Chaque consultation est associée à un patient et au médecin connecté lors de sa création. Ces associations ne sont pas modifiables ensuite.

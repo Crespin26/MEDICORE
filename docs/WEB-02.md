@@ -20,11 +20,15 @@ Ce contrôle est une heuristique : deux personnes peuvent avoir les mêmes nom, 
 
 La migration conserve les doublons éventuellement présents avant cette version : elle attribue l’empreinte au premier enregistrement du groupe, sans supprimer ni fusionner les autres. Un ancien doublon doit être vérifié et distingué avant qu’une modification puisse lui attribuer la même identité. Aucun dossier existant n’est effacé.
 
+## Homonymes confirmés — 29 octobre 2026
+
+Un administrateur peut confirmer deux personnes distinctes portant les mêmes prénom, nom et date de naissance, avec motif obligatoire et trace chiffrée. La référence MC et les historiques restent séparés. Cette exception ne désactive pas la prévention des doublons ordinaires ni les contrôles côté serveur. Les modifications de coordonnées des deux fiches restent possibles. Un changement d’identité réévalue les doublons. Voir les [règles métier et la recette](WEB-RECETTE.md).
+
 ## Conservation et archivage
 
-Aucune route ni action de suppression physique n’est exposée. Aucune purge automatique n’est exécutée.
+L’archivage et la réactivation sont disponibles pour l’administrateur, avec motif, auteur et date. Les historiques sont conservés et restent accessibles selon les permissions. Les rendez-vous et factures ouverts empêchent l’archivage ; une fiche archivée refuse les nouvelles opérations et disparaît des recherches opérationnelles. La liste propose les filtres actives, archivées et toutes. Les corrections historiques autorisées restent possibles.
 
-Le prochain travail d’archivage devra être réversible, réservé à l’administrateur et tracé, avec date, auteur et motif. Une fiche archivée devra conserver sa référence et ses liens métiers. Avant l’implémentation, définir les situations d’archivage, les permissions de consultation et la politique de conservation de l’établissement. Aucune durée réglementaire n’est présumée ici.
+Aucune suppression physique, fusion ni purge automatique n’est implémentée. La politique de conservation reste à valider selon le déploiement. Le [guide de recette](WEB-RECETTE.md) précise les règles et limites.
 
 ## Dépendances restantes
 

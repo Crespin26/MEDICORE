@@ -19,12 +19,14 @@ export default function MedicalEntry({
     revisions,
     kinds,
     timezone,
+    canUpdate,
 }: {
     patient: { id: number; first_name: string; last_name: string };
     entry: Entry;
     revisions: Page<Revision>;
     kinds: Record<string, string>;
     timezone: string;
+    canUpdate: boolean;
 }) {
     const [editing, setEditing] = useState(false);
     const { status } = usePage<SharedData>().props;
@@ -49,7 +51,8 @@ export default function MedicalEntry({
                         {status}
                     </p>
                 )}
-                {editing ? (
+                {!canUpdate && <p className="rounded-md border p-3">Lecture partagée : les corrections restent réservées au médecin auteur.</p>}
+                {editing && canUpdate ? (
                     <EntryForm key={entry.id} patientId={patient.id} entry={entry} kinds={kinds} onCancel={() => setEditing(false)} />
                 ) : (
                     <section className="rounded-xl border p-6">
@@ -59,9 +62,11 @@ export default function MedicalEntry({
                             {entry.occurred_on && ` · Survenue / début : ${entry.occurred_on.split('-').reverse().join('/')}`}
                         </p>
                         <p className="mt-4 break-words whitespace-pre-wrap">{entry.details || 'Aucun détail supplémentaire.'}</p>
-                        <Button className="mt-4" onClick={() => setEditing(true)}>
-                            Corriger l’information
-                        </Button>
+                        {canUpdate && (
+                            <Button className="mt-4" onClick={() => setEditing(true)}>
+                                Corriger l’information
+                            </Button>
+                        )}
                     </section>
                 )}
                 <section className="rounded-xl border p-6">

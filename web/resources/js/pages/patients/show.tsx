@@ -1,4 +1,5 @@
 import { money } from '@/components/billing/invoice-form';
+import { PatientLifecycle } from '@/components/patients/lifecycle';
 import { PatientForm, type Patient } from '@/components/patients/patient-form';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
@@ -14,15 +15,17 @@ export default function PatientDetails({
     appointments,
     consultations,
     invoices,
+    lifecycleEvents = [],
 }: {
     patient: Patient;
+    lifecycleEvents?: { id: number; action: string; reason: string; created_at: string }[];
     appointments: PatientAppointment[];
     consultations?: PatientConsultation[];
     invoices?: { id: number; number: string | null; currency: string; status: string; total_minor: number; paid_minor: number }[];
 }) {
     const { auth, status } = usePage<SharedData>().props;
     const [editing, setEditing] = useState(false);
-    const canWrite = auth.permissions.includes('patients.write');
+    const canWrite = auth.permissions.includes('patients.write') && !patient.archived_at;
     const fields = [
         ['Prénom', patient.first_name],
         ['Nom', patient.last_name],
@@ -49,6 +52,26 @@ export default function PatientDetails({
                     </h1>
                     <p className="text-muted-foreground mt-2">Fiche patient · MC-{patient.id}</p>
                 </div>
+                {patient.archived_at && <p className="rounded-md border p-4">Fiche archivée : les historiques restent consultables.</p>}
+                {auth.user.role === 'admin' && (
+                    <PatientLifecycle
+                        key={`${patient.id}-${patient.archived_at ?? 'active'}`}
+                        patientId={patient.id}
+                        archived={!!patient.archived_at}
+                    />
+                )}
+                {lifecycleEvents.length > 0 && (
+                    <details className="rounded-md border p-4">
+                        <summary>Historique administratif de la fiche</summary>
+                        <ul>
+                            {lifecycleEvents.map((event) => (
+                                <li key={event.id}>
+                                    {event.action} · {event.reason} · {event.created_at}
+                                </li>
+                            ))}
+                        </ul>
+                    </details>
+                )}
                 {status && (
                     <p role="status" className="rounded-lg border p-4">
                         {status}
@@ -95,10 +118,12 @@ export default function PatientDetails({
                 {auth.permissions.includes('consultations.view') && (
                     <section className="rounded-xl border p-6">
                         <div className="flex flex-wrap justify-between gap-4">
-                            <h2 className="font-semibold">Mes consultations de ce patient</h2>
-                            <Link className="underline" href={`/patients/${patient.id}/consultations/create`}>
-                                Nouvelle consultation
-                            </Link>
+                            <h2 className="font-semibold">Consultations accessibles de ce patient</h2>
+                            {!patient.archived_at && (
+                                <Link className="underline" href={`/patients/${patient.id}/consultations/create`}>
+                                    Nouvelle consultation
+                                </Link>
+                            )}
                         </div>
                         <ul className="mt-4 space-y-3">
                             {consultations?.map((item) => (
