@@ -11,11 +11,13 @@ class MedicalRecordEntry extends Model
 
     protected $fillable = ['kind', 'label', 'details', 'occurred_on', 'status'];
 
+    /** Chiffre les champs sensibles au repos et convertit les dates et versions du modèle. */
     protected function casts(): array
     {
         return ['label' => 'encrypted', 'details' => 'encrypted', 'occurred_on' => 'date:Y-m-d', 'version' => 'integer'];
     }
 
+    /** Expose les révisions conservées ; les écrans doivent les paginer et autoriser leur lecture. */
     public function revisions(): HasMany
     {
         return $this->hasMany(MedicalEntryRevision::class);

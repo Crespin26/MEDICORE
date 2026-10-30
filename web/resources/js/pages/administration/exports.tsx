@@ -1,5 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
+/** Affiche la traçabilité des téléchargements de statistiques agrégées. */
 export default function Exports({
     exports,
     timezone,

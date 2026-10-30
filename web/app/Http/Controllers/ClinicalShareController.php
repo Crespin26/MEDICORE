@@ -13,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class ClinicalShareController extends Controller
 {
+    /** Accorde à un autre médecin actif la lecture des seuls éléments dont l’acteur est auteur. */
     public function store(Request $request, Patient $patient, AppointmentScheduler $scheduler)
     {
         $data = $request->validate(['viewer_id' => ['required', 'integer', 'exists:users,id'], 'reason' => ['required', 'string', 'min:5', 'max:1000']]);
@@ -31,6 +32,7 @@ class ClinicalShareController extends Controller
         return back()->with('status', 'Partage en lecture seule accordé pour vos éléments de ce patient.');
     }
 
+    /** Révoque un partage détenu par l’acteur et trace le motif ; les prochains accès sont refusés. */
     public function revoke(Request $request, Patient $patient, ClinicalShare $share, AppointmentScheduler $scheduler)
     {
         abort_unless($share->patient_id === $patient->id && $share->owner_id === $request->user()->id, 403);

@@ -19,6 +19,7 @@ use Inertia\Inertia;
 
 class PatientController extends Controller
 {
+    /** Recherche et pagine les identités, par défaut actives ; partage les filtres entre web et API. */
     public function index(Request $request)
     {
         $filters = $request->validate([
@@ -65,6 +66,7 @@ class PatientController extends Controller
         ]);
     }
 
+    /** Expose l’identité ; sur le web, ajoute uniquement les résumés autorisés pour le rôle courant. */
     public function show(Request $request, Patient $patient)
     {
         if ($request->is('api/*')) {
@@ -98,6 +100,7 @@ class PatientController extends Controller
         return Inertia::render('patients/show', $props);
     }
 
+    /** Normalise l’identité et contrôle les doublons ; seule une confirmation administrateur motivée les distingue. */
     private function validated(Request $request, ?Patient $patient = null): array
     {
         $data = $request->validate([
@@ -138,6 +141,7 @@ class PatientController extends Controller
         return $data;
     }
 
+    /** Enregistre l’identité et son éventuelle justification atomiquement ; traduit les courses d’unicité en erreur de champ. */
     private function save(Patient $patient, array $data, Request $request): void
     {
         try {
@@ -153,6 +157,7 @@ class PatientController extends Controller
         }
     }
 
+    /** Crée une fiche et renvoie une réponse JSON 201 ou une redirection web. */
     public function store(Request $request)
     {
         $patient = new Patient;
@@ -164,6 +169,7 @@ class PatientController extends Controller
         return to_route('patients.index')->with('status', 'Patient créé.');
     }
 
+    /** Verrouille la fiche avant édition et refuse la modification d’un patient archivé. */
     public function update(Request $request, Patient $patient)
     {
         DB::transaction(function () use ($request, $patient) {

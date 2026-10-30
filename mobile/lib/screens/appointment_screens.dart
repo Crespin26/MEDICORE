@@ -24,14 +24,19 @@ class _AgendaScreenState extends State<AgendaScreen> {
     result = fetch();
   }
 
+  /// Charge les résultats de la page ou du jour sélectionné selon les filtres courants.
   Future<Map<String, dynamic>> fetch() => widget.api.request(
     'GET',
     'appointments',
     query: {'page': '$page', 'date': ?date, 'doctor_id': ?doctor},
   );
+
+  /// Relance le chargement serveur et remplace le résultat affiché sans cache local de données métier.
   void reload() => setState(() {
     result = fetch();
   });
+
+  /// Demande une transition au serveur puis rafraîchit l’agenda ; affiche les refus métier.
   Future<void> changeStatus(Map<String, dynamic> booking, String status) async {
     try {
       await widget.api.request(
@@ -269,8 +274,11 @@ class _BookingEditorState extends State<BookingEditor> {
     result = fetch();
   }
 
+  /// Charge les résultats de la page ou du jour sélectionné selon les filtres courants.
   Future<Map<String, dynamic>> fetch() =>
       widget.api.request('GET', 'appointments', query: {'date': date});
+
+  /// Transmet les champs du formulaire et affiche les erreurs de validation 422 renvoyées par l’API.
   Future<void> submit() async {
     setState(() {
       busy = true;

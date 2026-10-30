@@ -15,6 +15,7 @@ use Inertia\Inertia;
 
 class PersonnelController extends Controller
 {
+    /** Recherche et pagine les comptes avec leur fiche professionnelle selon les filtres autorisés. */
     public function index(Request $request)
     {
         $data = $request->validate(['search' => ['nullable', 'string', 'max:100'], 'role' => ['nullable', Rule::enum(Role::class)], 'status' => ['nullable', 'in:active,pending,suspended']]);
@@ -28,16 +29,19 @@ class PersonnelController extends Controller
             'filters' => ['search' => $data['search'] ?? '', 'role' => $data['role'] ?? '', 'status' => $data['status'] ?? ''], 'roles' => collect(Role::cases())->mapWithKeys(fn ($role) => [$role->value => $role->label()])]);
     }
 
+    /** Affiche la fiche du membre connecté sans commandes de gestion. */
     public function own(Request $request)
     {
         return $this->render($request, $request->user(), false);
     }
 
+    /** Affiche une fiche professionnelle, les absences et l’historique selon les droits de l’acteur. */
     public function show(Request $request, User $user)
     {
         return $this->render($request, $user, true);
     }
 
+    /** Assemble fiche et absences paginées ; ajoute l’historique uniquement pour la gestion. */
     private function render(Request $request, User $user, bool $manage)
     {
         $absences = StaffAbsence::where('user_id', $user->id)->orderByDesc('starts_at')->orderByDesc('id')->paginate(10, ['*'], 'absences_page')->withQueryString()->through(fn ($absence) => [...$absence->toArray(), 'starts_at' => ClinicTime::local($absence->starts_at), 'ends_at' => ClinicTime::local($absence->ends_at)]);
@@ -49,6 +53,7 @@ class PersonnelController extends Controller
         return Inertia::render('personnel/show', $props);
     }
 
+    /** Valide la fiche puis délègue sa mise à jour versionnée au gestionnaire de personnel. */
     public function update(Request $request, User $user, PersonnelManager $manager)
     {
         $data = $request->validate([
@@ -64,6 +69,7 @@ class PersonnelController extends Controller
         return to_route('personnel.show', $user)->with('status', 'Fiche professionnelle enregistrée.');
     }
 
+    /** Valide et délègue la déclaration d’une absence au gestionnaire de personnel. */
     public function absence(Request $request, User $user, PersonnelManager $manager)
     {
         $data = $request->validate(['starts_at' => ['required', 'date_format:Y-m-d\TH:i'], 'ends_at' => ['required', 'date_format:Y-m-d\TH:i'], 'category' => ['required', Rule::in(array_keys(StaffAbsence::CATEGORIES))], 'reason' => ['required', 'string', 'max:500']]);
@@ -72,6 +78,7 @@ class PersonnelController extends Controller
         return to_route('personnel.show', $user)->with('status', 'Absence enregistrée.');
     }
 
+    /** Valide le motif puis délègue l’annulation versionnée d’une absence. */
     public function cancel(Request $request, User $user, StaffAbsence $absence, PersonnelManager $manager)
     {
         abort_unless($absence->user_id === $user->id, 404);

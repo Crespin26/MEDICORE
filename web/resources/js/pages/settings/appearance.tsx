@@ -14,6 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+/** Présente le choix clair, sombre ou système partagé par les composants du navigateur. */
 export default function Appearance() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

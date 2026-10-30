@@ -14,6 +14,7 @@ use Throwable;
 
 class StaffController extends Controller
 {
+    /** Pagine les comptes et expose les rôles disponibles à l’administrateur. */
     public function index()
     {
         return Inertia::render('staff/index', [
@@ -22,6 +23,7 @@ class StaffController extends Controller
         ]);
     }
 
+    /** Crée un compte en attente avec un mot de passe aléatoire puis envoie son invitation. */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -37,6 +39,7 @@ class StaffController extends Controller
         return $this->sendInvitation($user);
     }
 
+    /** Renvoie une invitation uniquement pour un compte encore en attente. */
     public function invite(User $user)
     {
         abort_unless($user->status === 'pending', 409);
@@ -44,6 +47,7 @@ class StaffController extends Controller
         return $this->sendInvitation($user);
     }
 
+    /** Renouvelle le jeton haché avant envoi ; un échec du transport laisse le compte réinvitable. */
     private function sendInvitation(User $user)
     {
         $token = Str::random(64);
@@ -62,6 +66,7 @@ class StaffController extends Controller
             : 'Invitation transmise au transport e-mail.');
     }
 
+    /** Change les accès sous verrou, protège le dernier administrateur et révoque les sessions suspendues. */
     public function update(Request $request, User $user)
     {
         $data = $request->validate([

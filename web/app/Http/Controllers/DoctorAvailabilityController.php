@@ -16,11 +16,13 @@ use Inertia\Inertia;
 
 class DoctorAvailabilityController extends Controller
 {
+    /** Réserve la mutation à un administrateur ou au médecin propriétaire du créneau. */
     private function authorizeDoctor(Request $request, int $doctorId): void
     {
         abort_unless($request->user()->role === 'admin' || ($request->user()->role === 'doctor' && $request->user()->id === $doctorId), 403);
     }
 
+    /** Pagine les disponibilités du jour en limitant un médecin à ses propres créneaux. */
     public function index(Request $request)
     {
         $filters = $request->validate(['date' => ['nullable', 'date_format:Y-m-d']]);
@@ -33,6 +35,7 @@ class DoctorAvailabilityController extends Controller
         return Inertia::render('appointments/availability', ['doctors' => $doctors, 'slots' => $slots, 'date' => $day->toDateString(), 'timezone' => config('clinic.timezone')]);
     }
 
+    /** Crée une disponibilité future sans chevauchement ni absence et dans les horaires de la clinique. */
     public function store(Request $request, AppointmentScheduler $scheduler)
     {
         $data = $request->validate(['doctor_id' => ['required', 'integer', 'exists:users,id']]);
@@ -60,6 +63,7 @@ class DoctorAvailabilityController extends Controller
         return back(fallback: route('availabilities.index'))->with('status', 'Disponibilité ajoutée.');
     }
 
+    /** Supprime une disponibilité uniquement si aucun rendez-vous actif ne dépend du créneau. */
     public function destroy(Request $request, DoctorAvailability $availability, AppointmentScheduler $scheduler)
     {
         $this->authorizeDoctor($request, $availability->doctor_id);

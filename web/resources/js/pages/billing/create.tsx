@@ -1,6 +1,7 @@
 import { InvoiceForm, type Service } from '@/components/billing/invoice-form';
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
+/** Prépare le formulaire de brouillon à partir du catalogue et de la devise de la clinique. */
 export default function CreateInvoice({ services, currency }: { services: Service[]; currency: string }) {
     return (
         <AppLayout

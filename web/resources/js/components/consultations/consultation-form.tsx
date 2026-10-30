@@ -30,6 +30,7 @@ export type Consultation = {
     doctor: { id: number; name: string };
 };
 const textareaClass = 'border-input bg-background w-full rounded-md border p-3 text-sm';
+/** Saisit une consultation en heure clinique avec version et motif lors d’une correction. */
 export function ConsultationForm({
     patientId,
     now,

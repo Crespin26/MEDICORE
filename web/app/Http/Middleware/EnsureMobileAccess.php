@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureMobileAccess
 {
+    /** Exige un vrai jeton mobile et un compte actif ; refuse une authentification par cookie seule. */
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();

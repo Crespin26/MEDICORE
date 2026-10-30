@@ -17,6 +17,7 @@ use Inertia\Inertia;
 
 class AppointmentController extends Controller
 {
+    /** Retourne l’agenda journalier paginé et, sur le web, la semaine ; un médecin ne voit que son agenda. */
     public function index(Request $request)
     {
         $filters = $request->validate([
@@ -65,6 +66,7 @@ class AppointmentController extends Controller
         ]);
     }
 
+    /** Sérialise un rendez-vous en heure clinique avec ses transitions possibles. */
     private function record(Appointment $appointment): array
     {
         return ['id' => $appointment->id, 'patient_id' => $appointment->patient_id, 'doctor_id' => $appointment->doctor_id,
@@ -74,6 +76,7 @@ class AppointmentController extends Controller
         ];
     }
 
+    /** Recherche au plus 20 identités actives pour le sélecteur, sans données médicales. */
     public function patients(Request $request)
     {
         $data = $request->validate(['search' => ['required', 'string', 'min:2', 'max:100']]);
@@ -90,6 +93,7 @@ class AppointmentController extends Controller
         return response()->json($query->orderBy('last_name')->orderBy('first_name')->limit(20)->get(['id', 'first_name', 'last_name', 'birth_date']));
     }
 
+    /** Valide la saisie puis délègue la réservation transactionnelle au planificateur. */
     public function store(Request $request, AppointmentScheduler $scheduler)
     {
         $data = $request->validate(['patient_id' => ['required', 'integer', 'exists:patients,id'], 'doctor_id' => ['required', 'integer', 'exists:users,id']]);
@@ -102,6 +106,7 @@ class AppointmentController extends Controller
         return back(fallback: route('appointments.index'))->with('status', 'Rendez-vous planifié.');
     }
 
+    /** Déplace le rendez-vous via le planificateur et renouvelle son état de confirmation. */
     public function update(Request $request, Appointment $appointment, AppointmentScheduler $scheduler)
     {
         $data = $request->validate(['patient_id' => ['required', 'integer', 'exists:patients,id'], 'doctor_id' => ['required', 'integer', 'exists:users,id']]);
@@ -114,6 +119,7 @@ class AppointmentController extends Controller
         return back(fallback: route('appointments.index'))->with('status', 'Rendez-vous modifié ; sa confirmation est à renouveler.');
     }
 
+    /** Applique une transition autorisée sous verrou et refuse les statuts de présence avant le début. */
     public function status(Request $request, Appointment $appointment, AppointmentScheduler $scheduler)
     {
         $data = $request->validate(['status' => ['required', Rule::in(array_keys(Appointment::STATUSES))]]);

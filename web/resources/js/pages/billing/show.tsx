@@ -15,6 +15,7 @@ type Payment = {
     voided_at: string | null;
     void_reason: string | null;
 };
+/** Saisit un paiement reçu en conservant son jeton d’idempotence en cas de nouvelle tentative. */
 function PaymentForm({ invoice }: { invoice: Invoice }) {
     const form = useForm({ amount: '', method: 'cash', reference: '', token: crypto.randomUUID() });
     return (
@@ -75,6 +76,7 @@ function PaymentForm({ invoice }: { invoice: Invoice }) {
         </form>
     );
 }
+/** Demande l’annulation comptable d’un paiement avec motif obligatoire. */
 function VoidPayment({ payment }: { payment: Payment }) {
     const form = useForm({ reason: '' });
     return (
@@ -103,6 +105,7 @@ function VoidPayment({ payment }: { payment: Payment }) {
         </form>
     );
 }
+/** Présente la facture figée, les paiements et l’historique selon les permissions reçues. */
 export default function InvoiceDetails({
     invoice,
     events,

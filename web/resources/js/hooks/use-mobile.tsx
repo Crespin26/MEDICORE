@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 const MOBILE_BREAKPOINT = 768;
 
+/** Suit le seuil du menu mobile et libère son écouteur au démontage. */
 export function useIsMobile() {
     const [isMobile, setIsMobile] = useState<boolean | undefined>(undefined);
 

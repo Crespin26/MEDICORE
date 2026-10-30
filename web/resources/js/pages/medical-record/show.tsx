@@ -10,6 +10,7 @@ import { useRef, type FormEvent } from 'react';
 type Patient = { id: number; first_name: string; last_name: string };
 type Document = { doctor_id: number; id: number; title: string; original_name: string; size: number; created_at: string };
 type Timeline = { id: number; type: 'entry' | 'document' | 'consultation'; event_at: string };
+/** Affiche les liens de pagination d’une section, sans mélanger les autres pages du dossier. */
 function Pagination({ page, label }: { page: Page<unknown>; label: string }) {
     return (
         <nav aria-label={label} className="mt-4 flex gap-4">
@@ -19,6 +20,7 @@ function Pagination({ page, label }: { page: Page<unknown>; label: string }) {
         </nav>
     );
 }
+/** Affiche les éléments et documents lisibles, la chronologie et les partages du médecin. */
 export default function MedicalRecord({
     patient,
     entries,

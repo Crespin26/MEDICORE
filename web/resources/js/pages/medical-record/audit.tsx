@@ -11,6 +11,7 @@ type Event = {
     version: number | null;
     created_at: string;
 };
+/** Présente les événements d’accès autorisés, paginés et datés dans le fuseau de la clinique. */
 export default function Audit({
     patient,
     events,

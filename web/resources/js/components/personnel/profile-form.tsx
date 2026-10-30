@@ -16,6 +16,7 @@ export type Profile = {
     version: number;
 };
 export const selectClass = 'border-input bg-background w-full rounded-md border px-3 py-2 text-sm';
+/** Met à jour une fiche professionnelle en transmettant sa version pour éviter les écrasements. */
 export function ProfileForm({ userId, profile }: { userId: number; profile: Profile | null }) {
     const form = useForm({
         employee_number: profile?.employee_number ?? '',

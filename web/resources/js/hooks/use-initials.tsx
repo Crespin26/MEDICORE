@@ -1,3 +1,4 @@
+/** Fournit les initiales du premier et du dernier mot du nom affiché. */
 export function useInitials() {
     const getInitials = (fullName: string): string => {
         const names = fullName.trim().split(' ');

@@ -20,6 +20,7 @@ type ResetPasswordForm = {
     password_confirmation: string;
 };
 
+/** Soumet le nouveau mot de passe confirmé avec le jeton de réinitialisation. */
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const { data, setData, post, processing, errors, reset } = useForm<ResetPasswordForm>({
         token: token,

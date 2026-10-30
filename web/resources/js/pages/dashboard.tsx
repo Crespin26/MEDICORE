@@ -11,6 +11,7 @@ type AppointmentStats = {
     todayItems: { id: number; patient: string; doctor: string; time: string; status: string }[];
 };
 type Finance = { currency: string; gross: string; voided: string; net: string; outstanding: string };
+/** Présente les agrégats autorisés, leur période et les montants séparés par devise. */
 export default function Dashboard({
     patientCount,
     newPatients,

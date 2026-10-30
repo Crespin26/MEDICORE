@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { type FormEvent } from 'react';
 type Item = { id: number; patient_id: number; patient: string; consulted_at: string; reason: string; status: string };
+/** Affiche les consultations du médecin et leurs filtres paginés. */
 export default function Consultations({
     consultations,
     filters,

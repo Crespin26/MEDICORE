@@ -9,6 +9,7 @@ enum Role: string
     case Secretary = 'secretary';
     case Cashier = 'cashier';
 
+    /** Renvoie le libellé français du rôle pour les interfaces. */
     public function label(): string
     {
         return match ($this) {
@@ -17,6 +18,13 @@ enum Role: string
         };
     }
 
+    /** Liste les permissions connues à partir des rôles pour enregistrer les Gates et les props web. */
+    public static function permissionNames(): array
+    {
+        return array_values(array_unique(array_merge(...array_map(fn (self $role) => $role->permissions(), self::cases()))));
+    }
+
+    /** Définit les capacités du rôle ; les politiques ajoutent les contrôles par dossier et par auteur. */
     public function permissions(): array
     {
         return match ($this) {

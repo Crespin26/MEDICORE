@@ -13,6 +13,7 @@ type Day = { date: string; count: number; items: Booking[] };
 type Slot = { id: number; doctor: string; starts_at: string; ends_at: string };
 const dateLabel = (date: string) =>
     new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`));
+/** Limite les boutons aux transitions proposées et aux actions de présence permises au médecin. */
 function StatusAction({ booking, statuses, physician }: { booking: Booking; statuses: Record<string, string>; physician: boolean }) {
     const allowed = booking.transitions.filter((value) => !physician || ['arrived', 'completed', 'absent'].includes(value));
     const form = useForm({ status: '' });
@@ -44,6 +45,7 @@ function StatusAction({ booking, statuses, physician }: { booking: Booking; stat
         </form>
     ) : null;
 }
+/** Présente le jour et la semaine de l’agenda, les disponibilités et les actions autorisées. */
 export default function Appointments({
     appointments,
     calendar,

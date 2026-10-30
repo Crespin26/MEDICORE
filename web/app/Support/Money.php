@@ -10,6 +10,7 @@ class Money
 
     public const MAX = 1000000000000;
 
+    /** Convertit une saisie décimale positive en unités mineures ; rejette arrondis implicites et dépassements. */
     public static function minor(string $value, string $currency, string $field = 'amount'): int
     {
         $scale = self::SCALES[$currency] ?? null;
@@ -26,6 +27,7 @@ class Money
         return $minor;
     }
 
+    /** Formate un entier en unités mineures selon la devise, sans calcul en virgule flottante. */
     public static function format(int $minor, string $currency): string
     {
         $scale = self::SCALES[$currency];

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import AuthLayout from '@/layouts/auth-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { type FormEvent } from 'react';
+/** Active un compte à partir de son invitation à usage unique et d’un mot de passe confirmé. */
 export default function AcceptInvitation({ token }: { token: string }) {
     const form = useForm({ password: '', password_confirmation: '' });
     const submit = (event: FormEvent) => {

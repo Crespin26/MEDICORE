@@ -65,9 +65,12 @@ class ApiClient extends ChangeNotifier {
   final TokenStore store;
   String? _token;
   Map<String, dynamic>? user;
+
+  /// Vérifie une permission pour adapter l’interface ; le serveur reste l’autorité.
   bool can(String permission) =>
       (user?['permissions'] as List? ?? []).contains(permission);
 
+  /// Recharge le jeton sécurisé et vérifie sa validité auprès du serveur avant d’exposer le profil.
   Future<void> restore() async {
     _token = await store.read();
     if (_token != null) {
@@ -77,6 +80,7 @@ class ApiClient extends ChangeNotifier {
     }
   }
 
+  /// Authentifie le personnel et persiste uniquement le jeton dans le stockage sécurisé.
   Future<void> login(String email, String password, String device) async {
     final data = await request(
       'POST',
@@ -99,6 +103,7 @@ class ApiClient extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Retire immédiatement l’accès local puis révoque le jeton serveur si le réseau le permet.
   Future<void> logout() async {
     // Start revocation with the current token, then remove local access immediately.
     final revoke = _token == null
@@ -123,6 +128,7 @@ class ApiClient extends ChangeNotifier {
     }
   }
 
+  /// Envoie une requête JSON bornée dans le temps, sans redirection ni exposition des erreurs internes.
   Future<Map<String, dynamic>> request(
     String method,
     String endpoint, {

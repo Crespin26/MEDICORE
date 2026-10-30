@@ -15,6 +15,7 @@ class ConsultationRecorder
 {
     public function __construct(private AppointmentScheduler $scheduler) {}
 
+    /** Enregistre la consultation, sa révision chiffrée et son audit dans une même transaction ; refuse une version périmée. */
     public function save(User $actor, Patient $patient, array $data, ?int $id = null): Consultation
     {
         return $this->scheduler->transaction(function () use ($actor, $patient, $data, $id) {

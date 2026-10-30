@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 
 class ClinicHours
 {
+    /** Vérifie que tout le créneau tient dans la journée d’ouverture ; une règle vide désactive cette contrainte. */
     public static function fits(CarbonImmutable $start, CarbonImmutable $end, array $hours): bool
     {
         if (! $hours) {
@@ -20,6 +21,7 @@ class ClinicHours
         return $day && $day['enabled'] && $start->toDateString() === $end->toDateString() && $start->format('H:i') >= $day['opens'] && $end->format('H:i') <= $day['closes'];
     }
 
+    /** Relit les horaires sous le verrou partagé avec les changements de paramètres avant de les appliquer. */
     public static function assertOpen(CarbonImmutable $start, CarbonImmutable $end): void
     {
         // Read the current rules under the same lock used by settings changes.

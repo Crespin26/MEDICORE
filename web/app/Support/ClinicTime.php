@@ -10,6 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class ClinicTime
 {
+    /** Valide un créneau saisi dans le fuseau clinique et renvoie deux instants UTC du même jour local. */
     public static function interval(Request $request): array
     {
         $data = $request->validate([
@@ -25,6 +26,7 @@ class ClinicTime
         return [$start, $end];
     }
 
+    /** Convertit une heure locale validée en UTC ; refuse les heures ambiguës ou inexistantes au changement d’heure. */
     public static function parse(string $value, string $field): CarbonImmutable
     {
         $zone = new DateTimeZone(config('clinic.timezone'));
@@ -44,6 +46,7 @@ class ClinicTime
         return $matches[0];
     }
 
+    /** Formate un instant UTC pour un champ datetime-local dans le fuseau clinique. */
     public static function local(CarbonImmutable $time): string
     {
         return $time->setTimezone(config('clinic.timezone'))->format('Y-m-d\TH:i');

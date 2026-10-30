@@ -12,12 +12,14 @@ use Inertia\Inertia;
 
 class InvitationController extends Controller
 {
+    /** Construit la requête d’un jeton haché, non expiré et associé à un compte en attente. */
     private function account(string $token)
     {
         return User::where('invitation_token', hash('sha256', $token))
             ->where('status', 'pending')->where('invitation_expires_at', '>', now());
     }
 
+    /** Affiche le formulaire uniquement si l’invitation est encore utilisable. */
     public function show(string $token)
     {
         abort_unless($this->account($token)->exists(), 410, 'Invitation expirée ou déjà utilisée. Demandez un nouveau lien.');
@@ -25,9 +27,10 @@ class InvitationController extends Controller
         return Inertia::render('auth/accept-invitation', ['token' => $token]);
     }
 
+    /** Active le compte une seule fois sous verrou et invalide invitation et anciens jetons de réinitialisation. */
     public function store(Request $request, string $token)
     {
-        $data = $request->validate(['password' => ['required', 'confirmed', Password::min(12), 'max:72']]);
+        $data = $request->validate(['password' => ['required', 'confirmed', Password::defaults(), 'max:72']]);
         DB::transaction(function () use ($token, $data) {
             $user = $this->account($token)->lockForUpdate()->first();
             abort_unless($user, 410, 'Invitation expirée ou déjà utilisée.');

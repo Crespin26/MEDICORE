@@ -15,6 +15,7 @@ class ClinicalBackup
 
     private const CHUNK = 65536;
 
+    /** Sauvegarde SQLite et les documents en maintenance dans une archive chiffrée, sans écraser de fichier. */
     public function create(string $destination): void
     {
         $key = $this->key();
@@ -140,6 +141,7 @@ class ClinicalBackup
         }
     }
 
+    /** Valide une clé de sauvegarde indépendante des clés applicatives ; ne l’écrit jamais dans l’archive. */
     private function key(): string
     {
         if (! extension_loaded('sodium') || ! extension_loaded('zip')) {
@@ -154,6 +156,7 @@ class ClinicalBackup
         return $key;
     }
 
+    /** Refuse les destinations publiques ou dont le dossier parent est accessible aux autres utilisateurs. */
     private function assertPrivateParent(string $destination): void
     {
         $parent = realpath(dirname($destination));
@@ -171,6 +174,7 @@ class ClinicalBackup
         }
     }
 
+    /** Exige la maintenance ; l’opérateur doit aussi arrêter les workers et les autres écritures. */
     private function assertMaintenance(): void
     {
         if (! app()->isDownForMaintenance()) {
@@ -178,6 +182,7 @@ class ClinicalBackup
         }
     }
 
+    /** Crée un espace temporaire privé, sur le système de fichiers cible lors d’une restauration. */
     private function workspace(?string $parent = null): string
     {
         $path = ($parent ?? sys_get_temp_dir()).'/medicore-recovery-'.bin2hex(random_bytes(16));
@@ -188,6 +193,7 @@ class ClinicalBackup
         return $path;
     }
 
+    /** Chiffre le flux par blocs authentifiés et termine par un marqueur final obligatoire. */
     private function encrypt(string $source, $output, string $key): void
     {
         [$state, $header] = sodium_crypto_secretstream_xchacha20poly1305_init_push($key);
@@ -209,6 +215,7 @@ class ClinicalBackup
         }
     }
 
+    /** Déchiffre les blocs et refuse toute troncature, altération ou donnée après le marqueur final. */
     private function decrypt(string $source, string $destination, string $key): void
     {
         $input = @fopen($source, 'rb');
@@ -243,6 +250,7 @@ class ClinicalBackup
         }
     }
 
+    /** Lit exactement le nombre d’octets demandé ou signale une archive tronquée. */
     private function read($stream, int $length): string
     {
         $value = '';
@@ -257,6 +265,7 @@ class ClinicalBackup
         return $value;
     }
 
+    /** Écrit tous les octets, y compris lorsque le flux ne les accepte que partiellement. */
     private function write($stream, string $value): void
     {
         while ($value !== '') {

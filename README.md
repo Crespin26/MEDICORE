@@ -37,6 +37,8 @@ La [grille de recette humaine](docs/RECETTE-MANUELLE.md) complète les tests mul
 
 Le [guide API/mobile](docs/API-MOBILE.md) et la [référence de charge locale](docs/PERFORMANCE.md) documentent les nouveaux parcours et leurs limites de validation.
 
+Le [bilan actuel des travaux restants](docs/RESTE-A-FAIRE.md) distingue les migrations en attente, la préparation à la production, la validation sur appareils et les extensions futures.
+
 ## Confidentialité et sécurité
 
 Le dépôt de développement est destiné à rester **privé**. Ce choix ne remplace pas les protections nécessaires à une application manipulant des informations médicales.
@@ -69,3 +71,8 @@ Une démonstration pourra être créée séparément avec des données entièrem
 > Écosystème web et mobile de gestion clinique permettant de centraliser les dossiers patients, les consultations, les rendez-vous et la facturation.
 
 Ces formulations décrivent la cible du projet. Tant que les applications ne sont pas implémentées, accompagner leur utilisation publique de la mention « projet en développement ».
+
+## Maintenance et hébergement
+
+- [Architecture et contrats du code](docs/MAINTENANCE.md).
+- [Préparation et procédure de production](docs/PRODUCTION.md).

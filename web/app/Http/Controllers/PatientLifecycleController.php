@@ -14,6 +14,7 @@ use Illuminate\Validation\ValidationException;
 
 class PatientLifecycleController extends Controller
 {
+    /** Archive ou réactive la fiche avec justification ; refuse l’archivage si une opération reste ouverte. */
     public function update(Request $request, Patient $patient, AppointmentScheduler $scheduler)
     {
         abort_unless($request->user()->role === 'admin', 403);

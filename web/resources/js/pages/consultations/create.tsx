@@ -1,6 +1,7 @@
 import { ConsultationForm } from '@/components/consultations/consultation-form';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
+/** Prépare le formulaire clinique pour le patient et le rendez-vous éligible transmis par Laravel. */
 export default function CreateConsultation({
     patient,
     appointmentId,

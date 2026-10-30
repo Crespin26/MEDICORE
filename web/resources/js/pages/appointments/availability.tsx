@@ -7,6 +7,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { type FormEvent } from 'react';
 type Slot = { id: number; doctor: string; starts_at: string; ends_at: string };
+/** Demande le retrait d’une disponibilité et expose les conflits refusés par le serveur. */
 function RemoveSlot({ slot }: { slot: Slot }) {
     const form = useForm({ availability: '' });
     return (
@@ -25,6 +26,7 @@ function RemoveSlot({ slot }: { slot: Slot }) {
         </div>
     );
 }
+/** Affiche les créneaux datés du médecin et les formulaires de création ou retrait. */
 export default function Availability({
     doctors,
     slots,

@@ -10,6 +10,7 @@ import { useState } from 'react';
 type PatientAppointment = { id: number; doctor: string; starts_at: string; status: string };
 
 type PatientConsultation = { id: number; consulted_at: string; status: string };
+/** Affiche l’identité et les seuls résumés de rendez-vous, consultations et factures autorisés par le serveur. */
 export default function PatientDetails({
     patient,
     appointments,

@@ -9,6 +9,7 @@ import { useState, type FormEvent } from 'react';
 
 type Page = { data: Patient[]; prev_page_url: string | null; next_page_url: string | null; current_page: number; total: number };
 type Filters = { search: string; birth_from: string; birth_to: string; contact: string; state: string };
+/** Affiche les patients paginés et les filtres administratifs, avec accès au formulaire selon les permissions. */
 export default function Patients({ patients, filters }: { patients: Page; filters: Filters }) {
     const { auth, status } = usePage<SharedData>().props;
     const canWrite = auth.permissions.includes('patients.write');

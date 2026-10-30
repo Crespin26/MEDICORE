@@ -154,7 +154,8 @@ Voir le [guide WEB-08](WEB-08.md) pour les définitions des indicateurs, les par
 
 ### MOB-07 — Notifications et profil
 
-- [ ] Afficher et modifier les informations autorisées du compte.
+- [x] Afficher les informations du compte connecté.
+- [ ] Permettre leur modification mobile selon les droits.
 - [ ] Ajouter les notifications de rendez-vous et leurs préférences.
 - [ ] Gérer les autorisations et les jetons de notification des appareils.
 - [ ] Exclure les informations médicales du contenu visible sur l’écran verrouillé.
@@ -180,8 +181,10 @@ Voir le [guide WEB-08](WEB-08.md) pour les définitions des indicateurs, les par
 ### SEC-01 — Protection et exploitation
 
 - [x] Exclure les secrets, dépendances et bases SQLite du dépôt.
-- [x] Ajouter des en-têtes interdisant la mise en cache des réponses web.
-- [ ] Définir et implémenter le journal d’audit des actions sensibles.
+- [x] Ajouter des en-têtes interdisant la mise en cache des réponses web, API et exceptions.
+- [x] Harmoniser la politique de mot de passe et configurer explicitement les proxies de confiance.
+- [x] Fournir le diagnostic de production et les modèles Nginx/PHP/systemd (voir [hébergement](PRODUCTION.md)).
+- [ ] Compléter la couverture des actions/refus sensibles, la surveillance et la protection des journaux métier déjà implémentés.
 - [ ] Configurer HTTPS, secrets de production et protection des données stockées.
 - [x] Fournir une sauvegarde SQLite chiffrée et une restauration isolée avec tests sur données fictives (voir [reprise et clés](RECOVERY.md)).
 - [ ] Provisionner le coffre de clés, le stockage distant, la rétention et valider la reprise sur l’hébergement cible.

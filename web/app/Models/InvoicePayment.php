@@ -13,11 +13,13 @@ class InvoicePayment extends Model
 
     protected $hidden = ['token'];
 
+    /** Définit les conversions de stockage et les dates utilisées par le modèle. */
     protected function casts(): array
     {
         return ['amount_minor' => 'integer', 'balance_after_minor' => 'integer', 'paid_at' => 'immutable_datetime', 'voided_at' => 'immutable_datetime'];
     }
 
+    /** Associe cet enregistrement à sa facture. */
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);

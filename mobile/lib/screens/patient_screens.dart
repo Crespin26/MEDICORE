@@ -21,11 +21,14 @@ class _PatientsScreenState extends State<PatientsScreen> {
     result = fetch();
   }
 
+  /// Charge les résultats de la page ou du jour sélectionné selon les filtres courants.
   Future<Map<String, dynamic>> fetch() => widget.api.request(
     'GET',
     'patients',
     query: {'search': search.text, 'page': '$page'},
   );
+
+  /// Relance le chargement serveur et remplace le résultat affiché sans cache local de données métier.
   void reload() => setState(() {
     result = fetch();
   });
@@ -35,6 +38,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
     super.dispose();
   }
 
+  /// Ouvre le formulaire patient puis recharge la liste après une sauvegarde réussie.
   Future<void> openEditor() async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => PatientEditor(api: widget.api)),
@@ -177,6 +181,7 @@ class _PatientDetailsState extends State<PatientDetails> {
     reload();
   }
 
+  /// Relance le chargement serveur et remplace le résultat affiché sans cache local de données métier.
   void reload() {
     result = widget.api.request('GET', 'patients/${widget.id}');
   }
@@ -275,6 +280,8 @@ class _PatientEditorState extends State<PatientEditor> {
   Map<String, List<String>> errors = {};
   String? error;
   bool busy = false;
+
+  /// Transmet les champs du formulaire et affiche les erreurs de validation 422 renvoyées par l’API.
   Future<void> submit() async {
     setState(() {
       busy = true;

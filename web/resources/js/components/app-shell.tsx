@@ -7,13 +7,21 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, variant = 'header' }: AppShellProps) {
-    const [isOpen, setIsOpen] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('sidebar') !== 'false' : true));
+    const [isOpen, setIsOpen] = useState(() => {
+        try {
+            return typeof window !== 'undefined' ? localStorage.getItem('sidebar') !== 'false' : true;
+        } catch {
+            return true;
+        }
+    });
 
     const handleSidebarChange = (open: boolean) => {
         setIsOpen(open);
 
-        if (typeof window !== 'undefined') {
+        try {
             localStorage.setItem('sidebar', String(open));
+        } catch {
+            // Restricted browser storage must not prevent navigation.
         }
     };
 

@@ -1,0 +1,16 @@
+[Unit]
+Description=MediCore scheduled tasks
+After=network.target
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/medicore/current/web
+UMask=0027
+ExecStart=/usr/bin/php artisan schedule:run --no-interaction
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/srv/medicore/shared /srv/medicore/current/web/bootstrap/cache

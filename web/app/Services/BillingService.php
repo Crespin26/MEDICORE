@@ -15,6 +15,7 @@ use Illuminate\Validation\ValidationException;
 
 class BillingService
 {
+    /** Sérialise les écritures financières et revérifie les droits de l’acteur sous verrou. */
     public function transaction(User $actor, string $permission, callable $callback): mixed
     {
         return DB::transaction(function () use ($actor, $permission, $callback) {
@@ -27,6 +28,7 @@ class BillingService
         }, 5);
     }
 
+    /** Produit un identifiant préfixé unique, sans garantie de séquence comptable continue. */
     public function number(string $kind): string
     {
         $row = DB::table('billing_sequences')->where('name', $kind)->lockForUpdate()->first();
@@ -37,12 +39,14 @@ class BillingService
         return ($kind === 'invoice' ? 'MC-F-' : 'MC-R-').str_pad((string) $number, 8, '0', STR_PAD_LEFT);
     }
 
+    /** Conserve les instantanés financiers nécessaires à la traçabilité de l’opération. */
     public function event(User $actor, string $action, ?Invoice $invoice = null, ?BillableService $service = null, ?string $reason = null, array $extra = []): void
     {
         BillingEvent::create(['invoice_id' => $invoice?->id, 'billable_service_id' => $service?->id, 'actor_id' => $actor->id, 'actor_name' => $actor->name, 'action' => $action, 'reason' => $reason,
             'snapshot' => $invoice ? ['invoice' => $invoice->toArray(), 'lines' => $invoice->lines()->get()->toArray(), ...$extra] : ['service' => $service->toArray()], 'created_at' => now()]);
     }
 
+    /** Valide les prestations et calcule les lignes en unités monétaires entières, sans flottants. */
     private function lines(array $items, string $currency): array
     {
         $total = 0;
@@ -66,6 +70,7 @@ class BillingService
         return [$lines, $total];
     }
 
+    /** Crée un brouillon de façon idempotente ; un jeton réutilisé avec un autre contenu est refusé. */
     public function create(User $actor, array $data): Invoice
     {
         return $this->transaction($actor, 'billing.manage', function ($actor) use ($data) {
@@ -95,6 +100,7 @@ class BillingService
         });
     }
 
+    /** Modifie seulement un brouillon à la version attendue et recalcule ses lignes. */
     public function update(User $actor, int $id, array $data): Invoice
     {
         return $this->transaction($actor, 'billing.manage', function ($actor) use ($id, $data) {
@@ -115,6 +121,7 @@ class BillingService
         });
     }
 
+    /** Refuse l’écriture si le formulaire utilise une ancienne version de la facture. */
     public function version(Invoice $invoice, int $version): void
     {
         if ($invoice->version !== $version) {
@@ -122,6 +129,7 @@ class BillingService
         }
     }
 
+    /** Émet le brouillon et fige les informations du patient, de l’émetteur et des prestations. */
     public function issue(User $actor, int $id, int $version): Invoice
     {
         return $this->transaction($actor, 'billing.manage', function ($actor) use ($id, $version) {
@@ -146,6 +154,7 @@ class BillingService
         });
     }
 
+    /** Annule une facture éligible et conserve le motif dans l’historique. */
     public function cancel(User $actor, int $id, int $version, string $reason): void
     {
         $this->transaction($actor, 'billing.reverse', function ($actor) use ($id, $version, $reason) {
@@ -165,6 +174,7 @@ class BillingService
         });
     }
 
+    /** Enregistre un paiement déjà reçu, avec idempotence et contrôle du solde sous verrou. */
     public function pay(User $actor, int $id, array $data): InvoicePayment
     {
         return $this->transaction($actor, 'billing.pay', function ($actor) use ($id, $data) {
@@ -189,6 +199,7 @@ class BillingService
         });
     }
 
+    /** Recalcule le solde à partir des paiements non annulés et déduit le statut de la facture. */
     private function refreshBalance(Invoice $invoice): void
     {
         $invoice->paid_minor = (int) $invoice->payments()->whereNull('voided_at')->sum('amount_minor');
@@ -197,6 +208,7 @@ class BillingService
         $invoice->save();
     }
 
+    /** Annule comptablement un paiement et recalcule le solde ; aucun remboursement bancaire n’est déclenché. */
     public function void(User $actor, int $paymentId, string $reason): void
     {
         $this->transaction($actor, 'billing.reverse', function ($actor) use ($paymentId, $reason) {

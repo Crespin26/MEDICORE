@@ -19,6 +19,7 @@ use Inertia\Inertia;
 
 class AdministrationController extends Controller
 {
+    /** Affiche les paramètres de la clinique et leur historique paginé. */
     public function settings()
     {
         $setting = ClinicSetting::findOrFail(1);
@@ -26,6 +27,7 @@ class AdministrationController extends Controller
         return Inertia::render('administration/settings', ['setting' => [...$setting->toArray(), 'currency' => $setting->currency ?? config('clinic.currency')], 'timezone' => config('clinic.timezone'), 'events' => ClinicSettingEvent::orderByDesc('id')->paginate(10)->withQueryString()]);
     }
 
+    /** Versionne les paramètres sous verrou et refuse des horaires excluant des rendez-vous actifs. */
     public function update(Request $request, AppointmentScheduler $scheduler)
     {
         $data = $request->validate([
@@ -70,6 +72,7 @@ class AdministrationController extends Controller
         return to_route('administration.settings')->with('status', 'Paramètres enregistrés. Les opérations existantes conservent leur devise.');
     }
 
+    /** Produit un CSV agrégé et journalise son motif et son empreinte avant téléchargement. */
     public function export(Request $request, DashboardReport $service)
     {
         $data = $request->validate(['reason' => ['required', 'string', 'max:500']]);
@@ -87,6 +90,7 @@ class AdministrationController extends Controller
         return response($csv)->withHeaders(['Content-Type' => 'text/csv; charset=UTF-8', 'Content-Disposition' => 'attachment; filename="medicore-statistics.csv"', 'Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
+    /** Affiche l’historique des exports administratifs sans contenu médical. */
     public function exports()
     {
         return Inertia::render('administration/exports', ['exports' => AdministrationExport::orderByDesc('id')->paginate(30), 'timezone' => config('clinic.timezone')]);

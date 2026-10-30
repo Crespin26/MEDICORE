@@ -9,6 +9,7 @@ use RuntimeException;
 /** Verify keys and documents against the snapshot, without changing application connections. */
 class ClinicalRecoveryCheck
 {
+    /** Contrôle le schéma SQLite, le déchiffrement des champs et l’intégrité des documents du snapshot. */
     public function verify(PDO $pdo, string $medicalRoot): void
     {
         if ($pdo->query('PRAGMA integrity_check')->fetchColumn() !== 'ok' || $pdo->query('PRAGMA foreign_key_check')->fetch() !== false) {

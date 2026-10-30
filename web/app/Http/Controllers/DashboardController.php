@@ -9,6 +9,7 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
+    /** Construit les indicateurs du rôle courant sur la période validée. */
     public function index(Request $request, DashboardReport $service)
     {
         [$start, $end] = ReportingPeriod::from($request);

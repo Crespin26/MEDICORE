@@ -17,6 +17,7 @@ use Inertia\Inertia;
 
 class BillingController extends Controller
 {
+    /** Pagine les factures selon les filtres demandés. */
     public function index(Request $request)
     {
         $filters = $request->validate(['status' => ['nullable', Rule::in(array_keys(Invoice::STATUSES))], 'patient_id' => ['nullable', 'integer', 'exists:patients,id']]);
@@ -24,6 +25,7 @@ class BillingController extends Controller
         return Inertia::render('billing/index', ['invoices' => Invoice::when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))->when($filters['patient_id'] ?? null, fn ($q, $v) => $q->where('patient_id', $v))->orderByDesc('id')->paginate(20)->withQueryString(), 'filters' => ['status' => $filters['status'] ?? '', 'patient_id' => (string) ($filters['patient_id'] ?? '')], 'statuses' => Invoice::STATUSES]);
     }
 
+    /** Recherche les identités actives nécessaires à la facturation, sans données cliniques. */
     public function patients(Request $request)
     {
         $data = $request->validate(['search' => ['required', 'string', 'min:2', 'max:100']]);
@@ -39,16 +41,19 @@ class BillingController extends Controller
         return response()->json($query->orderBy('last_name')->limit(20)->get(['id', 'first_name', 'last_name', 'birth_date']));
     }
 
+    /** Prépare le catalogue actif et la devise pour un nouveau brouillon. */
     public function create()
     {
         return Inertia::render('billing/create', ['services' => BillableService::where('active', true)->where('currency', config('clinic.currency'))->orderBy('name')->get(), 'currency' => config('clinic.currency')]);
     }
 
+    /** Valide la structure des lignes ; le service reste responsable des montants et prestations. */
     private function lines(Request $request): array
     {
         return $request->validate(['lines' => ['required', 'array', 'min:1', 'max:50'], 'lines.*' => ['array:service_id,quantity'], 'lines.*.service_id' => ['required', 'integer', 'distinct', 'exists:billable_services,id'], 'lines.*.quantity' => ['required', 'integer', 'min:1', 'max:1000']]);
     }
 
+    /** Délègue la création idempotente d’un brouillon au service de facturation. */
     public function store(Request $request, BillingService $service)
     {
         $data = $request->validate(['patient_id' => ['required', 'integer', 'exists:patients,id'], 'token' => ['required', 'uuid'], 'currency' => ['nullable', Rule::in(array_keys(Money::SCALES))]]);
@@ -57,6 +62,7 @@ class BillingController extends Controller
         return to_route('billing.show', $invoice)->with('status', 'Brouillon enregistré.');
     }
 
+    /** Affiche la facture avec ses lignes, paiements et événements. */
     public function show(Invoice $invoice)
     {
         $invoice->load(['lines', 'payments']);
@@ -64,6 +70,7 @@ class BillingController extends Controller
         return Inertia::render('billing/show', ['invoice' => $invoice, 'events' => $invoice->events()->orderByDesc('id')->paginate(10)->withQueryString(), 'services' => BillableService::where('active', true)->where('currency', $invoice->currency)->orderBy('name')->get(), 'statuses' => Invoice::STATUSES, 'timezone' => config('clinic.timezone')]);
     }
 
+    /** Délègue la modification versionnée du brouillon au service. */
     public function update(Request $request, Invoice $invoice, BillingService $service)
     {
         $data = $request->validate(['version' => ['required', 'integer', 'min:1'], 'reason' => ['required', 'string', 'max:1000']]);
@@ -72,6 +79,7 @@ class BillingController extends Controller
         return to_route('billing.show', $invoice)->with('status', 'Brouillon corrigé avec les tarifs actuels.');
     }
 
+    /** Valide la version attendue et délègue l’émission de la facture. */
     public function issue(Request $request, Invoice $invoice, BillingService $service)
     {
         $data = $request->validate(['version' => ['required', 'integer', 'min:1']]);
@@ -80,6 +88,7 @@ class BillingController extends Controller
         return to_route('billing.show', $invoice)->with('status', 'Facture émise.');
     }
 
+    /** Exige un motif puis délègue l’annulation comptable. */
     public function cancel(Request $request, Invoice $invoice, BillingService $service)
     {
         $data = $request->validate(['version' => ['required', 'integer', 'min:1'], 'reason' => ['required', 'string', 'max:1000']]);
@@ -88,6 +97,7 @@ class BillingController extends Controller
         return to_route('billing.show', $invoice)->with('status', 'Facture annulée et conservée.');
     }
 
+    /** Valide la saisie d’un paiement reçu avant son enregistrement idempotent. */
     public function pay(Request $request, Invoice $invoice, BillingService $service)
     {
         $data = $request->validate(['amount' => ['required', 'string', 'max:32'], 'token' => ['required', 'uuid'], 'currency' => ['nullable', Rule::in(array_keys(Money::SCALES))], 'method' => ['required', 'in:cash,transfer,card'], 'reference' => ['nullable', 'string', 'max:100']]);
@@ -96,6 +106,7 @@ class BillingController extends Controller
         return to_route('billing.show', $invoice)->with('status', $payment->voided_at ? 'Cette demande correspond à un paiement déjà annulé. Aucune nouvelle écriture créée.' : 'Paiement enregistré — reçu '.$payment->receipt_number.'.');
     }
 
+    /** Exige un motif et délègue l’annulation comptable d’un paiement. */
     public function void(Request $request, InvoicePayment $payment, BillingService $service)
     {
         $data = $request->validate(['reason' => ['required', 'string', 'max:1000']]);
@@ -104,6 +115,7 @@ class BillingController extends Controller
         return to_route('billing.show', $payment->invoice_id)->with('status', 'Écriture de paiement annulée. Aucun remboursement automatique effectué.');
     }
 
+    /** Rend une facture imprimable à partir de ses données figées. */
     public function print(Invoice $invoice)
     {
         $invoice->load(['lines', 'payments']);
@@ -111,6 +123,7 @@ class BillingController extends Controller
         return view('billing.invoice', ['invoice' => $invoice]);
     }
 
+    /** Rend un reçu imprimable à partir du paiement et de la facture associés. */
     public function receipt(InvoicePayment $payment)
     {
         $payment->load('invoice');
@@ -118,11 +131,13 @@ class BillingController extends Controller
         return view('billing.receipt', ['payment' => $payment]);
     }
 
+    /** Affiche les prestations et la devise courante de facturation. */
     public function catalog()
     {
         return Inertia::render('billing/catalog', ['services' => BillableService::orderBy('code')->paginate(20), 'currency' => config('clinic.currency'), 'timezone' => config('clinic.timezone'), 'events' => BillingEvent::whereNotNull('billable_service_id')->orderByDesc('id')->paginate(10, ['*'], 'events_page')->withQueryString()]);
     }
 
+    /** Crée ou met à jour une prestation avec droits, version et événement d’historique. */
     public function saveService(Request $request, BillingService $billing, ?BillableService $service = null)
     {
         $data = $request->validate(['code' => ['required', 'string', 'max:40', 'regex:/^[A-Z0-9_-]+$/', Rule::unique('billable_services', 'code')->ignore($service?->id)], 'name' => ['required', 'string', 'max:255'], 'price' => ['required', 'string', 'max:32'], 'currency' => ['nullable', Rule::in(array_keys(Money::SCALES))], 'active' => ['required', 'boolean'], 'version' => [$service ? 'required' : 'nullable', 'integer', 'min:1'], 'reason' => [$service ? 'required' : 'nullable', 'string', 'max:1000']]);

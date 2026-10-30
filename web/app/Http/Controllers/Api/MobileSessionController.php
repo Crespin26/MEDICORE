@@ -10,11 +10,13 @@ use Illuminate\Validation\ValidationException;
 
 class MobileSessionController
 {
+    /** Expose l’identité minimale du compte et ses permissions, sans secret ni contenu clinique. */
     public static function profile(User $user): array
     {
         return [...$user->only('id', 'name', 'email', 'role'), 'permissions' => Role::tryFrom($user->role)?->permissions() ?? []];
     }
 
+    /** Authentifie un compte actif et émet un jeton mobile à durée limitée ; ne crée aucune session navigateur. */
     public function store(Request $request)
     {
         $data = $request->validate(['email' => ['required', 'email', 'max:255'], 'password' => ['required', 'string', 'max:1000'], 'device_name' => ['required', 'string', 'max:100']]);
@@ -29,11 +31,13 @@ class MobileSessionController
         return response()->json(['data' => ['token' => $token->plainTextToken, 'token_type' => 'Bearer', 'expires_at' => $expires->toIso8601String(), 'user' => self::profile($user)]], 201);
     }
 
+    /** Renvoie le profil du compte authentifié par le jeton mobile. */
     public function show(Request $request)
     {
         return response()->json(['data' => self::profile($request->user())]);
     }
 
+    /** Révoque seulement le jeton de l’appareil courant. */
     public function destroy(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

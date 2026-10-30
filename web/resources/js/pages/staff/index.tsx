@@ -12,6 +12,7 @@ type Page = { data: Account[]; current_page: number; prev_page_url: string | nul
 const statuses: Record<string, string> = { active: 'Actif', pending: 'Invitation en attente', suspended: 'Suspendu' };
 const selectClass = 'border-input bg-background rounded-md border px-3 py-2 text-sm';
 
+/** Gère le rôle, le statut et le renvoi d’invitation d’un compte sans permettre l’auto-modification. */
 function AccountRow({ account, roles, self }: { account: Account; roles: Role[]; self: boolean }) {
     const access = useForm({ role: account.role, status: account.status });
     const invitation = useForm({});
@@ -78,6 +79,7 @@ function AccountRow({ account, roles, self }: { account: Account; roles: Role[];
     );
 }
 
+/** Présente les comptes et le formulaire d’invitation administrateur. */
 export default function Staff({ staff, roles }: { staff: Page; roles: Role[] }) {
     const { auth, status } = usePage<SharedData>().props;
     const form = useForm({ name: '', email: '', role: 'secretary' });

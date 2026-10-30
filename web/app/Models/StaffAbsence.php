@@ -11,11 +11,13 @@ class StaffAbsence extends Model
 
     protected $guarded = ['id'];
 
+    /** Définit les conversions de stockage et les dates utilisées par le modèle. */
     protected function casts(): array
     {
         return ['starts_at' => 'immutable_datetime', 'ends_at' => 'immutable_datetime', 'cancelled_at' => 'immutable_datetime', 'version' => 'integer'];
     }
 
+    /** Associe l’absence au membre du personnel concerné. */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

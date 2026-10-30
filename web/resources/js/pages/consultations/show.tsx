@@ -15,6 +15,7 @@ type Revision = {
     created_at: string;
     author: { id: number; name: string };
 };
+/** Affiche le contenu clinique courant ou un instantané de révision avec les mêmes libellés. */
 function ClinicalContent({ data }: { data: { reason: string; observations: string | null; report: string | null; vitals: Vitals | null } }) {
     return (
         <div className="space-y-5">
@@ -42,6 +43,7 @@ function ClinicalContent({ data }: { data: { reason: string; observations: strin
         </div>
     );
 }
+/** Présente la consultation et ses révisions ; les corrections restent réservées à l’auteur. */
 export default function ConsultationDetails({
     consultation,
     revisions,

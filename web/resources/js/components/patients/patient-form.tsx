@@ -19,6 +19,7 @@ export type Patient = {
     updated_at?: string;
 };
 
+/** Crée ou corrige une identité et expose les erreurs métier, dont les homonymes à confirmer. */
 export function PatientForm({ patient, onDone }: { patient?: Patient; onDone?: () => void }) {
     const { auth } = usePage<SharedData>().props;
     const form = useForm({

@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureAccountActive
 {
+    /** Ferme la session des comptes inactifs avant l’accès aux routes applicatives. */
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user() && $request->user()->status !== 'active') {

@@ -18,6 +18,7 @@ export type Booking = {
 type PatientResult = { id: number; first_name: string; last_name: string; birth_date: string };
 export const selectClass = 'border-input bg-background w-full rounded-md border px-3 py-2 text-sm';
 
+/** Crée ou déplace un rendez-vous ; le serveur valide les conflits et les droits. */
 export function BookingForm({ doctors, date, booking, onDone }: { doctors: Doctor[]; date: string; booking?: Booking; onDone: () => void }) {
     const form = useForm({
         patient_id: booking ? String(booking.patient_id) : '',

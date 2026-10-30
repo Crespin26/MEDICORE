@@ -20,6 +20,7 @@ use Throwable;
 
 class MedicalDocumentController extends Controller
 {
+    /** Valide le type réel du fichier, chiffre son contenu et conserve ses métadonnées et son audit atomiquement. */
     public function store(Request $request, Patient $patient, AppointmentScheduler $scheduler)
     {
         $data = $request->validate(['title' => ['required', 'string', 'max:255'], 'file' => ['required', 'file', 'max:10240', 'mimes:pdf,jpg,jpeg,png', 'extensions:pdf,jpg,jpeg,png']]);
@@ -53,6 +54,7 @@ class MedicalDocumentController extends Controller
         return to_route('medical-record.show', $patient)->with('status', 'Document ajouté au stockage privé.');
     }
 
+    /** Autorise et audite la lecture, vérifie l’intégrité puis force un téléchargement non mis en cache. */
     public function download(Request $request, Patient $patient, MedicalDocument $document)
     {
         Gate::authorize('view', $document);

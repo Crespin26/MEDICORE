@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+/** Affiche les factures paginées et leurs filtres, sans recalculer les soldes côté client. */
 export default function Billing({
     invoices,
     filters,

@@ -21,6 +21,7 @@ use Inertia\Inertia;
 
 class MedicalRecordController extends Controller
 {
+    /** Assemble le dossier et la chronologie en filtrant chaque source par les auteurs autorisés. */
     public function show(Request $request, Patient $patient)
     {
         $data = $request->validate(['kind' => ['nullable', Rule::in(array_keys(MedicalRecordEntry::KINDS))]]);
@@ -45,6 +46,7 @@ class MedicalRecordController extends Controller
         ]);
     }
 
+    /** Valide une information médicale et impose version et motif pour une correction. */
     private function validated(Request $request): array
     {
         return $request->validate([
@@ -57,6 +59,7 @@ class MedicalRecordController extends Controller
         ]);
     }
 
+    /** Crée une information chiffrée et sa première révision pour un patient actif. */
     public function store(Request $request, Patient $patient, AppointmentScheduler $scheduler)
     {
         $data = $this->validated($request);
@@ -77,6 +80,7 @@ class MedicalRecordController extends Controller
         return to_route('medical-entries.show', [$patient, $entry])->with('status', 'Information médicale enregistrée.');
     }
 
+    /** Autorise la lecture d’une information et expose son historique paginé. */
     public function entry(Request $request, Patient $patient, MedicalRecordEntry $entry)
     {
         Gate::authorize('view', $entry);
@@ -87,6 +91,7 @@ class MedicalRecordController extends Controller
         return Inertia::render('medical-record/entry', ['patient' => $patient->only('id', 'first_name', 'last_name'), 'entry' => $entry, 'canUpdate' => $request->user()->can('update', $entry), 'revisions' => $revisions, 'kinds' => MedicalRecordEntry::KINDS, 'timezone' => config('clinic.timezone')]);
     }
 
+    /** Corrige une information de l’auteur sous verrou avec contrôle de version. */
     public function update(Request $request, Patient $patient, MedicalRecordEntry $entry, AppointmentScheduler $scheduler)
     {
         Gate::authorize('update', $entry);
@@ -109,6 +114,7 @@ class MedicalRecordController extends Controller
         return to_route('medical-entries.show', [$patient, $entry])->with('status', 'Information corrigée et version conservée.');
     }
 
+    /** Conserve l’instantané chiffré et écrit l’événement d’audit dans la transaction appelante. */
     private function revision(MedicalRecordEntry $entry, Request $request, ?string $reason): void
     {
         $entry->revisions()->create([
@@ -118,6 +124,7 @@ class MedicalRecordController extends Controller
         MedicalAudit::record($request->user(), $entry->patient_id, $reason ? 'entry.updated' : 'entry.created', 'entry', $entry->id, $entry->version);
     }
 
+    /** Affiche les seuls événements d’accès de l’acteur sur ce patient et audite cette consultation. */
     public function audit(Request $request, Patient $patient)
     {
         MedicalAudit::record($request->user(), $patient->id, 'audit.view', 'patient', $patient->id);

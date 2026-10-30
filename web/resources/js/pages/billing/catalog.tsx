@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+/** Convertit le prix pour la saisie puis transmet la prestation et sa version au serveur. */
 function CatalogForm({ currency, service, onDone }: { currency: string; service?: Service; onDone: () => void }) {
     const form = useForm({
         currency: service?.currency ?? currency,
@@ -82,6 +83,7 @@ function CatalogForm({ currency, service, onDone }: { currency: string; service?
         </form>
     );
 }
+/** Présente les prestations et leurs formulaires de gestion versionnée. */
 export default function Catalog({
     services,
     currency,

@@ -12,6 +12,7 @@ class RestoreClinicalBackup extends Command
 
     protected $description = 'Restaurer et contrôler une sauvegarde dans un dossier neuf sans remplacer les données actives';
 
+    /** Restaure et vérifie une archive dans une nouvelle cible, sans basculer la base active. */
     public function handle(ClinicalBackup $backup): int
     {
         try {

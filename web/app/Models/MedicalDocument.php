@@ -10,6 +10,7 @@ class MedicalDocument extends Model
 
     protected $hidden = ['path', 'sha256'];
 
+    /** Chiffre les champs sensibles au repos et convertit les dates et versions du modèle. */
     protected function casts(): array
     {
         return ['title' => 'encrypted', 'original_name' => 'encrypted'];

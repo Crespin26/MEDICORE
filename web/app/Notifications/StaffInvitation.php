@@ -9,11 +9,13 @@ class StaffInvitation extends Notification
 {
     public function __construct(public string $url) {}
 
+    /** Utilise le transport mail pour transmettre l’invitation. */
     public function via(object $notifiable): array
     {
         return ['mail'];
     }
 
+    /** Construit le message d’activation à partir du lien à usage unique. */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)->subject('Votre invitation MediCore')

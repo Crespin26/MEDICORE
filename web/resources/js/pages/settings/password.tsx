@@ -18,6 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+/** Change le mot de passe après vérification du mot de passe actuel puis efface les champs sensibles. */
 export default function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);

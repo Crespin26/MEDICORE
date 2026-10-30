@@ -16,6 +16,7 @@ type Setting = {
     version: number;
 };
 const days: Record<string, string> = { '1': 'Lundi', '2': 'Mardi', '3': 'Mercredi', '4': 'Jeudi', '5': 'Vendredi', '6': 'Samedi', '7': 'Dimanche' };
+/** Édite les paramètres de clinique et les horaires avec contrôle de version et justification. */
 export default function Settings({
     setting,
     events,

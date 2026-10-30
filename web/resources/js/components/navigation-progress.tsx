@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 // Inertia 2.0's default progress markup uses the invalid ARIA role "bar".
 // Keep an indeterminate indicator with a valid role and accessible name instead.
+/** Annonce une navigation en cours après un court délai et nettoie les abonnements Inertia. */
 export function NavigationProgress() {
     const [visible, setVisible] = useState(false);
     useEffect(() => {

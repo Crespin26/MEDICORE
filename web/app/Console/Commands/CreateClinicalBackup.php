@@ -12,6 +12,7 @@ class CreateClinicalBackup extends Command
 
     protected $description = 'Sauvegarder SQLite et les documents médicaux dans une archive chiffrée indépendante';
 
+    /** Crée une archive privée via le service et renvoie un code CLI exploitable par l’exploitation. */
     public function handle(ClinicalBackup $backup): int
     {
         try {

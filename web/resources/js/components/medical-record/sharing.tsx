@@ -5,6 +5,7 @@ import { type FormEvent } from 'react';
 
 type Doctor = { id: number; name: string };
 export type Share = { id: number; viewer_id: number; created_at: string };
+/** Révoque le partage après saisie d’un motif, sans modifier le contenu clinique. */
 function Revoke({ patientId, share }: { patientId: number; share: Share }) {
     const form = useForm({ reason: '' });
     return (
@@ -32,6 +33,7 @@ function Revoke({ patientId, share }: { patientId: number; share: Share }) {
         </form>
     );
 }
+/** Gère les partages directs en lecture seule des éléments propres au médecin. */
 export function ClinicalSharing({
     patientId,
     doctors,

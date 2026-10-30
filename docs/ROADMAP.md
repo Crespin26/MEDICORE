@@ -1,6 +1,6 @@
 # Feuille de route MediCore
 
-Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâches et leur état.
+Le [backlog web et mobile](FEATURES.md) détaille les fonctionnalités, les tâches et leur état. Le [bilan actuel des travaux restants](RESTE-A-FAIRE.md) les organise par priorité de mise en service et par extension.
 
 ## Réalisé
 

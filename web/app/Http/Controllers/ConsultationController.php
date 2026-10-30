@@ -16,6 +16,7 @@ use Inertia\Inertia;
 
 class ConsultationController extends Controller
 {
+    /** Pagine les consultations propres au médecin et audite les patients dont le contenu est affiché. */
     public function index(Request $request)
     {
         $filters = $request->validate(['patient_id' => ['nullable', 'integer', 'exists:patients,id'], 'status' => ['nullable', 'in:draft,validated']]);
@@ -41,6 +42,7 @@ class ConsultationController extends Controller
         ]);
     }
 
+    /** Prépare une consultation pour un patient actif et un éventuel rendez-vous éligible. */
     public function create(Request $request, Patient $patient)
     {
         $patient->assertActive();
@@ -63,6 +65,7 @@ class ConsultationController extends Controller
         ]);
     }
 
+    /** Délègue la création et la révision au service transactionnel de consultations. */
     public function store(SaveConsultationRequest $request, Patient $patient, ConsultationRecorder $recorder)
     {
         $consultation = $recorder->save($request->user(), $patient, $request->validated());
@@ -70,6 +73,7 @@ class ConsultationController extends Controller
         return to_route('consultations.show', $consultation)->with('status', 'Consultation enregistrée.');
     }
 
+    /** Autorise la lecture avant d’exposer la consultation et ses révisions paginées. */
     public function show(Request $request, Consultation $consultation)
     {
         Gate::authorize('view', $consultation);
@@ -85,6 +89,7 @@ class ConsultationController extends Controller
         ]);
     }
 
+    /** Exige la qualité d’auteur avant de déléguer la correction versionnée au service. */
     public function update(SaveConsultationRequest $request, Consultation $consultation, ConsultationRecorder $recorder)
     {
         Gate::authorize('update', $consultation);

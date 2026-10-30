@@ -21,6 +21,7 @@ interface LoginProps {
     canResetPassword: boolean;
 }
 
+/** Connecte le personnel et associe les erreurs aux champs pour les technologies d’assistance. */
 export default function Login({ status, canResetPassword }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',

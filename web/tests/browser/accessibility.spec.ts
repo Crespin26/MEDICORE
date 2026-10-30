@@ -136,3 +136,36 @@ test('chargement : indicateur accessible pendant une navigation', async ({ page 
         release();
     }
 });
+
+test('thème système : reste actif après avoir quitté les paramètres', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
+    await login(page, 'secretary');
+    await page.goto('/settings/appearance');
+    await page.getByRole('button', { name: 'Dark', exact: true }).click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await page.getByRole('button', { name: 'System', exact: true }).click();
+    await expect(page.locator('html')).not.toHaveClass(/dark/);
+    // An Inertia visit unmounts useAppearance without reloading the JS application.
+    await page.evaluate(() => document.querySelector<HTMLAnchorElement>('a[href$="/settings/profile"]')?.click());
+    await expect(page).toHaveURL(/\/settings\/profile$/);
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await page.emulateMedia({ colorScheme: 'light' });
+    await expect(page.locator('html')).not.toHaveClass(/dark/);
+});
+
+test('stockage navigateur bloqué : navigation et thème restent utilisables', async ({ page }) => {
+    await page.addInitScript(() => {
+        Object.defineProperty(window, 'localStorage', {
+            get() {
+                throw new DOMException('Storage blocked', 'SecurityError');
+            },
+        });
+    });
+    await login(page, 'secretary');
+    await page.goto('/settings/appearance');
+    await page.getByRole('button', { name: 'Dark', exact: true }).click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await page.getByRole('button', { name: 'Light', exact: true }).click();
+    await expect(page.locator('html')).not.toHaveClass(/dark/);
+});

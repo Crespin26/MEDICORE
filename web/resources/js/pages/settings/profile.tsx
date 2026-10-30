@@ -19,6 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+/** Permet la modification des informations du compte connecté et affiche les erreurs serveur. */
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
 

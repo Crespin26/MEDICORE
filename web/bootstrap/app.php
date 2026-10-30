@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureAccountActive;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LoadClinicSettings;
 use App\Http\Middleware\PrivateResponses;
+use App\Http\Middleware\TrustProxies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->replace(Illuminate\Http\Middleware\TrustProxies::class, TrustProxies::class);
         $middleware->api(append: [LoadClinicSettings::class, PrivateResponses::class]);
         $middleware->web(append: [
             LoadClinicSettings::class,
@@ -31,10 +33,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->shouldRenderJsonWhen(fn (Request $request, Throwable $exception) => $request->is('api/*') || $request->expectsJson());
         $exceptions->respond(function (Response $response) {
-            if (request()->is('api/*')) {
-                $response->headers->set('Cache-Control', 'no-store, private');
-                $response->headers->set('X-Content-Type-Options', 'nosniff');
-            }
+            // Exceptions bypass route middleware: errors must also remain private.
+            $response->headers->set('Cache-Control', 'no-store, private');
+            $response->headers->set('X-Content-Type-Options', 'nosniff');
+            $response->headers->set('Referrer-Policy', 'same-origin');
 
             return $response;
         });

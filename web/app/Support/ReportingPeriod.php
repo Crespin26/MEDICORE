@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 
 class ReportingPeriod
 {
+    /** Valide une période de 93 jours maximum et renvoie des bornes locales [début, fin exclusive). */
     public static function from(Request $request): array
     {
         $data = $request->validate(['from' => ['nullable', 'date_format:Y-m-d'], 'to' => ['nullable', 'date_format:Y-m-d']]);

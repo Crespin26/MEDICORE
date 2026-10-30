@@ -15,6 +15,7 @@ class PersonnelManager
 {
     public function __construct(private AppointmentScheduler $scheduler) {}
 
+    /** Verrouille les personnes concernées et revérifie les droits avant la mutation. */
     private function transaction(User $actor, int $userId, callable $callback): mixed
     {
         return $this->scheduler->transaction(function () use ($actor, $userId, $callback) {
@@ -26,11 +27,13 @@ class PersonnelManager
         });
     }
 
+    /** Conserve un instantané de la modification et son motif dans l’historique du personnel. */
     private function event(User $actor, int $userId, string $action, array $snapshot, ?string $reason = null): void
     {
         PersonnelEvent::create(['user_id' => $userId, 'actor_id' => $actor->id, 'actor_name' => $actor->name, 'action' => $action, 'snapshot' => $snapshot, 'reason' => $reason, 'created_at' => now()]);
     }
 
+    /** Met à jour une fiche professionnelle avec contrôle de version et unicité du matricule. */
     public function profile(User $actor, int $userId, array $data): void
     {
         $this->transaction($actor, $userId, function ($actor) use ($userId, $data) {
@@ -50,6 +53,7 @@ class PersonnelManager
         });
     }
 
+    /** Déclare une absence future sans conflit avec les absences ou rendez-vous actifs. */
     public function absence(User $actor, int $userId, array $data): StaffAbsence
     {
         $start = ClinicTime::parse($data['starts_at'], 'starts_at');
@@ -72,6 +76,7 @@ class PersonnelManager
         });
     }
 
+    /** Annule une absence avec contrôle de version ; répéter une annulation est sans effet. */
     public function cancel(User $actor, int $userId, int $absenceId, int $version, string $reason): void
     {
         $this->transaction($actor, $userId, function ($actor) use ($userId, $absenceId, $version, $reason) {

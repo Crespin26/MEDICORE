@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
+/** Affiche les fiches du personnel avec recherche et filtres de rôle et de statut. */
 export default function Personnel({
     staff,
     filters,

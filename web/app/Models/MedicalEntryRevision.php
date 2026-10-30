@@ -10,6 +10,7 @@ class MedicalEntryRevision extends Model
 
     protected $guarded = ['id'];
 
+    /** Chiffre les champs sensibles au repos et convertit les dates et versions du modèle. */
     protected function casts(): array
     {
         return ['snapshot' => 'encrypted:array', 'correction_reason' => 'encrypted', 'created_at' => 'immutable_datetime'];

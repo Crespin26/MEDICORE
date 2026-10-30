@@ -4,6 +4,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 Artisan::command('medicore:create-admin', function () {
     $name = $this->ask('Nom');
@@ -12,7 +13,7 @@ Artisan::command('medicore:create-admin', function () {
     $validator = Validator::make(compact('name', 'email', 'password'), [
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255|unique:users,email',
-        'password' => 'required|string|min:12',
+        'password' => ['required', 'string', Password::defaults(), 'max:72'],
     ]);
     if ($validator->fails()) {
         foreach ($validator->errors()->all() as $error) {

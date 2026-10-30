@@ -13,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
+    /** Associe le compte à sa fiche professionnelle. */
     public function professionalProfile(): HasOne
     {
         return $this->hasOne(ProfessionalProfile::class);
@@ -20,6 +21,7 @@ class User extends Authenticatable
 
     protected $attributes = ['role' => 'staff', 'status' => 'active'];
 
+    /** Vérifie la permission uniquement pour un compte actif dont le rôle est connu. */
     public function hasPermission(string $permission): bool
     {
         return $this->status === 'active' && in_array($permission, Role::tryFrom($this->role)?->permissions() ?? [], true);
@@ -28,6 +30,7 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
+    /** Révoque tous les jetons mobiles dès que mot de passe, rôle ou statut change. */
     protected static function booted(): void
     {
         static::updated(function (User $user) {

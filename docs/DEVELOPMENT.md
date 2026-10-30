@@ -56,3 +56,8 @@ Cette version est destinée au développement local. Les permissions métiers, p
 ## Recette web et nouvelles règles métier
 
 La [recette web](WEB-RECETTE.md) décrit l’exécution Playwright sur base temporaire, les homonymes confirmés par l’administrateur, l’archivage réversible et les partages en lecture seule entre médecins. Appliquer les migrations après sauvegarde contrôlée avant d’utiliser ces nouveaux écrans sur une base existante. Les comptes fictifs des tests ne sont jamais provisionnés dans la base active.
+
+## Maintenance et hébergement
+
+- [Architecture et contrats du code](MAINTENANCE.md).
+- [Préparation et procédure de production](PRODUCTION.md).

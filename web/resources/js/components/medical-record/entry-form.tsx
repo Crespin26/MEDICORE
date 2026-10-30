@@ -14,6 +14,7 @@ export type Entry = {
     version: number;
 };
 export const inputClass = 'border-input bg-background w-full rounded-md border px-3 py-2 text-sm';
+/** Saisit une information médicale ; les corrections conservent la version et leur justification. */
 export function EntryForm({
     patientId,
     kinds,
@@ -135,6 +136,7 @@ export function EntryForm({
         </form>
     );
 }
+/** Affiche un instant ISO dans le fuseau clinique transmis par le serveur. */
 export function displayTime(value: string, timezone: string): string {
     return new Date(value.includes('T') ? value : `${value.replace(' ', 'T')}Z`).toLocaleString('fr-FR', { timeZone: timezone });
 }

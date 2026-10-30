@@ -13,8 +13,10 @@ export type Line = {
     unit_price_minor: number;
     total_minor: number;
 };
+/** Formate pour affichage un montant en unités mineures, sans modifier sa valeur métier. */
 export const money = (value: number, currency: string) =>
     currency === 'XOF' ? `${value} XOF` : `${Math.floor(value / 100)},${String(value % 100).padStart(2, '0')} ${currency}`;
+/** Convertit un prix en unités mineures vers la saisie décimale attendue par le formulaire. */
 export const major = (value: number, currency: string) =>
     currency === 'XOF' ? String(value) : `${Math.floor(value / 100)}.${String(value % 100).padStart(2, '0')}`;
 export const selectClass = 'border-input bg-background w-full rounded-md border px-3 py-2 text-sm';
@@ -30,6 +32,7 @@ export type Invoice = {
     version: number;
     lines: Line[];
 };
+/** Recherche les patients actifs avec temporisation et annulation des réponses devenues inutiles. */
 function PatientPicker({ selected, onSelect }: { selected: string; onSelect: (id: string, label: string) => void }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<{ id: number; first_name: string; last_name: string; birth_date: string }[]>([]);
@@ -101,6 +104,7 @@ function PatientPicker({ selected, onSelect }: { selected: string; onSelect: (id
         </div>
     );
 }
+/** Édite un brouillon avec jeton d’idempotence ; les totaux définitifs restent calculés côté serveur. */
 export function InvoiceForm({
     services,
     currency,

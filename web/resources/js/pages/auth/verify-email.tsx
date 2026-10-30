@@ -7,6 +7,7 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 
+/** Présente l’état de vérification et permet de redemander un lien de validation. */
 export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});
 

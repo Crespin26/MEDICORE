@@ -12,6 +12,7 @@ class Patient extends Model
 
     protected $hidden = ['identity_key', 'search_text'];
 
+    /** Interdit une nouvelle opération métier sur une fiche archivée. */
     public function assertActive(): void
     {
         if ($this->archived_at !== null) {
@@ -19,16 +20,19 @@ class Patient extends Model
         }
     }
 
+    /** Calcule la clé normalisée prénom, nom et naissance servant à détecter les doublons. */
     public static function identityKey(string $firstName, string $lastName, string $birthDate): string
     {
         return hash('sha256', json_encode([Str::lower(Str::squish($firstName)), Str::lower(Str::squish($lastName)), substr($birthDate, 0, 10)], JSON_UNESCAPED_UNICODE));
     }
 
+    /** Normalise les termes sans accents pour la recherche administrative. */
     public static function searchText(string ...$parts): string
     {
         return Str::lower(Str::ascii(Str::squish(implode(' ', $parts))));
     }
 
+    /** Synchronise les index dérivés lors de chaque écriture sans les exposer dans les réponses. */
     protected static function booted(): void
     {
         static::saving(function (Patient $patient) {
@@ -39,6 +43,7 @@ class Patient extends Model
         });
     }
 
+    /** Définit les conversions de stockage et les dates utilisées par le modèle. */
     protected function casts(): array
     {
         return ['birth_date' => 'date:Y-m-d', 'archived_at' => 'immutable_datetime', 'distinct_identity' => 'boolean'];

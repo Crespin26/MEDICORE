@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useForm } from '@inertiajs/react';
 import { type FormEvent } from 'react';
 
+/** Archive ou réactive une fiche avec motif et confirmation explicite. */
 export function PatientLifecycle({ patientId, archived }: { patientId: number; archived: boolean }) {
     const form = useForm({ archived: !archived, reason: '' });
     function submit(event: FormEvent) {

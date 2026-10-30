@@ -13,6 +13,7 @@ type Revision = {
     correction_reason: string | null;
     snapshot: Entry;
 };
+/** Présente une information médicale et ses versions, avec édition uniquement si le serveur l’autorise. */
 export default function MedicalEntry({
     patient,
     entry,

@@ -39,10 +39,12 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
     restore();
   }
 
+  /// Actualise l’interface quand la session ou le profil en mémoire change.
   void changed() {
     if (mounted) setState(() {});
   }
 
+  /// Vérifie la session sous écran de protection et conserve une erreur récupérable en cas d’échec.
   Future<void> restore() async {
     setState(() {
       loading = true;
@@ -61,6 +63,7 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
     }
   }
 
+  /// Ferme la session après cinq minutes sans interaction, y compris au retour au premier plan.
   void checkIdle() {
     if (widget.api.user != null &&
         DateTime.now().difference(lastAction) > const Duration(minutes: 5)) {
@@ -68,6 +71,7 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
     }
   }
 
+  /// Masque les données en arrière-plan puis revérifie la session à la reprise.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state != AppLifecycleState.resumed) {
@@ -142,6 +146,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final form = GlobalKey<FormState>();
   bool busy = false;
   String? error;
+
+  /// Valide le formulaire de connexion et efface le mot de passe après chaque tentative.
   Future<void> login() async {
     if (!form.currentState!.validate()) return;
     setState(() {

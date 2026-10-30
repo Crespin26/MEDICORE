@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class LoadClinicSettings
 {
+    /** Charge les paramètres propres à la requête puis restaure la configuration, même en cas d’exception. */
     public function handle(Request $request, Closure $next)
     {
         $previous = config('clinic');

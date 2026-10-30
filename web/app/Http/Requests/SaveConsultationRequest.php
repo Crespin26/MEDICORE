@@ -7,11 +7,13 @@ use Illuminate\Validation\Rule;
 
 class SaveConsultationRequest extends FormRequest
 {
+    /** Exige la permission de saisir une consultation ; les droits d’auteur sont vérifiés séparément. */
     public function authorize(): bool
     {
         return $this->user()->can('consultations.write') && (! $this->route('consultation') || $this->user()->can('update', $this->route('consultation')));
     }
 
+    /** Décrit les champs cliniques autorisés et les contraintes de correction et de version. */
     public function rules(): array
     {
         return [

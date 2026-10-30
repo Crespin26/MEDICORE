@@ -12,6 +12,7 @@ class AdministrationExport extends Model
 
     public $timestamps = false;
 
+    /** Définit les conversions de stockage et les dates utilisées par le modèle. */
     protected function casts(): array
     {
         return ['created_at' => 'immutable_datetime'];

@@ -16,6 +16,7 @@ type Absence = {
     cancel_reason: string | null;
 };
 type Page<T> = { data: T[]; current_page: number; prev_page_url: string | null; next_page_url: string | null };
+/** Saisit une absence en heure clinique et affiche les conflits renvoyés par le serveur. */
 function AbsenceForm({ userId, categories }: { userId: number; categories: Record<string, string> }) {
     const form = useForm({ starts_at: '', ends_at: '', category: 'leave', reason: '' });
     return (
@@ -90,6 +91,7 @@ function AbsenceForm({ userId, categories }: { userId: number; categories: Recor
         </form>
     );
 }
+/** Demande l’annulation d’une absence avec sa version et un motif. */
 function CancelAbsence({ userId, absence }: { userId: number; absence: Absence }) {
     const form = useForm({ version: absence.version, reason: '' });
     return (
@@ -119,6 +121,7 @@ function CancelAbsence({ userId, absence }: { userId: number; absence: Absence }
         </form>
     );
 }
+/** Présente la fiche professionnelle, les absences et l’historique de gestion autorisé. */
 export default function ProfessionalProfile({
     member,
     profile,

@@ -14,6 +14,7 @@ use Illuminate\Validation\ValidationException;
 
 class AppointmentScheduler
 {
+    /** Exécute une mutation avec reprise sur conflit ; SQLite prend le verrou avant toute lecture. */
     public function transaction(callable $callback): mixed
     {
         return DB::transaction(function () use ($callback) {
@@ -27,6 +28,7 @@ class AppointmentScheduler
     }
 
     // Every scheduling/availability mutation takes the same doctor lock before reading conflicts.
+    /** Verrouille les médecins dans un ordre stable ; appeler dans une transaction de planification. */
     public function lockDoctors(array $ids): void
     {
         $ids = array_unique($ids);
@@ -40,6 +42,7 @@ class AppointmentScheduler
         }
     }
 
+    /** Crée ou déplace un rendez-vous après contrôle des horaires, absences et chevauchements. */
     public function book(array $data, CarbonImmutable $start, CarbonImmutable $end, ?int $id = null): Appointment
     {
         return $this->transaction(function () use ($data, $start, $end, $id) {

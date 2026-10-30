@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\Role;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -39,13 +40,12 @@ class HandleInertiaRequests extends Middleware
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         return array_merge(parent::share($request), [
-            ...parent::share($request),
             'name' => config('app.name'),
             'status' => fn () => $request->session()->get('status'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
-                'permissions' => collect(['dashboard.view', 'patients.view', 'patients.write', 'users.manage', 'appointments.view', 'appointments.write', 'appointments.status', 'availabilities.manage', 'consultations.view', 'consultations.write', 'medical-record.view', 'medical-record.write', 'billing.view', 'billing.manage', 'billing.pay', 'billing.reverse', 'catalog.manage', 'personnel.manage', 'personnel.self', 'administration.manage', 'administration.export'])->filter(fn ($permission) => $request->user()?->can($permission))->values()->all(),
+                'permissions' => collect(Role::permissionNames())->filter(fn ($permission) => $request->user()?->can($permission))->values()->all(),
             ],
         ]);
     }

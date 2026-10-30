@@ -7,6 +7,7 @@ use App\Models\User;
 
 class MedicalAudit
 {
+    /** Journalise un accès sans contenu clinique ; une erreur de journalisation interrompt l’opération. */
     public static function record(User $actor, int $patientId, string $action, string $subjectType, int $subjectId, ?int $version = null): void
     {
         MedicalAccessEvent::create([

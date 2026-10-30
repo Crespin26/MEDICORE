@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardReport
 {
+    /** Construit les indicateurs autorisés sur une période à fin exclusive ; ne mélange jamais les devises. */
     public function build(User $user, CarbonImmutable $start, CarbonImmutable $end): array
     {
         return DB::transaction(function () use ($user, $start, $end) {
@@ -52,6 +53,7 @@ class DashboardReport
         });
     }
 
+    /** Transforme les agrégats autorisés en lignes CSV sans identité de patient. */
     public function csvRows(array $report): array
     {
         $rows = [['metric', 'count', 'currency', 'amount_minor', 'date_from', 'date_to', 'as_of_utc']];
