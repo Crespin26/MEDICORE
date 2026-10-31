@@ -75,7 +75,7 @@ Le [banc local](PERFORMANCE.md) est livré : deux fois 100 requêtes, avec concu
 
 | Travail restant | Résultat attendu |
 | --- | --- |
-| Installer/configurer le SDK Android, compiler un APK et l'installer sur émulateur/appareil. | Version de test utilisable ; aucune compilation APK n'a été faite ici. |
+| Installer l’APK debug compilé le 30 octobre sur le téléphone USB et recetter les parcours. | SDK installé, compilation et signature vérifiées ; appareil pas encore détecté. |
 | Compiler iOS avec macOS/Xcode et une signature adaptée. | Version de test iOS installable. |
 | Vérifier Keystore/Keychain, expiration, révocation et déconnexion. | Tests sur matériel réel, y compris échecs réseau et stockage. |
 | Vérifier l'arrière-plan, les captures et les cinq minutes d'inactivité. | Comportement de confidentialité accepté sur chaque plateforme. |
@@ -84,7 +84,7 @@ Le [banc local](PERFORMANCE.md) est livré : deux fois 100 requêtes, avec concu
 | Définir identifiants, environnements, signatures et versions définitifs. | Builds reproductibles et distribution de test organisée. |
 | Préparer les éléments de publication si une publication est retenue. | Processus de livraison défini ; aucun envoi aux stores n'est effectué. |
 
-Le client Flutter et le test HTTP réel existent déjà. L'absence de SDK Android et de macOS/Xcode ici limite la validation matérielle, pas l'existence du code connecté.
+Le client Flutter, le test HTTP réel et un APK debug compilé existent. Le téléphone reste à connecter et à autoriser pour la recette matérielle ; iOS nécessite toujours macOS/Xcode.
 
 ## 7. Développer les modules mobiles suivants
 
@@ -127,3 +127,17 @@ Ces extensions ne sont pas toutes nécessaires pour lancer le périmètre web in
 Les étapes de recette mobile peuvent avancer en parallèle de l'exploitation web. Le code de base est largement livré ; la mise en service fiable, la validation humaine et les modules mobiles suivants constituent maintenant l'essentiel du travail restant. Aucun délai fiable ne peut être chiffré sans les décisions d'hébergement, les volumes et les priorités métier.
 
 Le 30 octobre, une revue de maintenabilité a ajouté les contrats de fonctions, le diagnostic `medicore:production-check` et les modèles d’hébergement. Voir [MAINTENANCE.md](MAINTENANCE.md) et [PRODUCTION.md](PRODUCTION.md). Ces préparatifs ne constituent pas un déploiement effectif.
+
+## Mise à jour du lancement local — 30 octobre 2026
+
+Les trois migrations mentionnées comme en attente dans le bilan initial ont été appliquées
+sur la base locale, après sauvegarde chiffrée et vérification d’une restauration isolée.
+Les clés applicatives existantes ont été conservées. Le serveur web/API, le worker
+et le scheduler ont été démarrés localement ; cela ne constitue pas une mise en production.
+Le SDK Android et Gradle ont été installés avec accord sur les licences pour préparer
+le lancement sur un téléphone USB. La validation sur appareil reste à effectuer.
+
+L’APK debug a ensuite été compilé avec succès et sa signature vérifiée :
+`mobile/build/app/outputs/flutter-apk/app-debug.apk` (151,8 Mio, API 24 minimum, ARM/ARM64/x86_64).
+Aucun téléphone USB n’était détecté lors de cette préparation ; aucune installation
+ou recette sur appareil n’est encore déclarée réussie.

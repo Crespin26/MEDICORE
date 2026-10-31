@@ -81,6 +81,12 @@ Le 29 octobre 2026 : suite complète de 191 tests PHP/2 107 assertions, onze tes
 
 Le test HTTP est volontairement ignoré par un `flutter test` seul sans fixture, puis exécuté explicitement par la commande ci-dessus. La CI configure ce test commun aux deux applications.
 
-Sur la machine de développement, Flutter analyze/tests et le test HTTP sont exécutables ; le SDK Android n'est pas installé. Aucun APK n'a donc été compilé et aucune recette sur appareil physique n'a été réalisée. La compilation iOS nécessite macOS/Xcode et n'a pas été exécutée sous Linux. Les tests avec stockage injecté ne prouvent pas à eux seuls le fonctionnement du Keychain/Keystore matériel.
+Sur la machine de développement, Flutter analyze/tests et le test HTTP sont exécutables. Le SDK Android a été installé le 30 octobre 2026. La compilation de `mobile/build/app/outputs/flutter-apk/app-debug.apk` a réussi et sa signature a été vérifiée (version debug, API 24 minimum, ARM/ARM64/x86_64). Aucun téléphone USB n’était détecté : l’installation et la recette sur appareil physique restent à effectuer. La compilation iOS nécessite macOS/Xcode et n'a pas été exécutée sous Linux. Les tests avec stockage injecté ne prouvent pas à eux seuls le fonctionnement du Keychain/Keystore matériel.
 
 Références : [Sanctum pour applications mobiles](https://laravel.com/docs/12.x/sanctum#mobile-application-authentication), [réseau Flutter](https://docs.flutter.dev/cookbook/networking/fetch-data), [stockage sécurisé Flutter](https://pub.dev/packages/flutter_secure_storage).
+
+### Lancement sur un téléphone USB
+
+Le script `scripts/run-mobile-usb.sh`, depuis la racine du dépôt, configure `adb reverse`
+pour relier le téléphone au serveur local sur le port 8000 et lance Flutter en debug.
+Voir les [instructions USB](../mobile/README.md#téléphone-android-branché-en-usb).
