@@ -27,6 +27,8 @@ Le serveur et le web React/TypeScript avec Inertia sont dans `web/` (Laravel 12,
 
 Consulter le [guide de démarrage](docs/DEVELOPMENT.md), la [feuille de route](docs/ROADMAP.md) et la [liste des fonctionnalités et tâches web/mobile](docs/FEATURES.md).
 
+Le [rapport complet d’avancement du 4 novembre 2026](docs/RAPPORT-AVANCEMENT.md) distingue les fonctionnalités livrées, les dernières validations et les travaux restant avant mise en service.
+
 Le [bilan complet de la partie web](docs/BILAN-WEB.md) récapitule les modules livrés, les tests, les limites et les priorités avant production.
 
 Le [guide de reprise et de gestion des clés](docs/RECOVERY.md) décrit le chiffrement des consultations, les sauvegardes SQLite et les exercices de restauration.
@@ -76,3 +78,5 @@ Ces formulations décrivent la cible du projet. Tant que les applications ne son
 
 - [Architecture et contrats du code](docs/MAINTENANCE.md).
 - [Préparation et procédure de production](docs/PRODUCTION.md).
+
+Le lot [MOB-07 — Profil et notifications](docs/MOB-07.md) ajoute le profil mobile modifiable, les préférences, la boîte privée et les rappels. Le raccordement Firebase est implémenté mais le push reste désactivé tant que le projet n’est pas configuré.

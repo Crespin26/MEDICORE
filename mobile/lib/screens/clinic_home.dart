@@ -1,18 +1,57 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../core/api_client.dart';
+import '../core/push_notifications.dart';
+import 'account_screen.dart';
+import 'notification_screens.dart';
 import 'patient_screens.dart';
 import 'appointment_screens.dart';
 
 class ClinicHome extends StatefulWidget {
-  const ClinicHome({super.key, required this.api});
+  const ClinicHome({super.key, required this.api, required this.push});
   final ApiClient api;
+  final PushGateway push;
   @override
   State<ClinicHome> createState() => _ClinicHomeState();
 }
 
 class _ClinicHomeState extends State<ClinicHome> {
   int selected = 0;
+  StreamSubscription<void>? messages;
+
+  @override
+  void initState() {
+    super.initState();
+    messages = widget.push.messages.listen((_) {
+      if (!mounted || !widget.api.can('appointments.view')) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Une notification est disponible dans MediCore.'),
+          action: SnackBarAction(
+            label: 'Ouvrir',
+            onPressed: () {
+              if (mounted) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => NotificationsScreen(api: widget.api),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    messages?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final api = widget.api;
@@ -24,32 +63,23 @@ class _ClinicHomeState extends State<ClinicHome> {
       (
         'Mon compte',
         Icons.account_circle_outlined,
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${api.user?['name']}',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                Text('${api.user?['email']}'),
-                Text('Rôle : ${api.user?['role']}'),
-                const SizedBox(height: 16),
-                const Text(
-                  'Seuls les modules autorisés sont affichés. Les données restent contrôlées par le serveur.',
-                ),
-              ],
-            ),
-          ),
-        ),
+        AccountScreen(api: api, push: widget.push),
       ),
     ];
     return Scaffold(
       appBar: AppBar(
         title: const Text('MediCore'),
         actions: [
+          if (api.can('appointments.view'))
+            IconButton(
+              tooltip: 'Mes notifications',
+              icon: const Icon(Icons.notifications_outlined),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => NotificationsScreen(api: api),
+                ),
+              ),
+            ),
           IconButton(
             tooltip: 'Se déconnecter',
             icon: const Icon(Icons.logout),

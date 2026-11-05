@@ -90,3 +90,10 @@ Références : [Sanctum pour applications mobiles](https://laravel.com/docs/12.x
 Le script `scripts/run-mobile-usb.sh`, depuis la racine du dépôt, configure `adb reverse`
 pour relier le téléphone au serveur local sur le port 8000 et lance Flutter en debug.
 Voir les [instructions USB](../mobile/README.md#téléphone-android-branché-en-usb).
+
+## Mise à jour MOB-07 — 5 novembre 2026
+
+Le profil mobile est désormais modifiable par `PATCH /me`. Les préférences, la boîte privée,
+les rappels et les inscriptions push sont implémentés. Le projet Firebase n’est pas encore
+provisionné et aucun push réel n’est validé. Les anciens paragraphes de périmètre décrivent
+le premier lot : voir le [contrat MOB-07](MOB-07.md) pour les nouvelles routes et règles.

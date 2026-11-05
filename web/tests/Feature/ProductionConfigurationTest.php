@@ -46,4 +46,11 @@ class ProductionConfigurationTest extends TestCase
     {
         $this->artisan('medicore:production-check')->expectsOutputToContain('APP_ENV doit être production.')->assertFailed();
     }
+
+    public function test_push_enabled_requires_a_private_credentials_file(): void
+    {
+        $this->configureProduction();
+        config(['mobile_notifications.push_enabled' => true, 'mobile_notifications.firebase_credentials' => null]);
+        $this->assertCount(1, ProductionConfiguration::issues());
+    }
 }

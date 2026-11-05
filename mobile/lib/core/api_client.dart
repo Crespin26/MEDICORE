@@ -103,6 +103,20 @@ class ApiClient extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Actualise le profil en mémoire sans restaurer une session fermée pendant la requête.
+  Future<void> updateProfile(String name, String email) async {
+    final userId = user?['id'];
+    final result = await request(
+      'PATCH',
+      'me',
+      body: {'name': name, 'email': email},
+    );
+    if (userId != null && user?['id'] == userId) {
+      user = Map<String, dynamic>.from(result['data'] as Map);
+      notifyListeners();
+    }
+  }
+
   /// Retire immédiatement l’accès local puis révoque le jeton serveur si le réseau le permet.
   Future<void> logout() async {
     // Start revocation with the current token, then remove local access immediately.
@@ -144,7 +158,10 @@ class ApiClient extends ChangeNotifier {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     });
-    if (_token != null) req.headers['Authorization'] = 'Bearer $_token';
+    final requestToken = _token;
+    if (requestToken != null) {
+      req.headers['Authorization'] = 'Bearer $requestToken';
+    }
     if (body != null) req.body = jsonEncode(body);
     try {
       final streamed = await transport
@@ -158,7 +175,10 @@ class ApiClient extends ChangeNotifier {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return decoded;
       }
-      if (response.statusCode == 401) {
+      // A delayed response from an old session must not sign out a newer login.
+      if (response.statusCode == 401 &&
+          requestToken != null &&
+          _token == requestToken) {
         _token = null;
         user = null;
         try {

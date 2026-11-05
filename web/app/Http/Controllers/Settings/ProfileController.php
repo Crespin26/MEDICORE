@@ -20,6 +20,7 @@ use App\Models\PatientEvent;
 use App\Models\PersonnelEvent;
 use App\Models\ProfessionalProfile;
 use App\Models\StaffAbsence;
+use App\Services\UserProfileUpdater;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,15 +45,9 @@ class ProfileController extends Controller
     /**
      * Update the user's profile settings.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request, UserProfileUpdater $profiles): RedirectResponse
     {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
+        $profiles->update($request->user(), $request->validated());
 
         return to_route('profile.edit');
     }

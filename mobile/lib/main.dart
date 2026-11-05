@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'core/api_client.dart';
+import 'core/push_notifications.dart';
 import 'screens/clinic_home.dart';
 
 void main() => runApp(
@@ -18,13 +19,16 @@ void main() => runApp(
 );
 
 class MediCoreApp extends StatefulWidget {
-  const MediCoreApp({super.key, required this.api});
+  const MediCoreApp({super.key, required this.api, this.push});
   final ApiClient api;
+  final PushGateway? push;
   @override
   State<MediCoreApp> createState() => _MediCoreAppState();
 }
 
 class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
+  late final PushGateway push;
+  late final MobilePushSession pushSession;
   bool loading = true;
   bool shield = false;
   String? error;
@@ -33,6 +37,8 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    push = widget.push ?? FirebasePushGateway();
+    pushSession = MobilePushSession(widget.api, push);
     WidgetsBinding.instance.addObserver(this);
     widget.api.addListener(changed);
     timer = Timer.periodic(const Duration(seconds: 30), (_) => checkIdle());
@@ -41,7 +47,10 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
 
   /// Actualise l’interface quand la session ou le profil en mémoire change.
   void changed() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+      unawaited(pushSession.sync().catchError((_) {}));
+    }
   }
 
   /// Vérifie la session sous écran de protection et conserve une erreur récupérable en cas d’échec.
@@ -95,6 +104,8 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
   @override
   void dispose() {
     timer?.cancel();
+    unawaited(pushSession.dispose());
+    unawaited(push.dispose());
     widget.api.removeListener(changed);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -121,7 +132,7 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
             child: child!,
           ),
     home: widget.api.user != null
-        ? ClinicHome(api: widget.api)
+        ? ClinicHome(api: widget.api, push: push)
         : LoginScreen(api: widget.api, error: error, retry: restore),
   );
 }

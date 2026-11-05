@@ -41,3 +41,10 @@ ANDROID_HOME="$HOME/Android/Sdk" ./scripts/run-mobile-usb.sh
 
 Le transfert disparaît au débranchement ; relancer le script à la reconnexion.
 Ce lancement HTTP est réservé au debug et reste refusé dans une version release.
+
+## Profil et notifications
+
+Le lot [MOB-07](../docs/MOB-07.md) ajoute l’édition du nom/e-mail, les préférences,
+la boîte privée et les rappels de rendez-vous. Appliquer sa migration backend avant
+d’utiliser la nouvelle version. Firebase est optionnel et désactivé par défaut ;
+sa configuration et une recette sur appareil sont nécessaires avant tout push réel.

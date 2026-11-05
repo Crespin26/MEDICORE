@@ -39,6 +39,15 @@ class ProductionConfiguration
         $appKeys = array_map($decode, [$appKey, ...config('app.previous_keys', [])]);
         $require(is_string($backupKey) && strlen($backupKey) === 32 && ! in_array($backupKey, $appKeys, true), 'Provisionner une MEDICORE_BACKUP_KEY indépendante de 32 octets en base64.');
 
+        if (config('mobile_notifications.push_enabled')) {
+            $credential = config('mobile_notifications.firebase_credentials');
+            $path = is_string($credential) ? realpath($credential) : false;
+            $public = realpath(public_path());
+            $require($path !== false && is_file($path) && is_readable($path) && (fileperms($path) & 0007) === 0
+                && ($public === false || ($path !== $public && ! str_starts_with($path, $public.DIRECTORY_SEPARATOR))),
+                'Le transport push requiert un fichier Firebase privé et lisible, hors du dossier public.');
+        }
+
         return $issues;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\MobileNotificationController;
+use App\Http\Controllers\Api\MobileProfileController;
 use App\Http\Controllers\Api\MobileSessionController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PatientController;
@@ -10,6 +12,13 @@ Route::prefix('v1')->group(function () {
     Route::post('session', [MobileSessionController::class, 'store'])->middleware(['throttle:mobile-login', 'throttle:10,1']);
     Route::middleware(['auth:sanctum', EnsureMobileAccess::class, 'throttle:mobile-api'])->group(function () {
         Route::get('me', [MobileSessionController::class, 'show']);
+        Route::patch('me', [MobileProfileController::class, 'update']);
+        Route::get('notification-preferences', [MobileNotificationController::class, 'preferences']);
+        Route::put('notification-preferences', [MobileNotificationController::class, 'updatePreferences']);
+        Route::get('notifications', [MobileNotificationController::class, 'index']);
+        Route::patch('notifications/{notification}/read', [MobileNotificationController::class, 'read']);
+        Route::put('push-device', [MobileNotificationController::class, 'device']);
+        Route::delete('push-device', [MobileNotificationController::class, 'forgetDevice']);
         Route::delete('session', [MobileSessionController::class, 'destroy']);
         Route::get('patients', [PatientController::class, 'index'])->middleware('can:patients.view');
         Route::get('patients/{patient}', [PatientController::class, 'show'])->middleware('can:patients.view');

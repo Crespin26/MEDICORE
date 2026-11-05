@@ -41,3 +41,9 @@ Recetter la première version mobile connectée sur appareils Android/iOS et pr�
 5. Préparation à la production : isolation si plusieurs établissements, audit des accès, sauvegardes testées et vérification des exigences applicables.
 
 Chaque module devra inclure ses validations et ses tests d’autorisation. La suppression de patients et les exports nominatifs attendent une politique de conservation et d’accès. Les exports statistiques agrégés sont déjà disponibles dans WEB-08. Consulter le [bilan web](BILAN-WEB.md) pour les priorités de stabilisation.
+
+## Lot MOB-07 — 5 novembre 2026
+
+Profil modifiable, préférences, boîte privée, rappels et raccordement Firebase sont implémentés.
+La configuration du projet Firebase/APNs et la réception sur appareil restent à valider.
+Voir [MOB-07](MOB-07.md).

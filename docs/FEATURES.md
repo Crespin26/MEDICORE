@@ -155,10 +155,13 @@ Voir le [guide WEB-08](WEB-08.md) pour les définitions des indicateurs, les par
 ### MOB-07 — Notifications et profil
 
 - [x] Afficher les informations du compte connecté.
-- [ ] Permettre leur modification mobile selon les droits.
-- [ ] Ajouter les notifications de rendez-vous et leurs préférences.
-- [ ] Gérer les autorisations et les jetons de notification des appareils.
-- [ ] Exclure les informations médicales du contenu visible sur l’écran verrouillé.
+- [x] Permettre leur modification mobile selon les droits (nom/e-mail, règles partagées avec le web).
+- [x] Ajouter une boîte privée, les événements de rendez-vous, les rappels planifiés et leurs préférences.
+- [x] Implémenter les autorisations OS, les inscriptions FID chiffrées et leur révocation de session.
+- [x] Exclure identité, horaire et contenu médical du payload push visible.
+- [ ] Provisionner Firebase/APNs et valider la livraison push réelle sur Android/iOS.
+
+Voir [MOB-07](MOB-07.md) : le push reste désactivé sans projet Firebase ; la boîte et les rappels internes sont livrés.
 
 ### MOB-08 — Livraison
 

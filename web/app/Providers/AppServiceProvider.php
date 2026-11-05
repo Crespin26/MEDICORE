@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Enums\Role;
+use App\Models\Appointment;
 use App\Models\User;
+use App\Observers\AppointmentObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -18,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // One policy for invitations, password resets and authenticated changes.
+        Appointment::observe(AppointmentObserver::class);
         Password::defaults(fn () => Password::min(12));
         RateLimiter::for('mobile-login', function ($request) {
             $email = $request->input('email');

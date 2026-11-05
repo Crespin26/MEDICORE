@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Services\AppointmentNotifications;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Validator;
@@ -31,3 +32,16 @@ Artisan::command('medicore:create-admin', function () {
 })->purpose('Créer un administrateur sans inscription publique');
 
 Schedule::command('sanctum:prune-expired --hours=24')->daily();
+
+Artisan::command('medicore:appointment-reminders', function () {
+    $count = app(AppointmentNotifications::class)->remind();
+    $this->info($count.' rappel(s) créé(s).');
+})->purpose('Créer les rappels de rendez-vous des membres ayant donné leur accord');
+
+Artisan::command('medicore:dispatch-push', function () {
+    $count = app(AppointmentNotifications::class)->dispatchPushes();
+    $this->info($count.' notification(s) mise(s) en file.');
+})->purpose('Transmettre les notifications persistantes au worker push');
+
+Schedule::command('medicore:appointment-reminders')->everyMinute()->withoutOverlapping();
+Schedule::command('medicore:dispatch-push')->everyMinute()->withoutOverlapping();

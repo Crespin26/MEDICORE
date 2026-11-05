@@ -141,3 +141,14 @@ L’APK debug a ensuite été compilé avec succès et sa signature vérifiée :
 `mobile/build/app/outputs/flutter-apk/app-debug.apk` (151,8 Mio, API 24 minimum, ARM/ARM64/x86_64).
 Aucun téléphone USB n’était détecté lors de cette préparation ; aucune installation
 ou recette sur appareil n’est encore déclarée réussie.
+
+## Mise à jour MOB-07 — 5 novembre 2026
+
+La modification du profil mobile, les préférences, la boîte privée, les rappels planifiés
+et le raccordement Firebase sont implémentés. La création du projet Firebase, sa configuration
+Android/iOS/APNs et la livraison réelle restent à valider ; le push est désactivé par défaut.
+Les anciennes mentions de profil/notifications non développés correspondent au bilan initial.
+Voir [MOB-07](MOB-07.md) pour le contrat, les droits et les étapes de mise en service.
+
+La migration MOB-07 a été appliquée à la base locale après sauvegarde/restauration contrôlée :
+16 migrations sont désormais appliquées. Le lot n’a pas démarré de serveur ni activé Firebase.

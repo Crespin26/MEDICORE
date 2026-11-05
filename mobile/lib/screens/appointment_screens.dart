@@ -7,8 +7,9 @@ String day(DateTime value) =>
     '${value.year}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
 
 class AgendaScreen extends StatefulWidget {
-  const AgendaScreen({super.key, required this.api});
+  const AgendaScreen({super.key, required this.api, this.initialDate});
   final ApiClient api;
+  final String? initialDate;
   @override
   State<AgendaScreen> createState() => _AgendaScreenState();
 }
@@ -21,6 +22,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
   @override
   void initState() {
     super.initState();
+    date = widget.initialDate;
     result = fetch();
   }
 

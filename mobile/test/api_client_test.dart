@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -137,4 +138,39 @@ void main() {
       api.dispose();
     },
   );
+  test('Un ancien 401 ne déconnecte pas une nouvelle session', () async {
+    final delayed = Completer<http.Response>();
+    final store = MemoryTokenStore();
+    var login = 0;
+    final api = ApiClient(
+      baseUrl: 'https://clinic.test/api/v1',
+      store: store,
+      transport: MockClient((request) async {
+        if (request.method == 'POST') {
+          login++;
+          return http.Response(
+            jsonEncode({
+              'data': {
+                'token': 'fictif-token-$login',
+                'user': {'id': login, 'permissions': []},
+              },
+            }),
+            201,
+          );
+        }
+        if (request.method == 'DELETE') return http.Response('', 204);
+        return delayed.future;
+      }),
+    );
+    await api.login('first@medicore.test', 'Fictif-secret', 'Fixture');
+    final pending = api.request('GET', 'patients');
+    await api.logout();
+    await api.login('second@medicore.test', 'Fictif-secret', 'Fixture');
+    final check = expectLater(pending, throwsA(isA<ApiException>()));
+    delayed.complete(http.Response('{}', 401));
+    await check;
+    expect(api.user?['id'], 2);
+    expect(store.token, 'fictif-token-2');
+    api.dispose();
+  });
 }
