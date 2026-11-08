@@ -102,39 +102,56 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             for (final item in items)
               Card(
-                child: ListTile(
-                  leading: Icon(
-                    item['read_at'] == null
-                        ? Icons.notifications_active_outlined
-                        : Icons.done,
-                  ),
-                  title: Text(labels[item['kind']] ?? item['title'] as String),
-                  subtitle: Text(
-                    [
-                      if (item['appointment_time'] != null)
-                        (item['appointment_time'] as String).replaceFirst(
-                          'T',
-                          ' à ',
-                        ),
-                      item['body'] as String,
-                    ].join('\n'),
-                  ),
-                  onTap: () {
-                    if (item['read_at'] == null) {
-                      markRead(item['id'] as String);
-                    }
-                    openAgenda(item['appointment_date'] as String?);
-                  },
-                  trailing: item['read_at'] == null
-                      ? TextButton(
-                          onPressed: () => markRead(item['id'] as String),
-                          child: const Text('Marquer comme lue'),
-                        )
-                      : const Text('Lue'),
+                // L’action sous le contenu laisse le texte lisible sur les petits écrans.
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ListTile(
+                      leading: Icon(
+                        item['read_at'] == null
+                            ? Icons.notifications_active_outlined
+                            : Icons.done,
+                      ),
+                      title: Text(
+                        labels[item['kind']] ?? item['title'] as String,
+                      ),
+                      subtitle: Text(
+                        [
+                          if (item['appointment_time'] != null)
+                            (item['appointment_time'] as String).replaceFirst(
+                              'T',
+                              ' à ',
+                            ),
+                          item['body'] as String,
+                        ].join('\n'),
+                      ),
+                      onTap: () {
+                        if (item['read_at'] == null) {
+                          markRead(item['id'] as String);
+                        }
+                        openAgenda(item['appointment_date'] as String?);
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                      child: Align(
+                        alignment: AlignmentDirectional.centerEnd,
+                        child: item['read_at'] == null
+                            ? TextButton(
+                                onPressed: () => markRead(item['id'] as String),
+                                child: const Text('Marquer comme lue'),
+                              )
+                            : const Text('Lue'),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 TextButton(
                   onPressed: page > 1

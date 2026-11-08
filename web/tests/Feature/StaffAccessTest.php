@@ -202,6 +202,30 @@ class StaffAccessTest extends TestCase
         $this->assertNotSame('old-remember-token', $user->fresh()->remember_token);
     }
 
+    public function test_role_change_revokes_web_and_mobile_sessions_but_preserves_other_accounts(): void
+    {
+        $user = $this->account('doctor');
+        $other = $this->account('secretary');
+        $user->forceFill(['remember_token' => 'old-remember-token'])->save();
+        $user->createToken('Téléphone fictif', ['mobile'], now()->addHours(8));
+        $other->createToken('Autre téléphone fictif', ['mobile'], now()->addHours(8));
+        foreach ([$user, $other] as $account) {
+            DB::table('sessions')->insert([
+                'id' => 'role-session-'.$account->id, 'user_id' => $account->id,
+                'payload' => base64_encode(serialize([])), 'last_activity' => time(),
+            ]);
+        }
+
+        $this->actingAs($this->account())->patch('/staff/'.$user->id, ['role' => 'secretary', 'status' => 'active'])->assertRedirect();
+
+        $this->assertSame('secretary', $user->fresh()->role);
+        $this->assertDatabaseMissing('sessions', ['id' => 'role-session-'.$user->id]);
+        $this->assertNotSame('old-remember-token', $user->fresh()->remember_token);
+        $this->assertSame(0, $user->tokens()->count());
+        $this->assertDatabaseHas('sessions', ['id' => 'role-session-'.$other->id]);
+        $this->assertSame(1, $other->tokens()->count());
+    }
+
     public function test_password_reset_email_uses_local_transport_for_active_account(): void
     {
         config(['mail.default' => 'array']);

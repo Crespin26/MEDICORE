@@ -10,8 +10,23 @@
 | Invitation du personnel | Oui | Non | Non | Non |
 | Modification des rôles, suspension et réactivation | Oui | Non | Non | Non |
 | Paramètres de son compte actif | Oui | Oui | Oui | Oui |
+| Lecture de l’agenda | Global | Propre agenda | Global | Non |
+| Création et déplacement des rendez-vous | Oui | Non | Oui | Non |
+| Statuts des rendez-vous | Global | Propre agenda | Global | Non |
+| Disponibilités | Gestion | Propres disponibilités | Non | Non |
+| Consultations et dossier médical | Non | Auteur et partages directs en lecture | Non | Non |
+| Saisie/correction clinique et partage | Non | Propres éléments, selon les règles métier | Non | Non |
+| Factures, paiements et reçus | Oui | Non | Non | Oui |
+| Annulation financière et catalogue | Oui | Non | Non | Non |
+| Gestion du personnel et paramètres de la clinique | Oui | Non | Non | Non |
+| Exports administratifs agrégés | Oui | Non | Non | Non |
 
-Cette matrice porte uniquement sur les modules déjà disponibles. Elle n’accorde pas encore d’accès aux futurs dossiers médicaux, consultations ou paiements. Les rôles sont définis dans `web/app/Enums/Role.php` et contrôlés sur chaque route. Les menus et formulaires reflètent ces mêmes permissions.
+Cette matrice décrit les modules web implémentés. Les rôles sont définis dans
+`web/app/Enums/Role.php` et contrôlés sur chaque route. Les politiques ajoutent
+les restrictions par patient, auteur et partage. Les menus reflètent les permissions
+mais ne remplacent jamais les contrôles serveur. Le mobile expose seulement les
+modules déjà disponibles dans l’API ; les permissions financières ou cliniques ne
+créent pas à elles seules des écrans ou des routes API correspondants.
 
 L’ancien rôle `staff` reste sans permission clinique jusqu’à son attribution à l’un des quatre rôles par un administrateur. La migration conserve les comptes existants actifs ; elle ne leur accorde aucun nouveau rôle.
 
@@ -39,6 +54,30 @@ Le lien expire après 48 heures. Seule son empreinte SHA-256 est stockée en bas
 Un administrateur peut modifier le rôle ou suspendre un autre compte actif. Il ne peut pas modifier ses propres accès ni supprimer son propre compte depuis les paramètres. Les modifications administratives sont sérialisées et revérifiées pour conserver un administrateur actif.
 
 La suspension bloque les nouvelles connexions, invalide le jeton « se souvenir de moi » et supprime les sessions Laravel stockées en base. Toute requête d’un compte non actif provoque aussi sa déconnexion, y compris vers les paramètres. Conserver `SESSION_DRIVER=database` pour cette suppression immédiate des sessions persistantes. La réactivation d’un compte déjà activé se fait depuis le même écran ; une invitation en attente doit être acceptée pour être activée.
+
+Depuis le renforcement du 8 novembre 2026, un changement de rôle depuis la gestion
+des comptes invalide également les sessions Laravel persistantes et le jeton
+« se souvenir de moi ». Les autres comptes conservent leurs sessions. Une sauvegarde
+sans changement de rôle d’un compte actif ne force pas sa reconnexion.
+
+## Sessions mobiles et réponses retardées
+
+L’API utilise un Bearer Sanctum avec la capacité `mobile`, valable huit heures.
+Une session navigateur seule ne donne pas accès aux routes mobiles. Le serveur
+révoque les jetons mobiles après changement de mot de passe, rôle ou statut ;
+la déconnexion mobile ne révoque que le jeton de l’appareil courant.
+
+Le client ne conserve que ce jeton dans le stockage sécurisé. Une génération de
+session invalide les opérations de connexion, restauration et modification du
+profil commencées avant une déconnexion ou une nouvelle connexion. Les lectures,
+écritures et effacements du coffre sont sérialisés : un effacement ancien ne doit
+pas supprimer un jeton nouvellement enregistré.
+
+Une connexion annulée dont la réponse arrive tard révoque son jeton capturé sans
+affecter le compte courant. Si le réseau empêche la révocation, le jeton reste
+soumis à son expiration côté serveur. Un `401` ferme l’accès local même si sa
+réponse n’est pas du JSON valide ; le `401` d’une ancienne session ne ferme pas
+la nouvelle. Une réponse reçue après destruction du client ne publie plus de profil.
 
 La réinitialisation de mot de passe est réservée aux comptes actifs et ne permet pas de contourner une invitation ou une suspension.
 
@@ -82,3 +121,11 @@ npm run build
 ```
 
 Les tests couvrent les permissions par rôle, les requêtes directes interdites, les invitations à usage unique, l’expiration et le renvoi des liens, la suspension, la réactivation, la protection de l’administrateur et les e-mails locaux.
+
+Le renforcement des sessions est couvert par `mobile/test/session_races_test.dart`
+et le scénario de changement de rôle de `StaffAccessTest`. Voir également les
+tests `MobileApiTest` pour les jetons, les expirations et les accès directs refusés.
+
+La livraison SMTP réelle, les protections du stockage sur appareils, HTTPS et la
+configuration de session sur l’hébergeur restent à recetter. La double authentification
+n’est pas implémentée dans ce lot.

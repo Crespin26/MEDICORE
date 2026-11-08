@@ -84,7 +84,8 @@ class StaffController extends Controller
                 abort_if($admins->count() <= 1, 409, 'Conservez au moins un administrateur actif.');
             }
             $user->forceFill($data);
-            if ($data['status'] === 'suspended') {
+            // Un changement de rôle impose une reconnexion sur le web comme sur mobile.
+            if ($user->isDirty('role') || $data['status'] === 'suspended') {
                 $user->remember_token = Str::random(60);
                 DB::table('sessions')->where('user_id', $user->id)->delete();
             }

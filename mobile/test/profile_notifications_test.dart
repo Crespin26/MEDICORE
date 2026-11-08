@@ -125,6 +125,10 @@ void main() {
   testWidgets(
     'Boîte : lecture idempotente et pagination sans données cliniques',
     (tester) async {
+      tester.view.physicalSize = const Size(320, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       bool read = false;
       final calls = <String>[];
       final api = client((request) async {
@@ -159,6 +163,7 @@ void main() {
       });
       await tester.pumpWidget(MaterialApp(home: NotificationsScreen(api: api)));
       await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
       await tester.tap(find.text('Marquer comme lue'));
       await tester.pumpAndSettle();
       expect(find.text('Lue'), findsOneWidget);

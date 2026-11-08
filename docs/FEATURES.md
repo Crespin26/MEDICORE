@@ -17,6 +17,8 @@ Hypothèse de travail : le web et le mobile sont destinés au personnel de la cl
 - [x] Créer les écrans d’invitation, d’activation et de suspension des comptes.
 - [x] Appliquer les permissions à chaque action et tester les refus d’accès.
 - [x] Configurer et tester les invitations et la réinitialisation via le transport e-mail local.
+- [x] Fermer les sessions web persistantes et révoquer les jetons mobiles après changement de rôle depuis la gestion des comptes.
+- [x] Protéger le client mobile contre les restaurations et connexions retardées après déconnexion/reconnexion.
 - [ ] Valider la livraison vers une boîte réelle avec le fournisseur SMTP retenu.
 
 Voir le [guide WEB-01 et la matrice des accès](WEB-01.md).
