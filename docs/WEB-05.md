@@ -53,7 +53,13 @@ Les libellés, détails, motifs de correction et versions des nouvelles informat
 
 Ce chiffrement utilise la clé de l’application. Sauvegarder et protéger cette clé avec les procédures d’exploitation ; ne pas la régénérer sur une installation contenant ces données. La restauration doit inclure la base, le stockage privé et la clé correspondante.
 
-Les comptes rendus de consultation créés dans WEB-04 ne sont pas convertis au chiffrement au repos par cette migration. Le chiffrement de ces contenus existants, des autres données cliniques et des sauvegardes reste à traiter dans la préparation à la production. Aucune conformité réglementaire globale n’est revendiquée par cet incrément.
+La migration initiale WEB-05 ne convertissait pas les consultations. Depuis le
+renforcement du 29 octobre, les champs cliniques des consultations et leurs révisions
+sont également chiffrés, et la migration correspondante convertit les anciennes
+valeurs. Voir [WEB-04](WEB-04.md#chiffrement-et-reprise--29-octobre-2026) et
+[RECOVERY.md](RECOVERY.md) pour la maintenance, les clés et les sauvegardes chiffrées.
+Les identités administratives et certaines métadonnées restent lisibles en base ;
+ce chiffrement ne remplace pas la protection des accès et des volumes sur l’hébergeur.
 
 ## Journal des accès
 
@@ -87,3 +93,21 @@ npm run lint:check
 ```
 
 L’extension PHP Fileinfo est nécessaire. Pour autoriser les dépôts de 10 Mo, configurer le serveur PHP avec `upload_max_filesize` au moins à `10M` et `post_max_size` au moins à `12M` ; une limite PHP inférieure reste prioritaire. Les fichiers privés sont exclus de Git. Les tests utilisent un stockage isolé et des données entièrement fictives ; ils vérifient l’isolation entre médecins, les accès directs, les versions, les fichiers refusés, le chiffrement, l’intégrité, l’audit et le nettoyage d’un dépôt échoué.
+
+## Vérification complémentaire — 8 novembre 2026
+
+Les tests `ClinicalIntegrityTest` couvrent le refus des libellés, titres et motifs
+de correction/partage/révocation composés uniquement de caractères invisibles.
+Un refus ne crée ni information médicale, ni document, ni fichier privé, et ne
+modifie pas la version ou les droits de partage existants.
+
+Un scénario vérifie également qu’un échec d’audit pendant un téléchargement empêche
+la restitution du PDF : réponse en erreur sans contenu du document, sans cache et
+sans événement de téléchargement réussi. Les règles d’auteur et de partage,
+l’intégrité des pièces et leur stockage privé restent celles décrites ci-dessus.
+
+Validation du lot : 223 tests Laravel / 2 325 assertions réussis, dont six nouveaux
+scénarios d’intégrité ; quatre parcours Chromium bureau/petit écran réussis pour
+validation, correction, document privé et partage/révocation. TypeScript, ESLint
+et Pint réussis. Les tests utilisent uniquement des données fictives et du stockage
+isolé ; aucun test sur hébergement de production n’est déclaré ici.

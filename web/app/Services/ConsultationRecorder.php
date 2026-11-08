@@ -25,10 +25,14 @@ class ConsultationRecorder
             $consultation = $id ? Consultation::whereKey($id)->lockForUpdate()->firstOrFail() : new Consultation;
             if ($id) {
                 Gate::forUser($actor)->authorize('update', $consultation);
+                abort_unless($consultation->patient_id === $patient->id, 404);
                 if ((int) $data['version'] !== $consultation->version) {
                     throw ValidationException::withMessages(['version' => 'Cette consultation a été modifiée. Rechargez la page avant de poursuivre.']);
                 }
             }
+            // La fiche fournie peut précéder une correction administrative de la naissance.
+            // Valider contre l’identité courante, verrouillée jusqu’à la fin de l’écriture clinique.
+            $patient = Patient::whereKey($patient->id)->lockForUpdate()->firstOrFail();
             $wasValidated = $consultation->status === 'validated';
             if ($wasValidated && ($data['action'] !== 'validate' || trim($data['correction_reason'] ?? '') === '')) {
                 throw ValidationException::withMessages(['correction_reason' => 'Une correction après validation nécessite un motif et conserve le statut validé.']);
@@ -38,7 +42,7 @@ class ConsultationRecorder
                 throw ValidationException::withMessages(['consulted_at' => 'La date doit se situer entre la naissance du patient et l’heure actuelle.']);
             }
             if (! $id) {
-                Patient::whereKey($patient->id)->lockForUpdate()->firstOrFail()->assertActive();
+                $patient->assertActive();
                 $consultation->patient_id = $patient->id;
                 $consultation->doctor_id = $actor->id;
                 $appointmentId = $data['appointment_id'] ?? null;

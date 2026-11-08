@@ -9,13 +9,19 @@ Les consultations contiennent un motif, des observations, des constantes faculta
 | Action | Médecin auteur | Autre médecin | Administrateur, secrétaire, caissier |
 | --- | --- | --- | --- |
 | Créer une consultation pour un patient | Oui | Peut créer sa propre consultation | Non |
-| Lire le compte rendu et ses versions | Oui | Non | Non |
+| Lire le compte rendu et ses versions | Oui | Seulement avec un partage direct actif pour ce patient | Non |
 | Modifier un brouillon et le valider | Oui | Non | Non |
 | Corriger un compte rendu validé | Oui, avec motif | Non | Non |
 
-Ce choix limite l’accès clinique au médecin auteur. La collaboration entre praticiens et un éventuel accès clinique délégué restent à définir. Le rôle administrateur n’accorde pas automatiquement de droit de lecture sur les notes médicales.
+L’auteur peut accorder un partage direct, explicite et révocable à un autre médecin
+actif pour ce patient. Il ouvre la lecture des éléments existants et futurs de cet
+auteur, sans correction ni transmission des accès reçus à un troisième médecin.
+Le rôle administrateur n’accorde pas automatiquement de droit de lecture clinique.
 
-Les contrôles portent sur les routes, les règles de formulaire et la consultation visée. Les données cliniques ne sont pas ajoutées à la fiche patient transmise aux rôles administratifs. L’historique visible depuis la fiche patient est limité aux consultations du médecin connecté.
+Les contrôles portent sur les routes, les règles de formulaire et la consultation visée.
+Les données cliniques ne sont pas ajoutées à la fiche patient transmise aux rôles
+administratifs. Les résumés accessibles depuis une fiche patient incluent les auteurs
+autorisés par partage ; la liste **Mes consultations** reste limitée à son propre auteur.
 
 ## Parcours
 
@@ -83,3 +89,19 @@ La migration ajoute les consultations et leurs versions, sans modifier les dossi
 Les motifs, observations, comptes rendus, constantes, instantanés de révision et motifs de correction sont chiffrés au repos par les modèles. La migration du 29 octobre transforme également les anciennes valeurs, sans retour automatique en clair. Sur une base contenant des consultations, elle exige la maintenance ; arrêter aussi tous les processus écrivains. Les métadonnées (identifiants, dates, statut et auteur) ne sont pas toutes chiffrées.
 
 Le [guide de reprise et de gestion des clés](RECOVERY.md) décrit la sauvegarde préalable, la rotation, la restauration et les limites d’exploitation. Ne pas appliquer le nouveau code sur les anciennes valeurs sans sa migration, ni supprimer les clés historiques nécessaires.
+
+## Renforcement de l’intégrité — 8 novembre 2026
+
+Le service recharge et verrouille la fiche patient avant de contrôler la date de
+consultation. Une ancienne instance de fiche, chargée avant une correction de la
+naissance, ne peut plus servir à contourner le contrôle chronologique. Une correction
+exige également que le patient fourni au service soit celui de la consultation ;
+une incohérence est refusée sans version ni événement d’audit supplémentaire.
+
+Les tests de non-régression vérifient aussi le rejet des motifs, comptes rendus et
+justifications composés uniquement d’espaces/caractères invisibles. Ce rejet est
+déjà assuré par la normalisation et la validation HTTP existantes. Les retours à
+la ligne internes d’un compte rendu valide restent conservés.
+
+Le lot ne crée pas d’API ni d’écrans cliniques Flutter : MOB-05 reste à développer.
+Aucune migration ni modification des clés de chiffrement n’est nécessaire.
