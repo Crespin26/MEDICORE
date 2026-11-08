@@ -179,6 +179,10 @@ class BillingService
     {
         return $this->transaction($actor, 'billing.pay', function ($actor) use ($id, $data) {
             $invoice = Invoice::whereKey($id)->lockForUpdate()->firstOrFail();
+            // La devise de la facture reste l’autorité, y compris lors d’une reprise idempotente.
+            if (isset($data['currency']) && $data['currency'] !== $invoice->currency) {
+                throw ValidationException::withMessages(['currency' => 'La devise du paiement doit correspondre à celle de la facture. Rechargez le formulaire.']);
+            }
             $amount = Money::minor($data['amount'], $invoice->currency);
             $existing = InvoicePayment::where('token', $data['token'])->first();
             if ($existing) {

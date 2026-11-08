@@ -15,7 +15,8 @@ class Money
     {
         $scale = self::SCALES[$currency] ?? null;
         abort_unless($scale !== null, 422, 'Devise non prise en charge.');
-        $pattern = $scale === 0 ? '/^[0-9]{1,12}$/' : '/^([0-9]{1,12})(?:[.,]([0-9]{1,2}))?$/';
+        // Le plafond XOF possède treize chiffres ; \z interdit aussi un saut de ligne final.
+        $pattern = $scale === 0 ? '/\A[0-9]{1,13}\z/' : '/\A([0-9]{1,12})(?:[.,]([0-9]{1,2}))?\z/';
         if (! preg_match($pattern, $value, $match)) {
             throw ValidationException::withMessages([$field => 'Saisissez un montant positif sans séparateur de milliers, avec au maximum '.$scale.' décimale(s).']);
         }

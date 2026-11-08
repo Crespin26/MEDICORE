@@ -151,8 +151,9 @@ class BillingController extends Controller
             }
             $setting = ClinicSetting::whereKey(1)->lockForUpdate()->firstOrFail();
             $currency = $setting->currency ?? config('clinic.currency');
-            if (! $service && isset($data['currency']) && $data['currency'] !== $currency) {
-                throw ValidationException::withMessages(['price' => 'La devise de l’établissement a changé. Rechargez le formulaire.']);
+            $priceCurrency = $item->currency ?? $currency;
+            if (isset($data['currency']) && $data['currency'] !== $priceCurrency) {
+                throw ValidationException::withMessages(['price' => 'La devise du prix ne correspond pas à celle de cet acte. Rechargez le formulaire.']);
             }
             $item->currency ??= $currency;
             $item->code = $data['code'];

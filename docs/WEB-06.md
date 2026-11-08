@@ -33,9 +33,21 @@ Les droits sont vérifiés sur chaque route et revérifiés dans la transaction 
 
 Les entrées monétaires sont des chaînes en unités principales, sans séparateur de milliers : `5000` pour XOF, `12.50` ou `12,50` pour EUR/USD. Les nombres négatifs, zéro, la notation exponentielle et les décimales excédentaires sont refusés.
 
+Le plafond de 1 000 000 000 000 unités mineures est inclus, y compris en XOF.
+Le parseur consomme la chaîne entière, sans accepter de caractères résiduels,
+même lorsqu’il est appelé directement sans normalisation HTTP préalable.
+
 Les montants sont stockés et calculés côté serveur en unités mineures entières. Les quantités sont des entiers de 1 à 1 000, avec au maximum 50 lignes distinctes par facture. Le total est limité à 1 000 000 000 000 unités mineures. Le client ne fournit ni prix ni total à enregistrer ; ils sont obtenus à partir du catalogue et recalculés par le serveur.
 
 La devise est conservée sur chaque acte et facture. Un changement de configuration ne convertit pas les anciennes opérations. Seuls les actes actifs utilisant la devise de la facture peuvent être sélectionnés pour ses lignes. Un acte devenu inactif reste conservé pour l’historique.
+
+La devise transmise lors d’un paiement doit correspondre à celle de la facture,
+y compris pour une reprise avec la même clé d’idempotence. Le formulaire web la
+transmet explicitement. Son absence reste acceptée pour les appels existants : le
+montant est alors interprété uniquement dans la devise enregistrée sur la facture.
+Lors d’une correction de tarif, la devise transmise doit correspondre à celle de
+l’acte, même si la devise courante de l’établissement a changé. Un désaccord est
+refusé sans modifier le prix, le paiement, le solde ou la numérotation des reçus.
 
 ## Factures et statuts
 
@@ -91,3 +103,26 @@ npm run lint:check
 ```
 
 Les tests couvrent les permissions, les calculs entiers et décimaux, les prix fournis par le client, les clés d’unicité, les annulations, les états, la conservation des versions, les impressions, le retour arrière transactionnel et les paiements simultanés. Les tests de concurrence nécessitent SQLite dans les processus enfants ; utiliser `MEDICORE_TEST_PHP_OPTIONS` si les extensions sont chargées via des options PHP temporaires.
+
+## Renforcement — 8 novembre 2026
+
+Le lot corrige le contrôle de devise des paiements et des corrections de tarifs,
+l’acceptation de la borne XOF annoncée et l’ancrage strict du parseur monétaire.
+Les tests `BillingIntegrityTest` vérifient également :
+
+- Le refus d’un paiement ou d’une reprise dans une autre devise, sans reçu supplémentaire.
+- La correction d’un ancien tarif dans sa propre devise après un changement de configuration.
+- Le paiement et le reçu d’une facture exactement au plafond XOF.
+- La stabilité de l’émetteur, de l’identité, de la devise et du solde historique du reçu
+  après d’autres paiements, une annulation et des changements administratifs.
+- Le retour arrière complet d’une annulation de paiement si l’audit ne peut pas être écrit.
+
+Ces changements ne nécessitent aucune migration. Les paiements restent des écritures
+de sommes déjà encaissées ; aucun prestataire bancaire ni remboursement automatique
+n’est ajouté. Les API et écrans financiers Flutter restent à développer dans MOB-06.
+
+Validation du lot : 231 tests Laravel / 2 375 assertions réussis, dont huit nouveaux
+scénarios d’intégrité financière. Les deux parcours Chromium bureau/petit écran
+« émission, paiement partiel puis solde et reçu » ont réussi. TypeScript, ESLint,
+Pint et le build Vite ont également réussi. Les tests utilisent des données fictives
+et ne réalisent aucune transaction bancaire.

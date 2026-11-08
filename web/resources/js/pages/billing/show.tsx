@@ -17,7 +17,7 @@ type Payment = {
 };
 /** Saisit un paiement reçu en conservant son jeton d’idempotence en cas de nouvelle tentative. */
 function PaymentForm({ invoice }: { invoice: Invoice }) {
-    const form = useForm({ amount: '', method: 'cash', reference: '', token: crypto.randomUUID() });
+    const form = useForm({ amount: '', currency: invoice.currency, method: 'cash', reference: '', token: crypto.randomUUID() });
     return (
         <form
             className="space-y-4 rounded-xl border p-6"
@@ -35,6 +35,7 @@ function PaymentForm({ invoice }: { invoice: Invoice }) {
         >
             <h2 className="font-semibold">Enregistrer un paiement · {invoice.currency}</h2>
             <InputError message={form.errors.token} />
+            <InputError message={form.errors.currency} />
             <div>
                 <label htmlFor="amount" className="mb-2 block text-sm">
                     Montant encaissé
