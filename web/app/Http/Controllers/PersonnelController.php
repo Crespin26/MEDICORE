@@ -20,7 +20,7 @@ class PersonnelController extends Controller
     {
         $data = $request->validate(['search' => ['nullable', 'string', 'max:100'], 'role' => ['nullable', Rule::enum(Role::class)], 'status' => ['nullable', 'in:active,pending,suspended']]);
         $query = User::with('professionalProfile')->when($data['role'] ?? null, fn ($q, $v) => $q->where('role', $v))->when($data['status'] ?? null, fn ($q, $v) => $q->where('status', $v));
-        if (! empty($data['search'])) {
+        if ($request->filled('search')) {
             $term = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $data['search']).'%';
             $query->where(fn ($q) => $q->whereRaw("name LIKE ? ESCAPE '!'", [$term])->orWhereRaw("email LIKE ? ESCAPE '!'", [$term])->orWhereHas('professionalProfile', fn ($q) => $q->whereRaw("employee_number LIKE ? ESCAPE '!'", [$term])->orWhereRaw("job_title LIKE ? ESCAPE '!'", [$term])->orWhereRaw("department LIKE ? ESCAPE '!'", [$term])));
         }

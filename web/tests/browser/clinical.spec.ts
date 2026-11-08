@@ -26,6 +26,50 @@ async function denied(page: Page, url: string) {
     await expect(page.locator('body')).not.toContainText('Compte rendu confidentiel de recette');
 }
 
+test('personnel : fiche professionnelle et recherche du matricule zéro', async ({ page }) => {
+    await login(page, 'admin');
+    await page.goto('/personnel/2'); // Médecin de la fixture isolée.
+    await page.getByLabel('Matricule (majuscules, chiffres, tirets)').fill('0');
+    await page.getByLabel('Fonction professionnelle', { exact: true }).fill('Médecin de recette');
+    await page.locator('#profile_reason').fill('Recette du matricule zéro');
+    await page.getByRole('button', { name: 'Enregistrer la fiche', exact: true }).click();
+    await expect(page.getByRole('status')).toContainText('Fiche professionnelle enregistrée.');
+    await page.goto('/personnel');
+    await page.getByLabel('Nom, e-mail, matricule, fonction ou service').fill('0');
+    await page.getByRole('button', { name: 'Rechercher', exact: true }).click();
+    await expect(page.locator('caption')).toHaveText('1 membre(s)');
+    await expect(page.locator('tbody')).toContainText('Recette doctor');
+});
+
+test('administration : sauvegardes successives et export statistique privé', async ({ page }) => {
+    await login(page, 'admin');
+    await page.goto('/administration/settings');
+    for (const name of ['Clinique de recette administrative', 'Clinique de recette confirmée']) {
+        await page.getByLabel('Nom de l’établissement', { exact: true }).fill(name);
+        await page.getByLabel('Motif de modification', { exact: true }).fill('Vérification des paramètres versionnés');
+        await page.getByRole('button', { name: 'Enregistrer les paramètres', exact: true }).click();
+        await expect(page.getByRole('status')).toContainText('Paramètres enregistrés.');
+        await expect(page.getByLabel('Motif de modification', { exact: true })).toHaveValue('');
+    }
+    await page.reload();
+    await expect(page.getByLabel('Nom de l’établissement', { exact: true })).toHaveValue('Clinique de recette confirmée');
+    await page.goto('/dashboard');
+    await page.getByLabel('Motif de l’export', { exact: true }).fill('Recette des agrégats administratifs');
+    const pending = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Télécharger le CSV', exact: true }).click();
+    const download = await pending;
+    expect(await download.failure()).toBeNull();
+    const stream = await download.createReadStream();
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream!) chunks.push(Buffer.from(chunk));
+    const csv = Buffer.concat(chunks).toString('utf8');
+    expect(csv).toContain('patients_total_current');
+    expect(csv).not.toContain('Recette Alice');
+    expect(csv).not.toContain('Compte rendu confidentiel');
+    await page.goto('/administration/exports');
+    await expect(page.locator('main')).toContainText('Recette des agrégats administratifs');
+});
+
 for (const [role, allowed, forbidden] of [
     ['admin', ['/patients', '/staff', '/personnel', '/billing', '/administration/settings'], ['/consultations', '/patients/1/medical-record']],
     ['doctor', ['/patients', '/appointments', '/consultations', '/patients/1/medical-record'], ['/staff', '/billing', '/administration/settings']],

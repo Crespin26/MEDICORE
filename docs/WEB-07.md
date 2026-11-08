@@ -83,3 +83,21 @@ npm run lint:check
 La migration ajoute les fiches, absences et événements, sans modifier les comptes ou rôles existants. Les profils sont complétés à la demande par l’administrateur.
 
 Les tests couvrent les permissions, la consultation de sa propre fiche, l’unicité des matricules, les versions, les périodes d’absence, la confidentialité des motifs dans l’agenda, les déplacements refusés, les annulations, le retour arrière transactionnel et les demandes simultanées. Les tests de concurrence nécessitent SQLite dans les processus enfants ; utiliser `MEDICORE_TEST_PHP_OPTIONS` si les extensions sont chargées par des options PHP temporaires.
+
+## Renforcement — 8 novembre 2026
+
+Le matricule `0` est une valeur valide, soumise aux mêmes contrôles que les autres.
+La recherche de cette valeur ne doit pas être interprétée comme une recherche vide.
+Le contrôle d’unicité est aussi exécuté sous verrou dans le service pour ce matricule :
+une collision est refusée comme erreur de validation sans créer de seconde fiche
+ni événement d’historique supplémentaire.
+
+Les tests complémentaires vérifient qu’un échec d’historique pendant l’annulation
+d’une absence conserve son état actif, sa version et son blocage de planning.
+Un parcours navigateur couvre la sauvegarde d’une fiche puis la recherche du
+matricule `0`, sur bureau et petit écran. Aucune migration n’est nécessaire.
+
+Validation commune au personnel et à l’administration : 236 tests Laravel /
+2 433 assertions réussis, dont cinq nouveaux scénarios d’intégrité ; quatre nouveaux
+parcours Chromium bureau/petit écran réussis. TypeScript application/E2E, ESLint
+et Pint réussis. Les essais utilisent des données fictives et un stockage isolé.

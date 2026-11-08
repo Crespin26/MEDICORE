@@ -1,5 +1,11 @@
 # WEB-08 — Tableau de bord et administration
 
+> Renforcement du 8 novembre 2026 : les bornes d’horaires sont comparées sans
+> arrondir les secondes ou microsecondes à la minute. La période maximale de
+> 93 jours est testée autour des deux changements d’heure de Europe/Paris.
+> Les sauvegardes successives de paramètres et le téléchargement du CSV agrégé
+> sont désormais couverts par un parcours navigateur bureau et petit écran.
+
 ## Indicateurs selon le rôle
 
 Le tableau de bord utilise les données enregistrées dans MediCore, sans chiffres de démonstration. Les sections sont calculées côté serveur selon les permissions :

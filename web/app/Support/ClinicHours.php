@@ -18,7 +18,10 @@ class ClinicHours
         $end = $end->setTimezone(config('clinic.timezone'));
         $day = $hours[(string) $start->isoWeekday()] ?? null;
 
-        return $day && $day['enabled'] && $start->toDateString() === $end->toDateString() && $start->format('H:i') >= $day['opens'] && $end->format('H:i') <= $day['closes'];
+        // Comparer toute la précision stockée, sans arrondir un dépassement à la minute.
+        return $day && $day['enabled'] && $start->toDateString() === $end->toDateString()
+            && $start->format('H:i:s.u') >= $day['opens'].':00.000000'
+            && $end->format('H:i:s.u') <= $day['closes'].':00.000000';
     }
 
     /** Relit les horaires sous le verrou partagé avec les changements de paramètres avant de les appliquer. */

@@ -41,7 +41,7 @@ class PersonnelManager
             if (($profile?->version ?? 0) !== (int) $data['version']) {
                 throw ValidationException::withMessages(['version' => 'Cette fiche a été modifiée. Rechargez-la avant de poursuivre.']);
             }
-            if (! empty($data['employee_number']) && ProfessionalProfile::where('employee_number', $data['employee_number'])->where('user_id', '!=', $userId)->exists()) {
+            if (isset($data['employee_number']) && $data['employee_number'] !== '' && ProfessionalProfile::where('employee_number', $data['employee_number'])->where('user_id', '!=', $userId)->exists()) {
                 throw ValidationException::withMessages(['employee_number' => 'Ce matricule est déjà attribué.']);
             }
             $isNew = ! $profile;
