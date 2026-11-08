@@ -24,6 +24,20 @@ class PatientDirectoryTest extends TestCase
         $this->actingAs(User::factory()->create(['role' => $role]));
     }
 
+    public function test_unicode_whitespace_only_names_cannot_create_or_erase_a_patient_identity(): void
+    {
+        $patient = Patient::create($this->data());
+        $this->login();
+        foreach (['first_name', 'last_name'] as $field) {
+            $data = $this->data([$field => "\u{00A0}\u{2003}\u{202F}"]);
+            $this->post('/patients', $data)->assertSessionHasErrors($field);
+            $this->patch('/patients/'.$patient->id, $data)->assertSessionHasErrors($field);
+        }
+        $this->assertDatabaseCount('patients', 1);
+        $this->assertSame('Alice', $patient->fresh()->first_name);
+        $this->assertSame('Exemple', $patient->fresh()->last_name);
+    }
+
     public function test_search_by_name_full_name_phone_email_and_reference(): void
     {
         $patient = Patient::create($this->data());

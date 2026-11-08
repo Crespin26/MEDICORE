@@ -103,6 +103,12 @@ class PatientController extends Controller
     /** Normalise l’identité et contrôle les doublons ; seule une confirmation administrateur motivée les distingue. */
     private function validated(Request $request, ?Patient $patient = null): array
     {
+        // Normaliser avant « required » : les espaces Unicode ne constituent pas une identité.
+        foreach (['first_name', 'last_name'] as $field) {
+            if (is_string($request->input($field))) {
+                $request->merge([$field => Str::squish($request->input($field))]);
+            }
+        }
         $data = $request->validate([
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],

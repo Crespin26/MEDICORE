@@ -35,29 +35,32 @@ class AppointmentController extends Controller
         if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-        if ($request->is('api/*')) {
-            $daily = (clone $query)->where('starts_at', '>=', $day->utc())->where('starts_at', '<', $day->addDay()->utc())->orderBy('starts_at')->orderBy('id')->paginate(20)->withQueryString()->through(fn ($appointment) => $this->record($appointment));
-
-            return response()->json(['appointments' => $daily, 'date' => $day->toDateString(), 'timezone' => config('clinic.timezone'), 'availability' => DoctorAvailability::with('doctor:id,name')->where('starts_at', '>=', $day->utc())->where('starts_at', '<', $day->addDay()->utc())->when($request->user()->role === 'doctor', fn ($q) => $q->where('doctor_id', $request->user()->id))->orderBy('starts_at')->get()->map(fn ($slot) => ['doctor_id' => $slot->doctor_id, 'doctor' => $slot->doctor->name, 'starts_at' => ClinicTime::local($slot->starts_at), 'ends_at' => ClinicTime::local($slot->ends_at)]), 'doctors' => User::where('role', 'doctor')->where('status', 'active')->when($request->user()->role === 'doctor', fn ($q) => $q->whereKey($request->user()->id))->get(['id', 'name']), 'statuses' => Appointment::STATUSES]);
-        }
-        $calendar = [];
-        for ($i = 0; $i < 7; $i++) {
-            $date = $day->startOfWeek()->addDays($i);
-            $daily = (clone $query)->where('starts_at', '>=', $date->utc())->where('starts_at', '<', $date->addDay()->utc());
-            $calendar[] = ['date' => $date->toDateString(), 'count' => (clone $daily)->count(), 'items' => $daily->orderBy('starts_at')->orderBy('id')->limit(3)->get()->map(fn ($appointment) => $this->record($appointment))];
-        }
         $daily = (clone $query)->where('starts_at', '>=', $day->utc())->where('starts_at', '<', $day->addDay()->utc())->orderBy('starts_at')->orderBy('id')->paginate(20)->withQueryString()->through(fn ($appointment) => $this->record($appointment));
         $doctors = User::where('role', 'doctor')->where('status', 'active')->when($request->user()->role === 'doctor', fn ($query) => $query->whereKey($request->user()->id))->orderBy('name')->get(['id', 'name']);
         $availability = DoctorAvailability::with('doctor:id,name')->where('starts_at', '>=', $day->utc())->where('starts_at', '<', $day->addDay()->utc())
             ->when($request->user()->role === 'doctor', fn ($query) => $query->where('doctor_id', $request->user()->id))
             ->when($request->user()->role !== 'doctor' && ! empty($filters['doctor_id']), fn ($query) => $query->where('doctor_id', $filters['doctor_id']))
-            ->orderBy('starts_at')->get()->map(fn ($slot) => ['id' => $slot->id, 'doctor' => $slot->doctor->name, 'starts_at' => ClinicTime::local($slot->starts_at), 'ends_at' => ClinicTime::local($slot->ends_at)]);
+            ->orderBy('starts_at')->get()->map(fn ($slot) => ['id' => $slot->id, 'doctor_id' => $slot->doctor_id, 'doctor' => $slot->doctor->name, 'starts_at' => ClinicTime::local($slot->starts_at), 'ends_at' => ClinicTime::local($slot->ends_at)]);
 
         $absences = StaffAbsence::with('user:id,name')->where('status', 'active')->where('starts_at', '<', $day->addDay()->utc())->where('ends_at', '>', $day->utc())
             ->whereHas('user', fn ($query) => $query->where('role', 'doctor'))
             ->when($request->user()->role === 'doctor', fn ($query) => $query->where('user_id', $request->user()->id))
             ->when($request->user()->role !== 'doctor' && ! empty($filters['doctor_id']), fn ($query) => $query->where('user_id', $filters['doctor_id']))
-            ->orderBy('starts_at')->get()->map(fn ($absence) => ['id' => $absence->id, 'doctor' => $absence->user->name, 'starts_at' => ClinicTime::local($absence->starts_at), 'ends_at' => ClinicTime::local($absence->ends_at)]);
+            ->orderBy('starts_at')->get()->map(fn ($absence) => ['id' => $absence->id, 'doctor_id' => $absence->user_id, 'doctor' => $absence->user->name, 'starts_at' => ClinicTime::local($absence->starts_at), 'ends_at' => ClinicTime::local($absence->ends_at)]);
+
+        // Web et mobile partagent le même périmètre de médecin, de disponibilités et d’absences.
+        if ($request->is('api/*')) {
+            return response()->json([
+                'appointments' => $daily, 'date' => $day->toDateString(), 'timezone' => config('clinic.timezone'),
+                'availability' => $availability, 'absences' => $absences, 'doctors' => $doctors, 'statuses' => Appointment::STATUSES,
+            ]);
+        }
+        $calendar = [];
+        for ($i = 0; $i < 7; $i++) {
+            $date = $day->startOfWeek()->addDays($i);
+            $dayQuery = (clone $query)->where('starts_at', '>=', $date->utc())->where('starts_at', '<', $date->addDay()->utc());
+            $calendar[] = ['date' => $date->toDateString(), 'count' => (clone $dayQuery)->count(), 'items' => $dayQuery->orderBy('starts_at')->orderBy('id')->limit(3)->get()->map(fn ($appointment) => $this->record($appointment))];
+        }
 
         return Inertia::render('appointments/index', [
             'absences' => $absences, 'appointments' => $daily, 'calendar' => $calendar, 'doctors' => $doctors, 'availability' => $availability,

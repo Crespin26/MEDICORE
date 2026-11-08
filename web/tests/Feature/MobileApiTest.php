@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Appointment;
 use App\Models\DoctorAvailability;
 use App\Models\Patient;
+use App\Models\StaffAbsence;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,6 +33,38 @@ class MobileApiTest extends TestCase
     private function token(User $user): string
     {
         return $user->createToken('Recette mobile', ['mobile'], now()->addHours(8))->plainTextToken;
+    }
+
+    public function test_patient_identity_is_normalized_before_required_validation_on_mobile(): void
+    {
+        $this->withToken($this->token($this->user()));
+        $data = ['first_name' => "\u{00A0}\u{2003}", 'last_name' => 'Fictif', 'birth_date' => '1990-01-01'];
+        $this->postJson('/api/v1/patients', $data)->assertUnprocessable()->assertJsonValidationErrors('first_name');
+        $this->assertDatabaseCount('patients', 0);
+        $data['first_name'] = "\u{00A0}Alice\u{2003}Marie\u{00A0}";
+        $this->postJson('/api/v1/patients', $data)->assertCreated()->assertJsonPath('data.first_name', 'Alice Marie');
+    }
+
+    public function test_agenda_scopes_availability_and_absences_without_exposing_absence_reasons(): void
+    {
+        config(['clinic.timezone' => 'Africa/Porto-Novo']);
+        $first = $this->user('doctor');
+        $second = $this->user('doctor');
+        foreach ([$first, $second] as $doctor) {
+            DoctorAvailability::create(['doctor_id' => $doctor->id, 'starts_at' => '2030-01-07 07:00:00', 'ends_at' => '2030-01-07 16:00:00']);
+            StaffAbsence::create(['user_id' => $doctor->id, 'created_by' => $doctor->id, 'starts_at' => '2030-01-06 22:00:00', 'ends_at' => '2030-01-07 09:00:00', 'category' => 'unavailable', 'reason' => 'Motif privé fictif']);
+        }
+        // Une absence annulée ne doit plus être affichée comme bloquante.
+        StaffAbsence::create(['user_id' => $first->id, 'created_by' => $first->id, 'starts_at' => '2030-01-07 12:00:00', 'ends_at' => '2030-01-07 13:00:00', 'category' => 'leave', 'reason' => 'Autre motif privé', 'status' => 'cancelled']);
+        $url = '/api/v1/appointments?date=2030-01-07&doctor_id='.$first->id;
+        $this->withToken($this->token($this->user()))->getJson($url)->assertOk()
+            ->assertJsonCount(1, 'availability')->assertJsonPath('availability.0.doctor_id', $first->id)
+            ->assertJsonCount(1, 'absences')->assertJsonPath('absences.0.doctor_id', $first->id)
+            ->assertJsonPath('absences.0.starts_at', '2030-01-06T23:00')
+            ->assertJsonMissingPath('absences.0.reason')->assertJsonMissingPath('absences.0.category');
+        $this->withToken($this->token($second))->getJson($url)->assertOk()
+            ->assertJsonCount(1, 'availability')->assertJsonPath('availability.0.doctor_id', $second->id)
+            ->assertJsonCount(1, 'absences')->assertJsonPath('absences.0.doctor_id', $second->id);
     }
 
     public function test_real_bearer_login_hashes_token_and_logout_revokes_only_current_device(): void

@@ -30,7 +30,24 @@ Une suspension, un changement de rôle ou de mot de passe révoque les jetons de
 
 La liste des patients reprend l'enveloppe de pagination Laravel : `data`, `current_page`, `per_page`, `next_page_url`, `total`, etc. La recherche accepte `search`, les dates de naissance et le filtre `state=active|archived|all`. La liste mobile courante utilise les fiches actives. Les attributs internes d'identité/recherche sont masqués.
 
-L'agenda accepte `date=AAAA-MM-JJ`, `doctor_id`, `status` et `page`. Il renvoie `appointments` (pagination), `date`, `timezone`, `doctors`, `availability` et `statuses`. Les horaires sont ceux de la clinique. La planification utilise `patient_id`, `doctor_id`, `starts_at`, `ends_at` avec le format local `AAAA-MM-JJTHH:mm` ; le serveur applique son fuseau et les règles de disponibilité.
+L'agenda accepte `date=AAAA-MM-JJ`, `doctor_id`, `status` et `page`. Il renvoie `appointments` (pagination), `date`, `timezone`, `doctors`, `availability`, `absences` et `statuses`. Les horaires sont ceux de la clinique. La planification utilise `patient_id`, `doctor_id`, `starts_at`, `ends_at` avec le format local `AAAA-MM-JJTHH:mm` ; le serveur applique son fuseau et les règles de disponibilité.
+
+Depuis le renforcement du 8 novembre 2026, `availability` et `absences` appliquent
+le même filtre médecin que les rendez-vous. Un médecin reste limité à son propre
+planning, même avec un filtre forgé. Les disponibilités et absences contiennent
+`id`, `doctor_id`, `doctor`, `starts_at` et `ends_at`. Les absences sont uniquement
+celles actives qui croisent la journée locale, y compris celles commencées la veille.
+Leur motif, catégorie et informations d’audit ne sont pas exposés dans l’agenda.
+Les disponibilités restent les plages déclarées : une absence peut en bloquer une
+partie ; elles ne constituent pas une garantie de réservation. Le serveur contrôle
+à nouveau absences, disponibilités et conflits au moment de l’écriture.
+
+Le formulaire Flutter affiche les absences du médecin choisi et impose un médecin
+actif avant enregistrement. Le médecin historique d’un rendez-vous reste affiché
+comme indisponible s’il n’est plus sélectionnable. Le déplacement d’un rendez-vous
+ancien peut ouvrir le calendrier ; la nouvelle réservation doit toujours être future.
+La création et le retrait des disponibilités restent accessibles via le web,
+sans nouvel endpoint de gestion mobile dans ce lot.
 
 Les détails/créations/modifications sont enveloppés dans `data`. Les erreurs de validation sont des réponses 422 avec `message` et `errors` indexées par champ. Les clients doivent aussi gérer 401 (reconnexion), 403 (refus), 429 (attendre) et les erreurs réseau. Les réponses ne donnent aucune garantie de fonctionnement hors ligne.
 

@@ -211,8 +211,11 @@ class _AgendaScreenState extends State<AgendaScreen> {
               ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Wrap(
+            alignment: WrapAlignment.spaceEvenly,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               TextButton(
                 onPressed: page > 1
@@ -348,6 +351,10 @@ class _BookingEditorState extends State<BookingEditor> {
           return const Center(child: CircularProgressIndicator());
         }
         final data = snapshot.data!;
+        final doctors = data['doctors'] as List;
+        final selectedDoctorAvailable = doctors.any(
+          (item) => '${item['id']}' == doctor,
+        );
         return ListView(
           padding: const EdgeInsets.all(20),
           children: [
@@ -360,7 +367,16 @@ class _BookingEditorState extends State<BookingEditor> {
                 errorText: errors['doctor_id']?.join('\n'),
               ),
               items: [
-                for (final item in data['doctors'] as List)
+                // Conserver l’ancien médecin pour expliquer la réaffectation requise.
+                if (doctor != null && !selectedDoctorAvailable)
+                  DropdownMenuItem(
+                    value: doctor,
+                    enabled: false,
+                    child: Text(
+                      '${widget.booking?['doctor'] ?? 'Médecin'} (indisponible)',
+                    ),
+                  ),
+                for (final item in doctors)
                   DropdownMenuItem(
                     value: '${item['id']}',
                     child: Text('${item['name']}'),
@@ -376,13 +392,17 @@ class _BookingEditorState extends State<BookingEditor> {
               onPressed: busy
                   ? null
                   : () async {
+                      final selected = DateTime.parse(date);
+                      final today = DateUtils.dateOnly(DateTime.now());
+                      final horizon = DateTime(today.year + 20);
                       final value = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.parse(date),
-                        firstDate: DateTime.now().subtract(
-                          const Duration(days: 1),
-                        ),
-                        lastDate: DateTime(2100),
+                        initialDate: selected,
+                        // Un ancien rendez-vous doit rester ouvrable pour être déplacé.
+                        firstDate: selected.isBefore(today) ? selected : today,
+                        lastDate: selected.isAfter(horizon)
+                            ? selected
+                            : horizon,
                       );
                       if (value != null && mounted) {
                         setState(() {
@@ -400,6 +420,15 @@ class _BookingEditorState extends State<BookingEditor> {
                 Text(
                   '${slot['doctor']} · ${slot['starts_at']} → ${slot['ends_at']}',
                 ),
+            for (final absence in (data['absences'] as List? ?? []))
+              if (doctor == null || '${absence['doctor_id']}' == doctor)
+                Text(
+                  'Absence : ${absence['doctor']} · ${absence['starts_at']} → ${absence['ends_at']}',
+                ),
+            if (doctors.isEmpty)
+              const Text(
+                'Aucun médecin actif. La réservation est indisponible.',
+              ),
             TextField(
               controller: start,
               keyboardType: TextInputType.datetime,
@@ -421,7 +450,7 @@ class _BookingEditorState extends State<BookingEditor> {
             if (error != null) Semantics(liveRegion: true, child: Text(error!)),
             const SizedBox(height: 16),
             FilledButton(
-              onPressed: busy ? null : submit,
+              onPressed: busy || !selectedDoctorAvailable ? null : submit,
               child: Text(
                 busy ? 'Enregistrement…' : 'Enregistrer le rendez-vous',
               ),

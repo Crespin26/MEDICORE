@@ -59,7 +59,38 @@ SQLite prend un verrou d’écriture dès le début de la transaction, avant tou
 
 Un compte médecin possédant un agenda ne peut plus être supprimé depuis ses paramètres. La suspension reste disponible aux administrateurs. Un médecin suspendu ou dont le rôle a changé ne peut pas recevoir de nouvelle réservation ; ses rendez-vous existants restent visibles à l’administration pour annulation ou réaffectation.
 
-Les notifications aux patients, le rappel automatique, les motifs médicaux et l’historique détaillé des changements restent hors de cet incrément.
+Les notifications aux patients, les motifs médicaux et l’historique détaillé des
+changements restent hors de cet incrément. Les rappels internes destinés au personnel
+ont été ajoutés ultérieurement dans [MOB-07](MOB-07.md) ; les notifications Firebase
+réelles restent à configurer et à qualifier.
+
+## Renforcement patients et planning — 8 novembre 2026
+
+Les noms et prénoms sont normalisés avant la validation obligatoire, sur le web
+comme dans l’API : une identité composée uniquement d’espaces Unicode est refusée,
+y compris lors d’une modification. La détection des doublons continue de porter
+sur l’identité normalisée.
+
+Les réponses web et mobile partagent désormais la sélection des disponibilités et
+absences du jour. Le filtre médecin s’applique à ces listes comme aux rendez-vous ;
+le médecin conserve son seul périmètre. Les absences affichées ne révèlent ni motif
+ni catégorie. Le formulaire mobile les présente pour le médecin sélectionné.
+
+Sur mobile, les paginations patients/agenda s’adaptent aux écrans étroits. Le
+formulaire de déplacement affiche un ancien médecin devenu inactif sans erreur,
+demande une réaffectation à un médecin actif et permet d’ouvrir le calendrier d’un
+ancien rendez-vous. Les règles serveur restent inchangées : pas de réservation
+dans le passé, pendant une absence ou hors disponibilité.
+
+La gestion des disponibilités demeure web : pas de nouvel écran de création/retrait
+de plages dans Flutter. Aucune migration n’est nécessaire pour ces corrections.
+
+Validation automatisée : 217 tests Laravel / 2 282 assertions et 31 tests Flutter
+réussis ; analyse Flutter, TypeScript, ESLint et Pint sans erreur.
+Quatre scénarios Chromium bureau/petit écran couvrant création, recherche, doublons,
+réservation, homonymes, archivage et réactivation ont également réussi.
+Le test HTTP réel Flutter/Laravel sur fixture fictive isolée a réussi, notamment
+la création d’un patient, la réservation et la lecture de l’agenda.
 
 ## Installation et vérification
 
