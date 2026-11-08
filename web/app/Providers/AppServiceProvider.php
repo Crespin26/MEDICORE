@@ -28,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by(hash('sha256', (is_string($email) ? strtolower($email) : 'invalid').'|'.$request->ip()));
         });
         RateLimiter::for('mobile-api', fn ($request) => Limit::perMinute(120)->by((string) ($request->user()?->id ?? $request->ip())));
+        RateLimiter::for('web-login', fn ($request) => Limit::perMinute(20)->by($request->ip()));
+        RateLimiter::for('password-challenge', fn ($request) => Limit::perMinute(5)->by(($request->user()?->id ?? 'guest').'|'.$request->ip()));
+        RateLimiter::for('password-reset', fn ($request) => Limit::perMinute(10)->by($request->ip()));
+        RateLimiter::for('medical-upload', fn ($request) => Limit::perMinute(10)->by((string) ($request->user()?->id ?? $request->ip())));
         foreach (Role::permissionNames() as $permission) {
             Gate::define($permission, fn (User $user) => $user->hasPermission($permission));
         }

@@ -138,10 +138,12 @@ class MobilePushSession {
   bool _syncing = false;
 
   Future<void> _register(String token) async {
+    final generation = api.sessionGeneration;
     final userId = api.user?['id'];
     if (userId == null || !api.can('appointments.view')) return;
     final preferences = await api.request('GET', 'notification-preferences');
-    if (api.user?['id'] != userId ||
+    if (api.sessionGeneration != generation ||
+        api.user?['id'] != userId ||
         preferences['data']['push_enabled'] != true) {
       return;
     }
@@ -166,21 +168,28 @@ class MobilePushSession {
     }
     if (_syncing || !api.can('appointments.view')) return;
     _syncing = true;
+    final generation = api.sessionGeneration;
     final userId = api.user?['id'];
     try {
       final result = await api.request('GET', 'notification-preferences');
-      if (api.user?['id'] != userId) return;
+      if (api.sessionGeneration != generation || api.user?['id'] != userId) {
+        return;
+      }
       if (result['data']['push_enabled'] != true) {
         await gateway.disable();
         return;
       }
       if (await gateway.authorize(request: false)) {
         final token = await gateway.installationId();
-        if (token != null && api.user?['id'] == userId) await _register(token);
+        if (token != null &&
+            api.sessionGeneration == generation &&
+            api.user?['id'] == userId) {
+          await _register(token);
+        }
       }
     } finally {
       _syncing = false;
-      if (api.user?['id'] != userId) {
+      if (api.sessionGeneration != generation || api.user?['id'] != userId) {
         if (api.user == null) {
           await gateway.disable();
         } else {

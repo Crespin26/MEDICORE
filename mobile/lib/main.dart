@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'core/api_client.dart';
 import 'core/push_notifications.dart';
@@ -19,9 +20,10 @@ void main() => runApp(
 );
 
 class MediCoreApp extends StatefulWidget {
-  const MediCoreApp({super.key, required this.api, this.push});
+  const MediCoreApp({super.key, required this.api, this.push, this.now});
   final ApiClient api;
   final PushGateway? push;
+  final DateTime Function()? now;
   @override
   State<MediCoreApp> createState() => _MediCoreAppState();
 }
@@ -32,14 +34,19 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
   bool loading = true;
   bool shield = false;
   String? error;
-  DateTime lastAction = DateTime.now();
+  late DateTime lastAction;
+  Object? previousUserId;
+  DateTime clockNow() => widget.now?.call() ?? DateTime.now();
   Timer? timer;
   @override
   void initState() {
     super.initState();
+    lastAction = clockNow();
+    previousUserId = widget.api.user?['id'];
     push = widget.push ?? FirebasePushGateway();
     pushSession = MobilePushSession(widget.api, push);
     WidgetsBinding.instance.addObserver(this);
+    HardwareKeyboard.instance.addHandler(keyActivity);
     widget.api.addListener(changed);
     timer = Timer.periodic(const Duration(seconds: 30), (_) => checkIdle());
     restore();
@@ -48,9 +55,25 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
   /// Actualise l’interface quand la session ou le profil en mémoire change.
   void changed() {
     if (mounted) {
+      if (previousUserId != widget.api.user?['id']) {
+        previousUserId = widget.api.user?['id'];
+        lastAction = clockNow();
+        if (previousUserId != null) error = null;
+      }
       setState(() {});
       unawaited(pushSession.sync().catchError((_) {}));
     }
+  }
+
+  /// Prend en compte le clavier physique sans intercepter ni conserver les touches saisies.
+  bool keyActivity(KeyEvent event) {
+    if (!shield &&
+        !loading &&
+        widget.api.user != null &&
+        (event is KeyDownEvent || event is KeyRepeatEvent)) {
+      lastAction = clockNow();
+    }
+    return false;
   }
 
   /// Vérifie la session sous écran de protection et conserve une erreur récupérable en cas d’échec.
@@ -75,7 +98,7 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
   /// Ferme la session après cinq minutes sans interaction, y compris au retour au premier plan.
   void checkIdle() {
     if (widget.api.user != null &&
-        DateTime.now().difference(lastAction) > const Duration(minutes: 5)) {
+        clockNow().difference(lastAction) >= const Duration(minutes: 5)) {
       unawaited(widget.api.logout().catchError((_) {}));
     }
   }
@@ -108,6 +131,7 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
     unawaited(push.dispose());
     widget.api.removeListener(changed);
     WidgetsBinding.instance.removeObserver(this);
+    HardwareKeyboard.instance.removeHandler(keyActivity);
     super.dispose();
   }
 
@@ -127,11 +151,27 @@ class _MediCoreAppState extends State<MediCoreApp> with WidgetsBindingObserver {
           )
         : Listener(
             onPointerDown: (_) {
-              lastAction = DateTime.now();
+              lastAction = clockNow();
             },
             child: child!,
           ),
-    home: widget.api.user != null
+    home: error != null && widget.api.user != null
+        ? Scaffold(
+            appBar: AppBar(title: const Text('Vérifier ma session')),
+            body: Column(
+              children: [
+                Expanded(
+                  child: ApiFailure(error: error!, retry: restore),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      unawaited(widget.api.logout().catchError((_) {})),
+                  child: const Text('Se déconnecter'),
+                ),
+              ],
+            ),
+          )
+        : widget.api.user != null
         ? ClinicHome(api: widget.api, push: push)
         : LoginScreen(api: widget.api, error: error, retry: restore),
   );

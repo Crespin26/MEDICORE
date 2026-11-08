@@ -66,6 +66,9 @@ class ApiClient extends ChangeNotifier {
   String? _token;
   Map<String, dynamic>? user;
   int _sessionVersion = 0;
+
+  /// Identifie les opérations du compte courant, même après reconnexion du même utilisateur.
+  int get sessionGeneration => _sessionVersion;
   bool _disposed = false;
   Future<void> _storagePending = Future<void>.value();
 

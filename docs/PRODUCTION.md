@@ -1,5 +1,39 @@
 # Hébergement de MediCore
 
+## Mise à niveau de sécurité du 8 novembre 2026
+
+Voir [le rapport de sécurité](SECURITY-2026-11-08.md). Le code nécessite désormais
+`SESSION_DRIVER=database` pour sa révocation persistante. `APP_URL` doit correspondre
+au nom d’hôte réellement présenté à Laravel, y compris pour les contrôles de santé.
+Les proxies autorisés doivent reconstruire les en-têtes transmis à l’application.
+
+Sur une installation existante, sauvegarder/restaurer selon [RECOVERY.md](RECOVERY.md),
+préserver toutes les clés et mettre le serveur en maintenance avant le remplacement
+du code. Arrêter les workers, le scheduler et drainer les requêtes en cours. Après
+installation du code et des dépendances, exécuter avec le compte de l’application :
+
+```bash
+php artisan medicore:revoke-sessions
+```
+
+Cette commande exige la maintenance ; elle révoque toutes les sessions web, jetons
+mobiles, liens de réinitialisation et cookies mémorisés de l’installation. Les
+comptes, rôles, mots de passe et données métier restent conservés. Tous les membres
+devront se reconnecter ; les liens de réinitialisation antérieurs devront être redemandés.
+Cette étape ferme aussi les accès émis avant l’ajout des protections de session.
+
+Vérifier les permissions de `.env` (0600, ou 0640 avec un groupe strictement contrôlé),
+des caches contenant la configuration, de SQLite, de ses journaux, du stockage médical,
+des sauvegardes et des journaux applicatifs. Les fichiers doivent appartenir au compte
+de service adapté et rester inaccessibles aux autres utilisateurs. Ne jamais placer
+les secrets ou la base sous `public`. Le diagnostic `medicore:production-check` contrôle
+notamment `.env`, le cache de configuration, la base et le stockage médical.
+
+Reconstruire les caches de configuration/routes, passer le diagnostic, redémarrer les
+workers/scheduler puis ouvrir la recette avant la remise en service. Ne pas régénérer
+`APP_KEY` ni les clés historiques. Aucun déploiement ni révocation de la base locale
+n’est effectué par cette documentation.
+
 Ce guide prépare une installation **sur un serveur Linux unique**, pour un établissement,
 avec Nginx, PHP-FPM et SQLite sur disque local. Il ne déploie rien automatiquement.
 Le web React est compilé avec Vite et servi par Laravel ; Flutter utilise la même origine

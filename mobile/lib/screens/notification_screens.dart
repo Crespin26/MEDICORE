@@ -256,6 +256,7 @@ class _NotificationPreferencesScreenState
       error = null;
     });
     final userId = widget.api.user?['id'];
+    final generation = widget.api.sessionGeneration;
     final platform = Theme.of(context).platform == TargetPlatform.iOS
         ? 'ios'
         : 'android';
@@ -281,13 +282,21 @@ class _NotificationPreferencesScreenState
           return;
         }
       }
-      if (widget.api.user?['id'] != userId || userId == null) return;
+      if (widget.api.sessionGeneration != generation ||
+          widget.api.user?['id'] != userId ||
+          userId == null) {
+        return;
+      }
       await widget.api.request(
         'PUT',
         'notification-preferences',
         body: preferences(),
       );
-      if (widget.api.user?['id'] != userId || !mounted) return;
+      if (widget.api.sessionGeneration != generation ||
+          widget.api.user?['id'] != userId ||
+          !mounted) {
+        return;
+      }
       if (push && token != null) {
         await widget.api.request(
           'PUT',

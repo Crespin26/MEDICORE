@@ -63,6 +63,48 @@ ApiClient client(Future<http.Response> Function(http.Request) handler) =>
     )..user = Map<String, dynamic>.from(profile);
 
 void main() {
+  test('Une ancienne inscription push ne traverse pas une reconnexion au même compte', () async {
+    final response = Completer<http.Response>();
+    final started = Completer<void>();
+    var writes = 0;
+    final api = client((request) async {
+      if (request.method == 'POST') {
+        return http.Response(
+          jsonEncode({
+            'data': {'token': 'fictif-nouvelle-session', 'user': profile},
+          }),
+          201,
+        );
+      }
+      if (request.method == 'GET') {
+        started.complete();
+        return response.future;
+      }
+      writes++;
+      return http.Response('', 204);
+    });
+    final push = FakePush();
+    final session = MobilePushSession(api, push);
+    push.registrationsController.add('fictif-installation-12345');
+    await started.future;
+    await api.logout();
+    await api.login('doctor@medicore.test', 'Fictif-secret', 'Fixture');
+    response.complete(
+      http.Response(
+        jsonEncode({
+          'data': {...defaults, 'push_enabled': true},
+        }),
+        200,
+      ),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(api.user?['id'], profile['id']);
+    expect(writes, 0);
+    await session.dispose();
+    await push.dispose();
+    api.dispose();
+  });
+
   testWidgets(
     'Profil : unicité affichée puis sauvegarde des seuls nom et e-mail',
     (tester) async {

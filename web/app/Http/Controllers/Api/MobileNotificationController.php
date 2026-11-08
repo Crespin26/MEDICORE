@@ -35,7 +35,8 @@ class MobileNotificationController
         abort_if(($data['appointment_updates'] || $data['appointment_reminders'] || $data['push_enabled']) && ! $request->user()->hasPermission('appointments.view'), 403);
         abort_if($data['push_enabled'] && ! config('mobile_notifications.push_enabled'), 422, 'Les notifications push ne sont pas encore configurées.');
         DB::transaction(function () use ($request, $data) {
-            User::whereKey($request->user()->id)->lockForUpdate()->firstOrFail();
+            $actor = $this->lockedActor($request);
+            abort_if(($data['appointment_updates'] || $data['appointment_reminders'] || $data['push_enabled']) && ! $actor->hasPermission('appointments.view'), 403);
             NotificationPreference::updateOrCreate(['user_id' => $request->user()->id], $data);
             if (! $data['push_enabled']) {
                 PushDevice::where('user_id', $request->user()->id)->delete();
@@ -73,10 +74,12 @@ class MobileNotificationController
     {
         abort_unless($request->user()->hasPermission('appointments.view'), 403);
         abort_unless(config('mobile_notifications.push_enabled'), 422, 'Transport push indisponible.');
-        abort_unless(NotificationPreference::where('user_id', $request->user()->id)->where('push_enabled', true)->exists(), 403);
         $data = $request->validate(['installation_id' => ['required', 'string', 'min:20', 'max:4096'], 'platform' => ['required', Rule::in(['android', 'ios'])]]);
         DB::transaction(function () use ($request, $data) {
-            User::whereKey($request->user()->id)->lockForUpdate()->firstOrFail();
+            $actor = $this->lockedActor($request);
+            abort_unless($actor->hasPermission('appointments.view'), 403);
+            // Même verrou que l’opt-out : une inscription en attente ne peut pas le contourner.
+            abort_unless(NotificationPreference::where('user_id', $actor->id)->where('push_enabled', true)->exists(), 403);
             $session = $request->user()->currentAccessToken()->id;
             $hash = hash('sha256', $data['installation_id']);
             PushDevice::where('installation_hash', $hash)->where('personal_access_token_id', '!=', $session)->delete();
@@ -95,5 +98,19 @@ class MobileNotificationController
         PushDevice::where('personal_access_token_id', $request->user()->currentAccessToken()->id)->delete();
 
         return response()->noContent();
+    }
+
+    /** Réserve le verrou SQLite avant lecture et recharge le compte actif pour les mutations de consentement. */
+    private function lockedActor(Request $request): User
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            User::whereKey($request->user()->id)->update(['updated_at' => DB::raw('updated_at')]);
+        }
+        $actor = User::whereKey($request->user()->id)->lockForUpdate()->firstOrFail();
+        abort_unless($actor->status === 'active', 401);
+        $token = $actor->tokens()->whereKey($request->user()->currentAccessToken()->id)->lockForUpdate()->first();
+        abort_unless($token && $token->can('mobile') && (! $token->expires_at || $token->expires_at->isFuture()), 401);
+
+        return $actor;
     }
 }

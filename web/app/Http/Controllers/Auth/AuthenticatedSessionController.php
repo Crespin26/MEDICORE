@@ -32,6 +32,8 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+        // La première requête protégée doit reconnaître le hash vérifié lors de cette connexion.
+        $request->session()->put('password_hash_web', Auth::guard('web')->hashPasswordForCookie($request->user()->getAuthPassword()));
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

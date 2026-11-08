@@ -1,7 +1,15 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// La clé de distribution est provisionnée localement et exclue du dépôt.
+val releaseKeyFile = rootProject.file("key.properties")
+val releaseKeys = Properties().apply {
+    if (releaseKeyFile.exists()) releaseKeyFile.inputStream().use { load(it) }
 }
 
 android {
@@ -29,13 +37,40 @@ android {
         versionName = flutter.versionName
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+    signingConfigs {
+        create("release") {
+            if (releaseKeyFile.exists()) {
+                keyAlias = releaseKeys.getProperty("keyAlias")
+                keyPassword = releaseKeys.getProperty("keyPassword")
+                storeFile = rootProject.file(releaseKeys.getProperty("storeFile"))
+                storePassword = releaseKeys.getProperty("storePassword")
+            }
         }
     }
+
+    buildTypes {
+        release {
+            // Aucun repli vers la clé debug : la validation release exige une clé dédiée.
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+}
+
+val validateReleaseCredentials by tasks.registering {
+    doLast {
+        check(releaseKeyFile.isFile) {
+            "Configurer android/key.properties avec une clé de distribution privée avant un build release."
+        }
+        check(listOf("storeFile", "storePassword", "keyAlias", "keyPassword").all {
+            !releaseKeys.getProperty(it).isNullOrBlank()
+        }) { "La configuration de signature release est incomplète." }
+    }
+}
+
+tasks.matching {
+    it.name.endsWith("Release") && listOf("assemble", "bundle", "package", "sign").any { prefix -> it.name.startsWith(prefix) }
+}.configureEach {
+    dependsOn(validateReleaseCredentials)
 }
 
 kotlin {

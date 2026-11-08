@@ -78,5 +78,6 @@ Ces formulations décrivent la cible du projet. Tant que les applications ne son
 
 - [Architecture et contrats du code](docs/MAINTENANCE.md).
 - [Préparation et procédure de production](docs/PRODUCTION.md).
+- [Revue de sécurité et corrections du 8 novembre 2026](docs/SECURITY-2026-11-08.md).
 
 Le lot [MOB-07 — Profil et notifications](docs/MOB-07.md) ajoute le profil mobile modifiable, les préférences, la boîte privée et les rappels. Le raccordement Firebase est implémenté mais le push reste désactivé tant que le projet n’est pas configuré.

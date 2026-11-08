@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\StaffInvitation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -56,7 +57,8 @@ class StaffController extends Controller
         try {
             $user->notify(new StaffInvitation(route('invitation.show', ['token' => $token])));
         } catch (Throwable $error) {
-            report($error);
+            // Les exceptions SMTP peuvent inclure le lien d’invitation ou des identifiants du transport.
+            Log::warning('Échec du transport d’invitation.', ['user_id' => $user->id, 'exception_class' => get_debug_type($error)]);
 
             return back()->with('status', 'Compte en attente enregistré, mais l’envoi a échoué. Vérifiez le transport e-mail puis renvoyez l’invitation.');
         }

@@ -26,6 +26,10 @@ class CheckProduction extends Command
             $issues[] = 'Construire les caches de configuration et de routes après avoir provisionné les secrets.';
         }
         $cachedConfig = app()->getCachedConfigPath();
+        $environment = app()->environmentFilePath();
+        if (is_file($environment) && (fileperms($environment) & 0027) !== 0) {
+            $issues[] = 'Le fichier .env doit rester privé (0600 ou 0640), sans écriture par le groupe ni accès aux autres utilisateurs.';
+        }
         if (is_file($cachedConfig) && (fileperms($cachedConfig) & 0007) !== 0) {
             $issues[] = 'Le cache de configuration contient les secrets et ne doit pas être lisible par les autres utilisateurs système.';
         }

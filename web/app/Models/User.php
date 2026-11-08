@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -33,9 +35,21 @@ class User extends Authenticatable
     /** Révoque tous les jetons mobiles dès que mot de passe, rôle ou statut change. */
     protected static function booted(): void
     {
+        // Tous les chemins d’écriture invalident aussi les cookies « se souvenir de moi ».
+        static::updating(function (User $user) {
+            if ($user->isDirty(['password', 'role', 'status'])) {
+                $user->remember_token = Str::random(60);
+            }
+        });
         static::updated(function (User $user) {
             if ($user->wasChanged(['password', 'role', 'status'])) {
                 $user->tokens()->delete();
+                DB::table('sessions')->where('user_id', $user->id)->delete();
+                DB::table('password_reset_tokens')->where('email', $user->email)->delete();
+            }
+            if ($user->wasChanged('email')) {
+                // Un lien émis avant le changement d’adresse ne doit jamais être réutilisé par un autre compte.
+                DB::table('password_reset_tokens')->whereIn('email', [$user->getOriginal('email'), $user->email])->delete();
             }
         });
     }

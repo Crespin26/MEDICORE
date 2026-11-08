@@ -1,0 +1,6 @@
+# Copier vers key.properties (ignoré par Git), puis renseigner les valeurs privées.
+# Utiliser un chemin absolu vers un keystore de distribution conservé hors du dépôt.
+storeFile=/chemin/prive/medicore-release.jks
+storePassword=REMPLACER_LOCALEMENT
+keyAlias=medicore-release
+keyPassword=REMPLACER_LOCALEMENT

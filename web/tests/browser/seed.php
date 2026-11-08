@@ -33,6 +33,11 @@ foreach (['admin', 'doctor', 'other-doctor', 'secretary', 'cashier', 'staff', 's
     $user->status = $role === 'suspended' ? 'suspended' : 'active';
     $user->save();
 }
+foreach (['chromium', 'small-screen', 'firefox', 'webkit'] as $browser) {
+    $user = new User(['name' => 'Recette sécurité '.$browser, 'email' => 'security-'.$browser.'@medicore.test', 'password' => 'Recette-Fictive-2026!']);
+    $user->role = 'doctor';
+    $user->save();
+}
 $patient = Patient::create(['first_name' => 'Alice', 'last_name' => 'Recette', 'birth_date' => '1990-01-01']);
 $doctor = User::where('email', 'doctor@medicore.test')->firstOrFail();
 $tomorrow = CarbonImmutable::now('Africa/Porto-Novo')->addDay()->startOfDay();

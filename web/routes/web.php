@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:medical-record.write')->group(function () {
         Route::post('patients/{patient}/medical-entries', [MedicalRecordController::class, 'store'])->name('medical-entries.store');
         Route::patch('patients/{patient}/medical-entries/{entry}', [MedicalRecordController::class, 'update'])->name('medical-entries.update');
-        Route::post('patients/{patient}/medical-documents', [MedicalDocumentController::class, 'store'])->name('medical-documents.store');
+        Route::post('patients/{patient}/medical-documents', [MedicalDocumentController::class, 'store'])->middleware('throttle:medical-upload')->name('medical-documents.store');
     });
     Route::middleware('can:billing.view')->group(function () {
         Route::get('billing', [BillingController::class, 'index'])->name('billing.index');

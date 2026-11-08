@@ -81,6 +81,27 @@ la nouvelle. Une réponse reçue après destruction du client ne publie plus de 
 
 La réinitialisation de mot de passe est réservée aux comptes actifs et ne permet pas de contourner une invitation ou une suspension.
 
+### Renforcement sécurité — 8 novembre 2026
+
+Le changement de mot de passe depuis les paramètres ferme aussi la session courante
+et demande une reconnexion. Changement/réinitialisation révoquent les sessions web
+persistantes, jetons mobiles, cookies mémorisés et liens de réinitialisation existants.
+Le mot de passe courant est revérifié sous verrou. La session web est liée au hash
+vérifié lors de la connexion, ce qui refuse un ancien cookie après changement du secret.
+
+Un changement d’adresse e-mail invalide les liens de réinitialisation de l’ancienne
+et de la nouvelle adresse. Une vérification de lien déjà en cours ne peut pas écraser
+un mot de passe ou une adresse modifiés entre-temps.
+
+La connexion web est limitée par adresse IP en plus de la limite par identifiant.
+Confirmation, changement et suppression de compte partagent une limite de cinq
+vérifications de mot de passe par minute et par compte/IP ; la réinitialisation est
+également limitée. Les mots de passe transmis sont bornés et les types invalides refusés.
+
+En production, les hôtes qui ne correspondent pas à `APP_URL` sont refusés par
+l’application, en plus du contrôle Nginx. Voir [la revue de sécurité](SECURITY-2026-11-08.md)
+pour le périmètre vérifié et la procédure de révocation lors d’une mise à niveau.
+
 ## E-mails locaux et SMTP
 
 Par défaut, `MAIL_MAILER=log` : les invitations et liens de réinitialisation sont écrits dans `web/storage/logs/laravel.log`. Aucun e-mail externe n’est envoyé. L’écran l’indique explicitement. Ces liens sont secrets : ne pas partager ni publier les journaux.

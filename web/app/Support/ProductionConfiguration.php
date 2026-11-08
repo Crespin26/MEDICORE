@@ -23,7 +23,7 @@ class ProductionConfiguration
         $require(config('session.secure') === true && config('session.http_only') === true, 'Les cookies de session doivent être Secure et HttpOnly.');
         $require(config('session.encrypt') === true, 'SESSION_ENCRYPT doit être true.');
         $require(in_array(config('session.same_site'), ['lax', 'strict'], true), 'SESSION_SAME_SITE doit être lax ou strict.');
-        $require(! in_array(config('session.driver'), ['array', 'cookie'], true), 'Utiliser un stockage de session persistant côté serveur.');
+        $require(config('session.driver') === 'database', 'SESSION_DRIVER doit être database pour la révocation persistante des sessions de ce profil.');
         $require(config('cache.default') !== 'array', 'Utiliser un cache persistant pour les limitations de requêtes.');
         $channel = config('logging.default');
         $require(in_array($channel, ['daily', 'single'], true), 'Le profil serveur utilise un journal local daily ou single.');

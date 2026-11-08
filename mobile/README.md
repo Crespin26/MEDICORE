@@ -48,3 +48,21 @@ Le lot [MOB-07](../docs/MOB-07.md) ajoute l’édition du nom/e-mail, les préf�
 la boîte privée et les rappels de rendez-vous. Appliquer sa migration backend avant
 d’utiliser la nouvelle version. Firebase est optionnel et désactivé par défaut ;
 sa configuration et une recette sur appareil sont nécessaires avant tout push réel.
+
+## Signature et protections de session
+
+La version release n’utilise plus la clé debug. Copier `android/key.properties.example`
+vers `android/key.properties`, puis fournir une clé de distribution et ses paramètres
+privés conservés hors dépôt. `key.properties`, `.jks` et `.keystore` sont ignorés par Git.
+La tâche `:app:validateReleaseCredentials` refuse une configuration absente/incomplète
+et précède les tâches de distribution release. Aucun keystore n’est créé automatiquement.
+La signature/distribution réelle reste à qualifier avec la clé du propriétaire.
+
+Après une reprise, un échec de vérification de session masque le compte jusqu’à une
+nouvelle vérification ou une déconnexion. Le clavier physique compte dans l’activité,
+sans conserver les touches, et cinq minutes sans action ferment la session locale.
+Les inscriptions push en attente sont liées à la génération de session : une ancienne
+réponse ne peut pas s’appliquer à une reconnexion, même au même compte.
+
+Voir [le rapport de sécurité](../docs/SECURITY-2026-11-08.md) pour les tests et les
+vérifications restantes sur Android/iOS réels.
